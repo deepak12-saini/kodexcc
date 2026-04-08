@@ -1,0 +1,16 @@
+<pre>Array
+(
+    [user_id] => 5
+    [category_id] => 1
+    [name] => jshsh
+    [email] => yshs
+    [mobile] => yeyw
+    [landline] => 
+    [company] => hehw
+    [address1] => hahs
+    [city] => hahw
+    [state] => ysys
+    [zip] => ysus
+    [country] => ysys
+)
+</pre>
