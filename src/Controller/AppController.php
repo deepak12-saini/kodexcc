@@ -16,6 +16,7 @@ declare(strict_types=1);
  */
 namespace App\Controller;
 
+use App\Model\LegacyModelAdapter;
 use Cake\Controller\Controller;
 
 class LegacySessionAdapter
@@ -35,6 +36,16 @@ class LegacySessionAdapter
     public function write(string $key, mixed $value): void
     {
         $this->controller->getRequest()->getSession()->write($key, $value);
+    }
+
+    public function delete(string $key): void
+    {
+        $this->controller->getRequest()->getSession()->delete($key);
+    }
+
+    public function destroy(): void
+    {
+        $this->controller->getRequest()->getSession()->destroy();
     }
 
     public function setFlash(string $message, string $element = 'default', array $options = []): void
@@ -77,23 +88,49 @@ class AppController extends Controller
     public LegacyPaginatorAdapter $Paginator;
     private array $legacyTables = [];
 
+    /**
+     * @var array<string, LegacyModelAdapter>
+     */
+    private array $legacyModelAdapters = [];
+
+    /**
+     * Reused legacy adapter per alias so state (e.g. $model->id) survives across property reads.
+     */
+    protected function legacyModel(string $name): ?LegacyModelAdapter
+    {
+        if (isset($this->legacyModelAdapters[$name])) {
+            return $this->legacyModelAdapters[$name];
+        }
+        try {
+            $this->legacyModelAdapters[$name] = new LegacyModelAdapter($this->fetchTable($name));
+        } catch (\Throwable) {
+            return null;
+        }
+
+        return $this->legacyModelAdapters[$name];
+    }
+
     public function __get(string $name): mixed
     {
         if (isset($this->legacyTables[$name])) {
             return $this->legacyTables[$name];
         }
 
+        if ($this->components()->has($name)) {
+            return $this->components()->get($name);
+        }
+
         if (preg_match('/^[A-Z][A-Za-z0-9_]*$/', $name) === 1) {
             try {
                 $this->legacyTables[$name] = $this->fetchTable($name);
+
                 return $this->legacyTables[$name];
             } catch (\Throwable) {
-                // Fall through to default undefined-property behavior.
+                // Fall through — not a table; may be other parent magic props.
             }
         }
 
-        trigger_error(sprintf('Undefined property `%s::$%s`', static::class, $name), E_USER_NOTICE);
-        return null;
+        return parent::__get($name);
     }
 
     /**
@@ -192,6 +229,27 @@ class AppController extends Controller
 		}		
 		$this->set('sessionItems',$items_list);
 	}
+	/**
+	 * Mutable POST data (replaces legacy $this->request->data reads).
+	 *
+	 * @return array<string, mixed>
+	 */
+	protected function requestData(): array
+	{
+		$d = $this->getRequest()->getData();
+		return is_array($d) ? $d : [];
+	}
+
+	/**
+	 * Replace parsed body (for legacy code that assigned to $this->request->data).
+	 *
+	 * @param array<string, mixed> $data
+	 */
+	protected function setRequestData(array $data): void
+	{
+		$this->setRequest($this->getRequest()->withParsedBody($data));
+	}
+
 	//Function 'callConstants' to define constants
 	function callConstants()	{
 		$configTable = $this->fetchTable('Config');

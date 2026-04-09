@@ -10,5 +10,8 @@ class LabelCategoryTable extends Table
     public function initialize(array $config): void
     {
         parent::initialize($config);
+
+        $this->setTable('label_category');
+        $this->setPrimaryKey('id');
     }
 }

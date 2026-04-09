@@ -146,8 +146,8 @@
 					<?php						
 						if(in_array(28,$chkuserpermission) ){
 					?>
-					<li class="<?php if($this->params['controller']=='production_reports') {echo 'active';}?>">
-						<a href="<?php echo SITEURL?>production_reports">
+					<li class="<?php if ($this->params['controller']=='ProductionReports') {echo 'active';}?>">
+						<a href="<?php echo SITEURL?>production-reports">
 							<i class="menu-icon fa fa-money "></i>
 							<span class="menu-text">Production Report</span></b>
 						</a>
@@ -197,7 +197,7 @@
 					<?php						
 						if(in_array(14,$chkuserpermission) ){
 					?>
-					<li class="<?php if (($this->params['controller']=='mailers') && $this->params['action']=='eoi') {echo 'active';}?>">
+					<li class="<?php if ((strtolower((string)$this->request->getParam('controller')) === 'mailers') && $this->request->getParam('action') === 'eoi') {echo 'active';}?>">
 						<a href="<?php echo SITEURL?>mailers/eoi">
 							<i class="menu-icon fa fa-money "></i>
 							<span class="menu-text">EOI Mailer List</span></b>
@@ -208,7 +208,7 @@
 					<?php						
 						if(in_array(15,$chkuserpermission) ){
 					?>
-					<li class="<?php if ($this->params['controller']=='mailers' && $this->params['action']=='index') {echo 'active';}?>">
+					<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'mailers' && $this->request->getParam('action') === 'index') {echo 'active';}?>">
 						<a href="<?php echo SITEURL?>mailers">
 							<i class="menu-icon fa fa-image "></i>
 							<span class="menu-text">DuroEzy Spec</span></b>

@@ -10,5 +10,13 @@ class LabelTable extends Table
     public function initialize(array $config): void
     {
         parent::initialize($config);
+
+        $this->setTable('label');
+        $this->setPrimaryKey('id');
+
+        $this->belongsTo('LabelCategory', [
+            'foreignKey' => 'category_id',
+            'joinType' => 'LEFT',
+        ]);
     }
 }

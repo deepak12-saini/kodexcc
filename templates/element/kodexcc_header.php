@@ -68,22 +68,19 @@ $getpro = $this->requestAction('/app/getcate');
 				<?php
 					foreach($getpro as $getpros)
 					{
-						$slug = $getpros['Category']['slug'];
-						if($slug == 'waterproofing-membranes')
-						{
+						$slug = $getpros['Category']['slug'] ?? '';
+						$cate = 'other';
+						if ($slug === 'waterproofing-membranes') {
 							$cate = 'waterproofing';
-						}else if($slug == 'sealants-silicones')
-						{
+						} elseif ($slug === 'sealants-silicones') {
 							$cate = 'sealants';
-						}else if($slug == 'primers')
-						{
+						} elseif ($slug === 'primers') {
 							$cate = 'primers';
-						}else if($slug == 'waterproofing-tapes')
-						{
+						} elseif ($slug === 'waterproofing-tapes') {
 							$cate = 'adhesives';
 						}
 				?>
-				<li class="sitemenu_submenu-li no-submenu pcat pcat_<?= $cate; ?>">
+				<li class="sitemenu_submenu-li no-submenu pcat pcat_<?php echo h($cate); ?>">
 					<a class="sitemenu_submenu-a" href="<?php echo SITEURL.'products/'.$getpros['Category']['slug']; ?>"><?php echo $getpros['Category']['category_name']; ?></a>								
 						<div class="product-dropdown-menu">
 						<div class="product-menu">

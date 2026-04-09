@@ -9,7 +9,7 @@
 	<div class="row">
 		<div class="col-xs-12">
 	
-		<?php echo $this->Form->create('Product',array('class'=>'form-horizontal','role'=>'form','enctype'=>'multipart/form-data'));?>
+		<?php echo $this->Form->create(null, ['class' => 'form-horizontal', 'role' => 'form', 'type' => 'file']); ?>
 			<div class="form-group">
 				<label class="col-sm-3 control-label no-padding-right" for="form-field-1"> Category: </label>
 				<div class="col-sm-9">

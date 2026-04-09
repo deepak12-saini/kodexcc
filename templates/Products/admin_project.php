@@ -1,7 +1,7 @@
 	<div class="page-content">
 		<div class="page-header">
 			<h1>			
-			Product Project Images	 <?php echo $this->Html->link('Add Images',array('controller' => 'products','action' => 'admin_projectadd/'.$product_id),array('class'=>'btn btn-info btn-xs top-button')); ?>	
+			Product Project Images	 <a href="<?php echo SITEURL; ?>admin/products/project-add/<?php echo h($product_id); ?>" class="btn btn-info btn-xs top-button">Add Images</a>	
 
 			<a href="<?php echo SITEURL; ?>admin/products" class='btn btn-info btn-xs top-button' style="float:right;">Back</a>	
 			</h1>
@@ -32,7 +32,7 @@
 					
                     <td> <?php echo date('d-M-Y',strtotime($imageArrs['Project']['created'])); ?></td>
 					 <td class="actions">
-						<?php echo $this->Form->postLink(__('Delete'), array('action' => 'projectdelete', $product_id,$imageArrs['Project']['id']), array('class'=>'btn btn-mini btn-danger','style'=>'margin-top:2px;'), __('Are you sure you want to delete # %s?', $imageArrs['Project']['id'])); ?>
+						<?php echo $this->Form->postLink(__('Delete'), ['action' => 'projectDelete', $product_id, $imageArrs['Project']['id']], ['class'=>'btn btn-mini btn-danger','style'=>'margin-top:2px;'], __('Are you sure you want to delete # %s?', $imageArrs['Project']['id'])); ?>
 						
 						</td>
 					</tr>

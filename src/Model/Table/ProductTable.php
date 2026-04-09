@@ -19,5 +19,14 @@ class ProductTable extends Table
             'foreignKey' => 'category_id',
             'joinType' => 'LEFT',
         ]);
+
+        $this->addBehavior('Timestamp', [
+            'events' => [
+                'Model.beforeSave' => [
+                    'created' => 'new',
+                    'modified' => 'always',
+                ],
+            ],
+        ]);
     }
 }

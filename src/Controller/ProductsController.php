@@ -77,6 +77,7 @@ class ProductsController extends AppController
             $this->set('products', $legacyProducts);
             $this->set('slug', $slug);
             $this->set('category_name', $category['category_name'] ?? ucfirst($slug));
+            $this->set('category_image', $category['image'] ?? '');
             $this->set('meta_title', $category['meta_title'] ?? null);
             $this->set('meta_description', $category['meta_description'] ?? null);
             $this->set('meta_keyword', $category['meta_keyword'] ?? null);

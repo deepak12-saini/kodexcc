@@ -108,6 +108,16 @@ header("Content-Security-Policy: frame-ancestors 'none'");
 			background-size: cover;
 		}
 	}
+	/* Products landing banner: anchor background so left-side logo/badge are not cropped (cover + center was clipping) */
+	.page-banner.page-banner-products.bg-img {
+		background-position: left center;
+	}
+	@media (max-width: 850px) {
+		.page-banner.page-banner-products.bg-img {
+			background-position: left top;
+		}
+	}
+
 	.error{ color: #e43d3c; }
 	</style>
 	<!-- Google tag (gtag.js) -->

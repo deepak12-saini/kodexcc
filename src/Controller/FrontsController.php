@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Cake\Event\EventInterface;
+use Cake\Mailer\Mailer;
 
 class FrontsController extends AppController{
 	public $helpers = array('Html','Form','Session');
@@ -174,25 +175,19 @@ class FrontsController extends AppController{
 							</body>
 						</html>';		
 
-						try{	
-						
+						try{
 							$subject = SITENAME.' :: Contact Us';
-							//$to = 'web@xoroglobal.com';					
-							$to = 'kal@kodexcc.com';					
-							require $_SERVER['DOCUMENT_ROOT'].'/app/webroot/DuroEzy/sendgrid/vendor/autoload.php';
-							$from = 'noreply@kodexcc.com';	
-							$from = new SendGrid\Email("Kodexcc", $from);
-							$to = new SendGrid\Email("Kodexcc", $to);
-							$content = new SendGrid\Content("text/html", $html);	
-							$mail = new SendGrid\Mail($from, $subject, $to, $content);
-							$apiKey = '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';
-							$sg = new \SendGrid($apiKey);		
-							$response = $sg->client->mail()->send()->post($mail); 
-							
-								
-						}catch (Exception $e){
-							
-						}									
+							$to = 'info@kodexcc.com';
+                            (new Mailer())
+                                ->setTransport('default')
+                                ->setFrom(['info@kodexcc.com' => 'Kodexcc'])
+                                ->setTo($to)
+                                ->setSubject($subject)
+                                ->setEmailFormat('html')
+                                ->deliver($html);
+						} catch (\Throwable $e) {
+                            // Do not block form submission if email sending fails.
+						}
 						$this->Session->setFlash('Your mesage has been sent successfully.','default',array('class' => 'alert alert-success'));
 						$this->redirect('/contact-us');						
 					

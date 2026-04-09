@@ -23,7 +23,7 @@
 <head>
 	<?php echo $this->Html->charset(); ?>
 	<title>
-		<?php echo $title_for_layout; ?>
+		<?php echo h($title_for_layout ?? $this->fetch('title') ?: 'Admin'); ?>
 	</title>
 	<link href="<?php echo SITEURL ;?>favicon.png" type="image/x-icon" rel="icon" />
 		<meta name="google-site-verification" content="R50rW2j4zN6nENTDOVPfRsczHvMGGOTDBu8Tkag5ltg" />

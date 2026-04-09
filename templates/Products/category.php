@@ -27,7 +27,7 @@
 	.divd{ display:inline-block; margin-right:8px}
 	</style>	
 	<main class="page-body page-body-2">
-	<section class="vc-row vc-row-o bg-img page-banner" style="background-image:url('<?php echo SITEURL ;?>wp-content/uploads/Our-Products.png');">
+	<section class="vc-row vc-row-o bg-img page-banner page-banner-products" style="background-image:url('<?php echo SITEURL ;?>wp-content/uploads/Our-Products.png');">
 		<div class="vc-col vc-col-o banner-content ctn ctn-lg">	
 			<h1 class="hd"></h1>
 		</div>

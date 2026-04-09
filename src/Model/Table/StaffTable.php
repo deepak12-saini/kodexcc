@@ -10,5 +10,7 @@ class StaffTable extends Table
     public function initialize(array $config): void
     {
         parent::initialize($config);
+
+        $this->setTable('staff');
     }
 }

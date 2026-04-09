@@ -10,5 +10,8 @@ class VocCertificateTable extends Table
     public function initialize(array $config): void
     {
         parent::initialize($config);
+
+        $this->setTable('voc_certificate');
+        $this->setPrimaryKey('id');
     }
 }

@@ -36,6 +36,7 @@
 	</style>
 	<?php
 		$desc = '';
+		$banner = 'Banner-Waterproofing.jpg';
 		$slug = $products['Category']['slug'];
 		if($slug == 'waterproofing-membranes')
 		{			
@@ -49,6 +50,11 @@
 		}else if($slug == 'waterproofing-tapes')
 		{			
 			$banner = 'Banner-Tapes.jpg';
+		}
+
+		$datasheetHref = (string)($products['Product']['datasheet'] ?? '');
+		if ($datasheetHref !== '' && !preg_match('#^https?://#i', $datasheetHref)) {
+			$datasheetHref = SITEURL . 'productimg/' . ltrim($datasheetHref, '/');
 		}
 	
 	?>
@@ -147,7 +153,7 @@
 						<div id="document-gallery-1" class="document-gallery" >
 							<div class='document-icon-row'>
 								<div class="document-icon" data-id="7185">
-									<a href="<?php echo $products['Product']['datasheet']; ?>" target="_blank" title="Download <?php echo ucfirst(($products['Product']['title'])); ?>">
+									<a href="<?php echo h($datasheetHref); ?>" target="_blank" title="Download <?php echo ucfirst(($products['Product']['title'])); ?>">
 										<!--img src="" title="<?php echo ucfirst(($products['Product']['title'])); ?>" alt="<?php echo ucfirst(($products['Product']['title'])); ?>" data-ext="pdf"/-->
 										<span class="title btn"><?php echo ucfirst(($products['Product']['title'])); ?> &#8211; Product Data Sheet</span>
 									</a>

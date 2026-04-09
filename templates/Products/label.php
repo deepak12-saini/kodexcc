@@ -14,11 +14,12 @@
 		<h1>			
 		Product Label List			
 		<form action="" method="post" style="float:right;">
-			<select  name="data[label_cate_id]" id="category_id">
+			<?php $filterCatId = $category_id ?? $label_cate_id ?? ''; ?>
+			<select name="category_id" id="category_id">
 				<option value="">Please select category</option>
-				<?php foreach($LabelCategory as $LabelCategoryArr){?>
-					<option <?php if($label_cate_id == $LabelCategoryArr['LabelCategory']['id']){ echo 'selected'; }  ?>  value="<?php echo $LabelCategoryArr['LabelCategory']['id']?>" ><?php echo $LabelCategoryArr['LabelCategory']['category']?></option>
-				<?php }?>
+				<?php foreach ($LabelCategory as $LabelCategoryArr) { ?>
+					<option <?php if ((string)$filterCatId === (string)($LabelCategoryArr['LabelCategory']['id'] ?? '')) { echo 'selected'; } ?> value="<?php echo h($LabelCategoryArr['LabelCategory']['id'] ?? ''); ?>"><?php echo h($LabelCategoryArr['LabelCategory']['category'] ?? $LabelCategoryArr['LabelCategory']['name'] ?? ''); ?></option>
+				<?php } ?>
 			</select>
 			
 			<input type="text" name="label" value="<?php echo $label; ?>" placeholder="Search By Label" >
@@ -68,10 +69,10 @@
 						<?php if(!empty($labelArr)){ $i=1;  foreach ($labelArr as $labelArrs): ?>
 					<tr>
 						<td>#<?php echo $i; ?>&nbsp;</td>
-						<td><?php echo h($labelArrs['LabelCategory']['category']); ?>&nbsp;</td>		
-						<td><?php echo h($labelArrs['Label']['name']); ?>&nbsp;</td>					
-						<td><?php echo h($labelArrs['Label']['weight']); ?>&nbsp;</td>
-						<td><a href="<?php echo SITEURL.'products/download/'.$labelArrs['Label']['url']; ?>"><?php echo $labelArrs['Label']['url']; ?></a>&nbsp;</td>					
+						<td><?php echo h($labelArrs['LabelCategory']['category'] ?? $labelArrs['LabelCategory']['name'] ?? ''); ?>&nbsp;</td>
+						<td><?php echo h($labelArrs['Label']['name'] ?? ''); ?>&nbsp;</td>
+						<td><?php echo h($labelArrs['Label']['weight'] ?? ''); ?>&nbsp;</td>
+						<td><?php $u = $labelArrs['Label']['url'] ?? ''; ?><?php if ($u !== '') { ?><a href="<?php echo SITEURL . 'products/download/' . h($u); ?>"><?php echo h($u); ?></a><?php } ?>&nbsp;</td>					
 								
 					</tr>
 					<?php $i++; endforeach; }else{ ?>

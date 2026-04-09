@@ -36,6 +36,13 @@
 	} */
 	</style>
 	<?php
+		// Safe defaults for newly imported categories.
+		$cate = 'category_250.jpg';
+		$banner = 'Banner-Waterproofing.jpg';
+		$categoryIcon = '';
+		if (!empty($category_image)) {
+			$categoryIcon = SITEURL . 'category/' . ltrim((string)$category_image, '/');
+		}
 		$desc = '';
 		if($slug == 'waterproofing-membranes')
 		{
@@ -82,7 +89,7 @@
 	
 	<section class="vc-row vc-row-o sec-gap">
 		<div class="vc-col vc-col-o ctn txt-center txt-block">			
-			<img class="img above-cat-hd-icon" src="<?php echo SITEURL.'wp-content/'.$cate; ?>" alt="<?php echo ucfirst($category_name); ?>">
+			<img class="img above-cat-hd-icon" src="<?php echo h($categoryIcon !== '' ? $categoryIcon : (SITEURL.'wp-content/'.$cate)); ?>" alt="<?php echo ucfirst($category_name); ?>">
 			<h2 class="hd txt-accessories hd-lg p"><?php echo ucfirst($category_name); ?></h2>
 			<div class="txt-content txt-xl p">
 				<p><?= $desc; ?></p>

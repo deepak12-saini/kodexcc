@@ -39,6 +39,9 @@ class AppView extends View
      */
     public function initialize(): void
     {
+        $this->loadHelper('Flash');
+        $this->loadHelper('Session');
+        $this->loadHelper('params');
     }
 
     /**

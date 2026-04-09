@@ -9,17 +9,17 @@
 	<div class="row">
 		<div class="col-xs-12">
 	
-		<?php echo $this->Form->create('Product',array('class'=>'form-horizontal','role'=>'form','enctype'=>'multipart/form-data'));?>
+		<?php echo $this->Form->create(null, ['class' => 'form-horizontal', 'role' => 'form', 'type' => 'file']); ?>
 		
 			<div class="form-group">
 				<label class="col-sm-3 control-label no-padding-right" for="form-field-1"> Label Category: </label>
 				<div class="col-sm-9">
 				
-					<select class="col-xs-10 col-sm-5" name="data[Label][label_cate_id]" id="category_id">
+					<select class="col-xs-10 col-sm-5" name="data[Label][category_id]" id="category_id">
 					<option value="">Please select Label category </option>
-						<?php foreach($LabelCategory as $LabelCategoryArr){?>
-							<option value="<?php echo $LabelCategoryArr['LabelCategory']['id']?>" ><?php echo $LabelCategoryArr['LabelCategory']['category']?></option>
-						<?php }?>
+						<?php foreach ($LabelCategory as $LabelCategoryArr) { ?>
+							<option value="<?php echo h($LabelCategoryArr['LabelCategory']['id'] ?? ''); ?>"><?php echo h($LabelCategoryArr['LabelCategory']['category'] ?? $LabelCategoryArr['LabelCategory']['name'] ?? ''); ?></option>
+						<?php } ?>
 					</select>
 
 				</div>

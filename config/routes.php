@@ -49,7 +49,29 @@ return function (RouteBuilder $routes): void {
      */
     $routes->setRouteClass(DashedRoute::class);
 
+    /*
+     * Admin prefix: enables URL generation for ['prefix' => 'Admin', 'controller' => 'Users', ...]
+     * e.g. /admin/users/login, /admin/users/forgot-password, /admin/users/dashboard
+     */
+    $routes->prefix('Admin', function (RouteBuilder $builder): void {
+        $builder->setRouteClass(DashedRoute::class);
+        // Legacy URL `admin/mailers/sendemail/{id}` → MailersController::sendSpecificationEmail (not AppController::sendemail).
+        $builder->connect(
+            '/mailers/sendemail/{id}',
+            ['controller' => 'Mailers', 'action' => 'sendSpecificationEmail'],
+            ['pass' => ['id'], 'id' => '\d+'],
+        );
+        $builder->fallbacks();
+    });
+
     $routes->scope('/', function (RouteBuilder $builder): void {
+        // Allow legacy DuroEzy PDF links like `/dompdf/1234-5678.pdf`.
+        $builder->connect(
+            '/dompdf/{file}',
+            ['controller' => 'Dompdf', 'action' => 'download'],
+            ['pass' => ['file'], 'file' => '.*\.pdf'],
+        );
+
         /*
          * Here, we are connecting '/' (base path) to a controller called 'Pages',
          * its action called 'display', and we pass a param to select the view file

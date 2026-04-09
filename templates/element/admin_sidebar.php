@@ -29,15 +29,15 @@
 					</li>
 					
 					<li class="<?php if ($this->params['controller']=='ProductionReports') { echo 'active';}?>">
-						<a href="<?php echo SITEURL?>admin/ProductionReports">
+						<a href="<?php echo SITEURL?>admin/production-reports">
 							<i class="menu-icon fa fa-file"></i>
 							<span class="menu-text"> Production Reports </span>
 						</a>
 
 						<b class="arrow"></b>
 					</li>
-					<li class="<?php if ($this->params['controller']=='reward_products') { echo 'active';}?>">
-						<a href="<?php echo SITEURL?>admin/reward_products">
+					<li class="<?php if ($this->params['controller']=='RewardProducts') { echo 'active';}?>">
+						<a href="<?php echo SITEURL?>admin/reward-products">
 							<i class="menu-icon fa fa-file"></i>
 							<span class="menu-text">Reward Products</span>
 						</a>
@@ -240,13 +240,13 @@
 
 					</li>
 					<?php // } ?>
-					<li class="<?php if ($this->params['controller']=='mailers') {echo 'active';}?>">
+					<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'mailers') {echo 'active';}?>">
 						<a href="<?php echo SITEURL?>admin/mailers">
 							<i class="menu-icon fa fa-image "></i>
 							<span class="menu-text">DuroEzy Spec</span></b>
 						</a>
 					</li>
-					<li class="<?php if ($this->params['controller']=='tasks') {echo 'active';}?>">
+					<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'tasks') {echo 'active';}?>">
 						<a href="<?php echo SITEURL.'admin/tasks/type'; ?>">
 							<i class="menu-icon fa fa-flask"></i>
 							<span class="menu-text">DuroLab</span>
@@ -257,7 +257,7 @@
 
 					<?php  } ?>
 					
-					<li class="<?php if ($this->params['controller']=='categories' || $this->params['controller']=='products') {echo 'active';}?>">
+					<li class="<?php if ($this->params['controller']=='Categories' || $this->params['controller']=='Subcategories' || $this->params['controller']=='Products') {echo 'active';}?>">
 						<a href="#" class="dropdown-toggle">
 							<i class="menu-icon fa fa-bars "></i>
 							<span class="menu-text"> Product</span>
@@ -269,21 +269,28 @@
 
 						<ul class="submenu">
 							
-							<li class="<?php if ($this->params['controller']=='categories') {echo 'active';}?>">
+							<li class="<?php if ($this->params['controller']=='Categories') {echo 'active';}?>">
 								<a href="<?php echo SITEURL?>admin/categories">
 									<i class="menu-icon fa fa-setting"></i>
 									Category
 								</a>
 								<b class="arrow"></b>
 							</li>
-							<li class="<?php if ($this->params['controller']=='products' && $this->params['action']=='admin_index') {echo 'active';}?>">
+							<li class="<?php if ($this->params['controller']=='Subcategories') {echo 'active';}?>">
+								<a href="<?php echo SITEURL?>admin/subcategories">
+									<i class="menu-icon fa fa-setting"></i>
+									Subcategory
+								</a>
+								<b class="arrow"></b>
+							</li>
+							<li class="<?php if ($this->params['controller']=='Products' && $this->params['action']=='index') {echo 'active';}?>">
 								<a href="<?php echo SITEURL?>admin/products">
 									<i class="menu-icon fa fa-setting"></i>
 									Product List
 								</a>
 								<b class="arrow"></b>
 							</li>
-							<li class="<?php if ($this->params['controller']=='products' && $this->params['action']=='admin_label') {echo 'active';}?>">
+							<li class="<?php if ($this->params['controller']=='Products' && $this->params['action']=='label') {echo 'active';}?>">
 								<a href="<?php echo SITEURL?>admin/products/label">
 									<i class="menu-icon fa fa-setting"></i>
 									Product Label
@@ -291,8 +298,8 @@
 								<b class="arrow"></b>
 							</li>
 							
-							<li class="<?php if($this->params['controller']=='products'  && $this->params['action']=='admin_voc_vertificate') { echo 'active'; }?>">
-								<a href="<?php echo SITEURL?>admin/products/voc_vertificate">
+							<li class="<?php if($this->params['controller']=='Products'  && $this->params['action']=='vocVertificate') { echo 'active'; }?>">
+								<a href="<?php echo SITEURL?>admin/products/voc-vertificate">
 									<i class="menu-icon fa fa-setting"></i>
 									Voc Certificate
 								</a>
@@ -306,7 +313,7 @@
 							<span class="menu-text"> Staff List</span></b>
 						</a>
 					</li>
-					<li class="<?php if ($this->params['controller']=='users' && $this->params['action']=='admin_customer') {echo 'active';}?>">
+					<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'users' && $this->request->getParam('action') === 'customer') {echo 'active';}?>">
 						<a href="<?php echo SITEURL?>admin/users/customer">
 							<i class="menu-icon fa fa-user "></i>
 							<span class="menu-text">Customers </span></b>
@@ -646,8 +653,8 @@
 
 								<b class="arrow"></b>
 							</li>
-							<li class="<?php if ($this->params['controller']=='users' && $this->params['action']=='admin_web_setting') {echo 'active';}?>">
-								<a href="<?php echo SITEURL;?>admin/users/web_setting">
+							<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'users' && in_array((string)$this->request->getParam('action'), ['web_setting', 'webSetting'], true)) {echo 'active';}?>">
+								<a href="<?php echo SITEURL;?>admin/users/web-setting">
 									<i class="menu-icon fa fa-setting"></i>
 									Website Settings
 								</a>

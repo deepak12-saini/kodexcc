@@ -28,7 +28,7 @@ require 'sendgrid/vendor/autoload.php';
 	  </div>  
 	</div>';
 	
-	$filePath = $_SERVER['DOCUMENT_ROOT'].'/customdurotech/app/webroot/dompdf/'.$pdfname;
+	$filePath = dirname(__DIR__) . '/dompdf/' . $pdfname;
 	
 	try{
 		$senderemail = 'sales@durotechindustries.com.au';

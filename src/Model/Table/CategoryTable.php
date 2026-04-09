@@ -18,5 +18,9 @@ class CategoryTable extends Table
             'className' => 'Product',
             'foreignKey' => 'category_id',
         ]);
+
+        $this->hasMany('Subcategory', [
+            'foreignKey' => 'category_id',
+        ]);
     }
 }
