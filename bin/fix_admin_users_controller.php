@@ -25,7 +25,7 @@ $actions = [
     'dashboard', 'staff', 'customer', 'salemeet', 'payment_setting', 'web_setting',
     'profile', 'labfile', 'contact', 'permission', 'subscriber_list', 'contactus',
     'loginhisotry', 'quizz', 'change_password', 'add_staff', 'uploadprodcut',
-    'customerpermission', 'natspec_presentation_status', 'cpd_presentation_status',
+    'customerpermission', 'natspecPresentationStatus', 'cpdPresentationStatus',
     'accesstouser', 'forgot_password', 'edit_staff', 'edit_new_staff', 'updatelabfile',
 ];
 foreach ($actions as $a) {

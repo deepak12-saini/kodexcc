@@ -10,5 +10,7 @@ class RewardPointTable extends Table
     public function initialize(array $config): void
     {
         parent::initialize($config);
+        $this->setTable('reward_point');
+        $this->setPrimaryKey('id');
     }
 }

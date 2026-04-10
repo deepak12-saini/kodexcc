@@ -21,20 +21,42 @@
 
 								<div class="space-6"></div>
 
-								<?php echo $this->Form->create('User',array('action'=> 'login','name'=>'loginForm','id'=>'loginForm'));?>
+								<?php echo $this->Form->create(null, [
+									'url' => ['controller' => 'Users', 'action' => 'login'],
+									'name' => 'loginForm',
+									'id' => 'loginForm',
+								]); ?>
 								<?php echo $this->Session->flash(); ?>
 									<fieldset>
 										<label class="block clearfix">
 											<span class="block input-icon input-icon-right">
-												
-												<?php echo $this->Form->input('NappUser.email',array('div'=>false,'label'=>false, 'class' => array('form-control'),'placeholder'=>'Email','id'=>'email'))?>
+												<?php echo $this->Form->control('NappUser.email', [
+													'label' => false,
+													'templates' => [
+														'inputContainer' => '{{content}}',
+														'inputContainerError' => '{{content}}',
+													],
+													'class' => 'form-control',
+													'placeholder' => 'Email',
+													'id' => 'email',
+												]); ?>
 												<i class="ace-icon fa fa-user"></i>
 											</span>
 										</label>
 
 										<label class="block clearfix">
 											<span class="block input-icon input-icon-right">
-												<?php echo $this->Form->input('NappUser.password',array('div'=>false,'label'=>false, 'class' =>array('form-control') ,'placeholder'=>'Password','type' =>'password','id'=>'password'))?>
+												<?php echo $this->Form->control('NappUser.password', [
+													'label' => false,
+													'type' => 'password',
+													'templates' => [
+														'inputContainer' => '{{content}}',
+														'inputContainerError' => '{{content}}',
+													],
+													'class' => 'form-control',
+													'placeholder' => 'Password',
+													'id' => 'password',
+												]); ?>
 												<i class="ace-icon fa fa-lock"></i>
 											</span>
 										</label>
@@ -46,7 +68,7 @@
 												<input type="checkbox" class="ace" />
 												<span class="lbl"> Remember Me</span>
 											</label-->
-												<?php echo $this->Form->submit('Login',array('div'=>false,'class'=>'width-35 pull-right btn btn-sm btn-primary'));?>
+												<?php echo $this->Form->submit('Login', ['class' => 'width-35 pull-right btn btn-sm btn-primary']); ?>
 											<!--button type="button" class="width-35 pull-right btn btn-sm btn-primary">
 												<i class="ace-icon fa fa-key"></i>
 												<span class="bigger-110">Login</span>
@@ -109,25 +131,37 @@
 									Enter your email and to receive instructions
 								</p>
 
-								<form action="<?php echo SITEURL.'users/send_forgot_password'?>" method="post">
+								<?php echo $this->Form->create(null, [
+									'url' => SITEURL . 'users/send_forgot_password',
+									'method' => 'post',
+								]); ?>
 								<?php echo $this->Session->flash(); ?>
 									<fieldset>
 										<label class="block clearfix">
 											<span class="block input-icon input-icon-right">
-												<?php echo $this->Form->input('User.email',array('div'=>false,'label'=>false, 'class' => array('form-control'),'placeholder'=>'Email','id'=>'uemail'))?>
+												<?php echo $this->Form->control('User.email', [
+													'label' => false,
+													'templates' => [
+														'inputContainer' => '{{content}}',
+														'inputContainerError' => '{{content}}',
+													],
+													'class' => 'form-control',
+													'placeholder' => 'Email',
+													'id' => 'uemail',
+												]); ?>
 												<i class="ace-icon fa fa-envelope"></i>
 											</span>
 										</label>
 
 										<div class="clearfix">
-										<?php echo $this->Form->submit('Send Me',array('div'=>false,'class'=>'width-35 pull-right btn btn-xs btn-danger'));?>
+										<?php echo $this->Form->submit('Send Me', ['class' => 'width-35 pull-right btn btn-xs btn-danger']); ?>
 											<!--button type="button" class="width-35 pull-right btn btn-sm btn-danger">
 												<i class="ace-icon fa fa-lightbulb-o"></i>
 												<span class="bigger-110">Send Me!</span>
 											</button-->
 										</div>
 									</fieldset>
-								</form>
+								<?php echo $this->Form->end(); ?>
 							</div><!-- /.widget-main -->
 
 							<div class="toolbar center">
@@ -150,42 +184,91 @@
 								<div class="space-6"></div>
 								<p> Enter your details to begin: </p>
 
-								<form action="<?php echo SITEURL.'users/register'?>" method="post">
+								<?php echo $this->Form->create(null, [
+									'url' => ['controller' => 'Users', 'action' => 'register'],
+								]); ?>
 									<fieldset>
 										<label class="block clearfix">
 											<span class="block input-icon input-icon-right">
-												<select name="data[NappUser][is_staff_id" id="is_staff_id">
-													<option value="">Select Register Type</option>
-													<option value="0" >Employee</select>
-													<option value="1" >Staff</select>
-												</select>
+												<?php echo $this->Form->control('NappUser.is_staff_id', [
+													'label' => false,
+													'type' => 'select',
+													'options' => [
+														'0' => 'Employee',
+														'1' => 'Staff',
+													],
+													'empty' => 'Select Register Type',
+													'templates' => [
+														'inputContainer' => '{{content}}',
+														'inputContainerError' => '{{content}}',
+													],
+													'class' => 'form-control',
+													'id' => 'is_staff_id',
+												]); ?>
 											</span>
 										</label>
 										<label class="block clearfix">
 											<span class="block input-icon input-icon-right">
-												<input type="text" class="form-control" name="data[NappUser][name]" id="Cname" placeholder="First Name" />
+												<?php echo $this->Form->control('NappUser.name', [
+													'label' => false,
+													'templates' => [
+														'inputContainer' => '{{content}}',
+														'inputContainerError' => '{{content}}',
+													],
+													'class' => 'form-control',
+													'placeholder' => 'First Name',
+													'id' => 'Cname',
+												]); ?>
 												<i class="ace-icon fa fa-user"></i>
 											</span>
 										</label>
 										<label class="block clearfix">
 											<span class="block input-icon input-icon-right">
-												<input type="text" class="form-control" name="data[NappUser][lname]" id="Clname" placeholder="Last Name" />
+												<?php echo $this->Form->control('NappUser.lname', [
+													'label' => false,
+													'templates' => [
+														'inputContainer' => '{{content}}',
+														'inputContainerError' => '{{content}}',
+													],
+													'class' => 'form-control',
+													'placeholder' => 'Last Name',
+													'id' => 'Clname',
+												]); ?>
 												<i class="ace-icon fa fa-user"></i>
 											</span>
 										</label>
 										<label class="block clearfix">
 											<span class="block input-icon input-icon-right">
-												<input type="email" class="form-control" name="data[NappUser][email]" id="Cemail" placeholder="Email" />
+												<?php echo $this->Form->control('NappUser.email', [
+													'label' => false,
+													'type' => 'email',
+													'templates' => [
+														'inputContainer' => '{{content}}',
+														'inputContainerError' => '{{content}}',
+													],
+													'class' => 'form-control',
+													'placeholder' => 'Email',
+													'id' => 'Cemail',
+												]); ?>
 												<i class="ace-icon fa fa-envelope"></i>
 											</span>
 										</label>
 										<label class="block clearfix">
 											<span class="block input-icon input-icon-right">
-												<input type="password" class="form-control" name="data[NappUser][password]" id="Cpassword" placeholder="Password" />
+												<?php echo $this->Form->control('NappUser.password', [
+													'label' => false,
+													'type' => 'password',
+													'templates' => [
+														'inputContainer' => '{{content}}',
+														'inputContainerError' => '{{content}}',
+													],
+													'class' => 'form-control',
+													'placeholder' => 'Password',
+													'id' => 'Cpassword',
+												]); ?>
 												<i class="ace-icon fa fa-lock"></i>
 											</span>
 										</label>
-
 
 										<div class="space-24"></div>
 
@@ -202,7 +285,7 @@
 											</button>
 										</div>
 									</fieldset>
-								</form>
+								<?php echo $this->Form->end(); ?>
 							</div>
 
 							<div class="toolbar center">

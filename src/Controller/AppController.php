@@ -250,6 +250,24 @@ class AppController extends Controller
 		$this->setRequest($this->getRequest()->withParsedBody($data));
 	}
 
+	/**
+	 * CRM views use fname / mobile; init_schema rows may only populate name / phone.
+	 *
+	 * @param array<string, mixed> $client
+	 * @return array<string, mixed>
+	 */
+	protected function mergeClientLegacyDisplayFields(array $client): array
+	{
+		if (($client['fname'] ?? '') === '' && ($client['name'] ?? '') !== '') {
+			$client['fname'] = $client['name'];
+		}
+		if (($client['mobile'] ?? '') === '' && ($client['phone'] ?? '') !== '') {
+			$client['mobile'] = $client['phone'];
+		}
+
+		return $client;
+	}
+
 	//Function 'callConstants' to define constants
 	function callConstants()	{
 		$configTable = $this->fetchTable('Config');

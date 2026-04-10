@@ -44,39 +44,39 @@
 
 						<b class="arrow"></b>
 					</li>
-					<li class="<?php if ($this->params['controller']=='duro_orders' && $this->params['action']=='admin_userreward') { echo 'active';}?>">
-						<a href="<?php echo SITEURL?>admin/duro_orders/userreward">
+					<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'duroorders' && $this->request->getParam('action') === 'userreward') { echo 'active';}?>">
+						<a href="<?php echo SITEURL?>admin/duro-orders/userreward">
 							<i class="menu-icon fa fa-file"></i>
 							<span class="menu-text">Reward Points</span>
 						</a>
 
 						<b class="arrow"></b>
 					</li>
-					<li class="<?php if ($this->params['controller']=='duro_orders' && $this->params['action']=='admin_feedback') { echo 'active';}?>">
-						<a href="<?php echo SITEURL?>admin/duro_orders/feedback">
+					<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'duroorders' && $this->request->getParam('action') === 'feedback') { echo 'active';}?>">
+						<a href="<?php echo SITEURL?>admin/duro-orders/feedback">
 							<i class="menu-icon fa fa-file"></i>
 							<span class="menu-text">Sample Feedback</span>
 						</a>
 
 						<b class="arrow"></b>
 					</li>
-					<li class="<?php if ($this->params['controller']=='label_stocks') { echo 'active';}?>">
-						<a href="<?php echo SITEURL?>admin/label_stocks">
+					<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'labelstocks') { echo 'active';}?>">
+						<a href="<?php echo SITEURL?>admin/label-stocks">
 							<i class="menu-icon fa fa-user"></i>
 							<span class="menu-text"> Label Stock </span>
 						</a>
 
 						<b class="arrow"></b>
 					</li>
-					<li class="<?php if ($this->params['controller']=='package_stocks') { echo 'active';}?>">
-						<a href="<?php echo SITEURL?>admin/package_stocks">
+					<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'packagestocks') { echo 'active';}?>">
+						<a href="<?php echo SITEURL?>admin/package-stocks">
 							<i class="menu-icon fa fa-user"></i>
 							<span class="menu-text"> Package Stock </span>
 						</a>
 
 						<b class="arrow"></b>
 					</li>
-					<li class="<?php if ($this->params['controller']=='purchases') { echo 'active';}?>">
+					<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'purchases') { echo 'active';}?>">
 						<a href="<?php echo SITEURL?>admin/purchases">
 							<i class="menu-icon fa fa-file"></i>
 							<span class="menu-text">Purchase Request</span>
@@ -89,15 +89,15 @@
 					if($userid != 7){ ?>
 					
 					
-					<li class="<?php if ($this->params['controller']=='duro_orders'  && $this->params['action']=='admin_duro_orders') { echo 'active';}?>">
-						<a href="<?php echo SITEURL?>admin/duro_orders">
+					<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'duroorders' && $this->request->getParam('action') === 'index') { echo 'active';}?>">
+						<a href="<?php echo SITEURL?>admin/duro-orders">
 							<i class="menu-icon fa fa-file"></i>
 							<span class="menu-text"> Duro Order </span>
 						</a>
 
 						<b class="arrow"></b>
 					</li>
-					<li class="<?php if ($this->params['controller']=='natas') {echo 'active';}?>">
+					<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'natas') { echo 'active'; } ?>">
 						<a href="<?php echo SITEURL?>admin/natas">
 							<i class="menu-icon fa fa-certificate"></i>
 							<span class="menu-text"> NATA </span>
@@ -113,7 +113,7 @@
 
 						<b class="arrow"></b>
 					</li>
-					<li class="<?php if ($this->params['controller']=='materials') {echo 'active';}?>">
+					<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'materials') { echo 'active'; } ?>">
 						<a href="#" class="dropdown-toggle">
 							<i class="menu-icon fa fa-file "></i>
 							<span class="menu-text">Material Order</span>
@@ -125,14 +125,17 @@
 
 						<ul class="submenu">
 						
-							<li class="<?php if (($this->params['controller']=='materials') && ($this->params['action']=='admin_index' || $this->params['action']=='admin_add' || $this->params['action']=='admin_edit' )) {echo 'active'; } ?>">
+							<li class="<?php
+								$ma = (string)$this->request->getParam('action');
+								if (strtolower((string)$this->request->getParam('controller')) === 'materials' && in_array($ma, ['index', 'add', 'edit'], true)) { echo 'active'; }
+							?>">
 								<a href="<?php echo SITEURL?>admin/materials">
 									<i class="menu-icon fa fa-user"></i>
 									 Materials 
 								</a>
 								<b class="arrow"></b>
 							</li>
-							<li class="<?php if (($this->params['controller']=='materials') && ($this->params['action']=='admin_order')){ echo 'active'; } ?>">
+							<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'materials' && $this->request->getParam('action') === 'order') { echo 'active'; } ?>">
 								<a href="<?php echo SITEURL?>admin/materials/order">
 									<i class="menu-icon fa fa-user"></i>
 									 Materials Order
@@ -142,7 +145,7 @@
 						</ul>
 					</li>
 							
-					<li class="<?php if ($this->params['controller']=='sales' && (($this->params['action']=='admin_saledasboard') || ($this->params['action']=='admin_index') || ($this->params['action']=='admin_salereminder'))) {echo 'active';}?>">
+					<li class="<?php $sc = strtolower((string)$this->request->getParam('controller')); $sa = (string)$this->request->getParam('action'); if ($sc === 'sales' && in_array($sa, ['saledasboard', 'index', 'salereminder'], true)) { echo 'active'; } ?>">
 						<a href="#" class="dropdown-toggle">
 							<i class="menu-icon fa fa-file "></i>
 							<span class="menu-text">Sales</span>
@@ -154,7 +157,7 @@
 
 						<ul class="submenu">
 						
-							<li class="<?php if ($this->params['controller']=='clients') {echo 'active'; } ?>">
+							<li class="<?php if ($this->request->getParam('controller') === 'Clients') {echo 'active'; } ?>">
 								<a href="<?php echo SITEURL?>admin/clients">
 									<i class="menu-icon fa fa-user"></i>
 									 CRM
@@ -162,7 +165,7 @@
 								<b class="arrow"></b>
 							</li>
 							
-							<li class="<?php if ($this->params['controller']=='sales' && $this->params['action']=='admin_saledasboard') {echo 'active';}?>">
+							<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'sales' && $this->request->getParam('action') === 'saledasboard') { echo 'active'; } ?>">
 								<a href="<?php echo SITEURL.'admin/sales/saledasboard'; ?>">
 									<i class="menu-icon fa fa-setting"></i>
 									Sale Dashboard
@@ -176,7 +179,7 @@
 								</a>
 								<b class="arrow"></b>
 							</li>
-							<li class="<?php if ($this->params['controller']=='sales' && $this->params['action']=='admin_salereminder') {echo 'active';}?>">
+							<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'sales' && $this->request->getParam('action') === 'salereminder') { echo 'active'; } ?>">
 								<a href="<?php echo SITEURL.'admin/sales/salereminder'; ?>">
 									<i class="menu-icon fa fa-setting"></i>
 									Sale Reminder
@@ -186,7 +189,7 @@
 						</ul>
 					</li>
 					
-					<li class="<?php if ($this->params['controller']=='productions') {echo 'active';}?>">
+					<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'productions') { echo 'active'; } ?>">
 						<a href="#" class="dropdown-toggle">
 							<i class="menu-icon fa fa-file "></i>
 							<span class="menu-text">Production App</span>
@@ -199,14 +202,14 @@
 						<ul class="submenu">
 							
 							
-								<li class="<?php if ($this->params['controller']=='productions' && $this->params['action']=='admin_index') {echo 'active';}?>">
+								<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'productions' && $this->request->getParam('action') === 'index') { echo 'active'; } ?>">
 								<a href="<?php echo SITEURL.'admin/productions'; ?>">
 									<i class="menu-icon fa fa-setting"></i>
 									Batches Made 
 								</a>
 								<b class="arrow"></b>
 							</li>
-							<li class="<?php if ($this->params['controller']=='productions' && $this->params['action']=='admin_batch_count_sheet') {echo 'active';}?>">
+							<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'productions' && $this->request->getParam('action') === 'batchCountSheet') { echo 'active'; } ?>">
 								<a href="<?php echo SITEURL.'admin/productions/batch_count_sheet'; ?>">
 									<i class="menu-icon fa fa-setting"></i>
 									QC Result
@@ -505,7 +508,7 @@
 								<b class="arrow"></b>
 							</li>
 							
-							<li class="<?php if ($this->params['controller']=='purchases' && $this->params['action']=='admin_index') {echo 'active';}?>">
+							<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'purchases' && $this->request->getParam('action') === 'index') {echo 'active';}?>">
 								 
 								<a href="<?php echo SITEURL;?>admin/purchases"> 
 									<i class="menu-icon fa fa-setting"></i>
@@ -513,9 +516,9 @@
 								</a>
 								<b class="arrow"></b>
 							</li>
-							<li class="<?php if ($this->params['controller']=='purchases' && $this->params['action']=='admin_resource_requirement') {echo 'active';}?>">
+							<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'purchases' && $this->request->getParam('action') === 'resourceRequirement') {echo 'active';}?>">
 								 
-								<a href="<?php echo SITEURL;?>admin/purchases/resource_requirement"> 
+								<a href="<?php echo SITEURL;?>admin/purchases/resource-requirement"> 
 									<i class="menu-icon fa fa-setting"></i>
 									Resource Requirement
 								</a>

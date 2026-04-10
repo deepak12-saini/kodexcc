@@ -1,3 +1,9 @@
+<?php
+$nu = $cus_arr['NappUser'] ?? [];
+$isApproved = (int)($nu['is_approved'] ?? 0);
+$deptId = (int)($nu['dept_id'] ?? 0);
+$mobile = trim((string)($nu['mobile_number'] ?? ''));
+?>
 <!-- #section:basics/content.breadcrumbs -->
 <div class="breadcrumbs" id="breadcrumbs">
 	<script type="text/javascript">
@@ -55,37 +61,33 @@
 	<div class="col-xs-12">
 	
 	
-	<?php if($cus_arr['NappUser']['is_approved'] == 0){	?>
-		<div class="alert alert-block alert-danger">
-			
-			<i class="ace-icon fa fa-warning red"></i>
-
-			Your account is not aprroved by admin right now. Please waiting for approval. Thanks
+	<?php if ($isApproved === 0) { ?>
+		<div class="alert alert-block alert-danger" style="border-radius:4px;">
+			<i class="ace-icon fa fa-clock-o"></i>
+			<strong>Pending approval.</strong>
+			Your account is not approved by admin yet. Please wait for approval. Thank you.
 		</div>
-	<?php }else if($cus_arr['NappUser']['is_approved'] == 2){	?>
-		<div class="alert alert-block alert-warning">
-			
-			<i class="ace-icon fa fa-warning red"></i>
-
-			You account is disapproved by admin. Please contact at <b>technical@durotechindustries.com.au</b> or <b>sals@durotechindustries.com.au</b>.
+	<?php } elseif ($isApproved === 2) { ?>
+		<div class="alert alert-block alert-warning" style="border-radius:4px;">
+			<i class="ace-icon fa fa-ban"></i>
+			<strong>Account not active.</strong>
+			Your account has been disapproved by admin. Please contact
+			<b>technical@durotechindustries.com.au</b> or <b>sals@durotechindustries.com.au</b>.
 		</div>
-	<?php }else if(($cus_arr['NappUser']['dept_id'] == 0) || ($cus_arr['NappUser']['mobile_number'] == '')){	?>
-		<div class="alert alert-block alert-warning">			
-			<i class="ace-icon fa fa-warning red"></i>
-			Please <a href="<?php echo SITEURL.'staffs/profile' ?>">Click Here </a> to complete your profile.
-		</div>			
-	<?php }else{ ?>
-
-		<div class="alert alert-block alert-success">
+	<?php } elseif ($deptId === 0 || $mobile === '') { ?>
+		<div class="alert alert-block alert-info" style="border-radius:4px;">
+			<i class="ace-icon fa fa-user"></i>
+			<strong>Complete your profile.</strong>
+			Please <a href="<?php echo h(SITEURL . 'staffs/profile'); ?>" class="alert-link">open your profile</a> to add department and mobile number.
+		</div>
+	<?php } else { ?>
+		<div class="alert alert-block alert-success" style="border-radius:4px;">
 			<button type="button" class="close" data-dismiss="alert">
 				<i class="ace-icon fa fa-times"></i>
 			</button>
 			<i class="ace-icon fa fa-check green"></i>
-			Welcome to
-			<strong class="green">
-			<?php echo SITENAME ; ?> Staff Panel		
-			</strong>			
-		</div>		
+			Welcome to <strong class="green"><?php echo h(SITENAME); ?> Staff Panel</strong>
+		</div>
 	<?php } ?>
 	<div class="row">
         
@@ -96,7 +98,7 @@
 	
 	<?php
 		$chkuserpermission = $this->requestAction('/app/chkuserpermission');
-		if(in_array(8,$chkuserpermission)){
+		if (!empty($nu) && in_array(8, $chkuserpermission, true)) {
 	?>
 	<div class="row">
 		<div class="col-xs-12">	
@@ -114,7 +116,7 @@
 					</div>
 
 					<div class="infobox-data">
-						<span class="infobox-data-number"><?php echo $cus_arr['NappUser']['basic_sal']; ?></span>
+						<span class="infobox-data-number"><?php echo h($nu['basic_sal'] ?? ''); ?></span>
 						<div class="infobox-content">Base Salary</div>
 					</div>
 					
@@ -126,7 +128,7 @@
 					</div>
 
 					<div class="infobox-data">
-						<span class="infobox-data-number"><?php echo $cus_arr['NappUser']['super']; ?></span>
+						<span class="infobox-data-number"><?php echo h($nu['super'] ?? ''); ?></span>
 						<div class="infobox-content">Super</div>
 					</div>
 
@@ -139,7 +141,7 @@
 					</div>
 
 					<div class="infobox-data">
-						<span class="infobox-data-number"><?php echo $cus_arr['NappUser']['phone_expnse']; ?></span>
+						<span class="infobox-data-number"><?php echo h($nu['phone_expnse'] ?? ''); ?></span>
 						<div class="infobox-content">Phone</div>
 					</div>					
 				</div>
@@ -150,7 +152,7 @@
 					</div>
 
 					<div class="infobox-data">
-						<span class="infobox-data-number"><?php echo $cus_arr['NappUser']['fmv']; ?></span>
+						<span class="infobox-data-number"><?php echo h($nu['fmv'] ?? ''); ?></span>
 						<div class="infobox-content">Full Maintained Vehicle</div>
 					</div>
 				</div>
@@ -163,7 +165,7 @@
 
 					<!-- /section:pages/dashboard.infobox.sparkline -->
 					<div class="infobox-data">
-						<span class="infobox-data-number"><?php echo $cus_arr['NappUser']['total_annual_package']; ?></span>
+						<span class="infobox-data-number"><?php echo h($nu['total_annual_package'] ?? ''); ?></span>
 						<div class="infobox-content">Total Annual Package</div>
 					</div>
 
@@ -187,7 +189,7 @@
 					</div>
 
 					<div class="infobox-data">
-						<span class="infobox-data-number"><?php echo $cus_arr['NappUser']['sale_targe_per_week']; ?></span>
+						<span class="infobox-data-number"><?php echo h($nu['sale_targe_per_week'] ?? ''); ?></span>
 						<div class="infobox-content">Sale Target Per Week</div>
 					</div>
 					
@@ -199,7 +201,7 @@
 					</div>
 
 					<div class="infobox-data">
-						<span class="infobox-data-number"><?php echo $cus_arr['NappUser']['sale_targe_per_month']; ?></span>
+						<span class="infobox-data-number"><?php echo h($nu['sale_targe_per_month'] ?? ''); ?></span>
 						<div class="infobox-content">Sale Target Per Month</div>
 					</div>
 
@@ -212,7 +214,7 @@
 					</div>
 
 					<div class="infobox-data">
-						<span class="infobox-data-number"><?php echo $cus_arr['NappUser']['sale_targe_per_annum']; ?></span>
+						<span class="infobox-data-number"><?php echo h($nu['sale_targe_per_annum'] ?? ''); ?></span>
 						<div class="infobox-content">Sale Target Per Annual</div>
 					</div>					
 				</div>
@@ -270,25 +272,25 @@
 									<tr>
 										<td><span class="label label-info">F2F Meeting</span></td>
 										<td class="hidden-480">
-											<i class="label label-primary arrowed-in arrowed-in-right" ><?php echo $cus_arr['NappUser']['ff_day']; ?> Per Day</i>
+											<i class="label label-primary arrowed-in arrowed-in-right" ><?php echo h($nu['ff_day'] ?? ''); ?> Per Day</i>
 										</td>
 										<td class="hidden-480">
-											<i class="label label-warning arrowed-in arrowed-in-right" ><?php echo $cus_arr['NappUser']['ff_meeting']; ?> Per Week</i>
+											<i class="label label-warning arrowed-in arrowed-in-right" ><?php echo h($nu['ff_meeting'] ?? ''); ?> Per Week</i>
 										</td>
 										<td class="hidden-480">
-											<i class="label label-info arrowed-in arrowed-in-right" ><?php echo $cus_arr['NappUser']['ff_month']; ?> Per Month</i>
+											<i class="label label-info arrowed-in arrowed-in-right" ><?php echo h($nu['ff_month'] ?? ''); ?> Per Month</i>
 										</td>
 									</tr>
 									<tr>
 										<td><span class="label label-info">Calls per week(spoken to)</span></td>
 										<td class="hidden-480">
-											<i class="label label-primary arrowed-in arrowed-in-right" ><?php echo $cus_arr['NappUser']['cc_day']; ?> Per Day</i>
+											<i class="label label-primary arrowed-in arrowed-in-right" ><?php echo h($nu['cc_day'] ?? ''); ?> Per Day</i>
 										</td>
 										<td class="hidden-480">
-											<i class="label label-warning arrowed-in arrowed-in-right" ><?php echo $cus_arr['NappUser']['cc_meeting']; ?> Per  Week</i>
+											<i class="label label-warning arrowed-in arrowed-in-right" ><?php echo h($nu['cc_meeting'] ?? ''); ?> Per  Week</i>
 										</td>
 										<td class="hidden-480">
-											<i class="label label-info arrowed-in arrowed-in-right" ><?php echo $cus_arr['NappUser']['cc_month']; ?> Per Month</i>
+											<i class="label label-info arrowed-in arrowed-in-right" ><?php echo h($nu['cc_month'] ?? ''); ?> Per Month</i>
 										</td>
 									</tr>	
 									

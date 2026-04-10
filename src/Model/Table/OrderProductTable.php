@@ -10,5 +10,14 @@ class OrderProductTable extends Table
     public function initialize(array $config): void
     {
         parent::initialize($config);
+
+        $this->setTable('order_product');
+        $this->setPrimaryKey('id');
+
+        $this->belongsTo('Product', [
+            'foreignKey' => 'product_id',
+            'className' => 'Product',
+            'joinType' => 'LEFT',
+        ]);
     }
 }

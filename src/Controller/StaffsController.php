@@ -80,7 +80,7 @@ class StaffsController extends AppController
 	}	
 	
 	public function dashboard() {
-		$this->layout='staff_inner_layout';
+		$this->viewBuilder()->setLayout('staff_inner_layout');
 		$this->set('title_for_layout',SITENAME.' Staff Dashboard Page');
 		$this->checkSatffSession(); 
 				
@@ -92,7 +92,7 @@ class StaffsController extends AppController
 
 	function profile()
 	{
-		$this->layout='staff_inner_layout';
+		$this->viewBuilder()->setLayout('staff_inner_layout');
 		$this->set('title_for_layout',SITENAME.' Profile Page');
 		$this->checkSatffSession();
 		$customer_id=$this->Session->read('Customer.id');
@@ -120,45 +120,38 @@ class StaffsController extends AppController
 		$this->set('departmentArr',$department);
 	}
 	
-	function change_password()
+	public function changePassword(): void
 	{
-		$this->layout='staff_inner_layout';
-		$this->set('title_for_layout',SITENAME.' Change Password Page');
+		$this->viewBuilder()->setLayout('staff_inner_layout');
+		$this->set('title_for_layout', SITENAME . ' Change Password Page');
 		$this->checkSatffSession();
-		if($this->getRequest()->is('post')){
-			$customer_id=$this->Session->read('Customer.id');
-			$user = $this->NappUser->find('first',array('conditions'=>array('NappUser.id'=>$customer_id)));
-			if(!empty($user)){
-				$this->NappUser->id=$user['NappUser']['id'];
-				if($this->requestData()['NappUser']['new_password']==$this->requestData()['NappUser']['confirm_password'])
-				{
-						
-					if($user['NappUser']['password']==$this->requestData()['NappUser']['current_password'])
-					{
-						
-						$this->NappUser->saveField("password",$this->requestData()['NappUser']['new_password']);
-						
-						$this->Session->setFlash('Your password has been changed successfully.','default',array('class' => 'alert alert-success'));
+		if ($this->getRequest()->is('post')) {
+			$customer_id = $this->Session->read('Customer.id');
+			$user = $this->NappUser->find('first', ['conditions' => ['NappUser.id' => $customer_id]]);
+			if (!empty($user)) {
+				$this->NappUser->id = $user['NappUser']['id'];
+				$data = $this->requestData();
+				if (($data['NappUser']['new_password'] ?? '') === ($data['NappUser']['confirm_password'] ?? '')) {
+					if (($user['NappUser']['password'] ?? '') === ($data['NappUser']['current_password'] ?? '')) {
+						$this->NappUser->saveField('password', $data['NappUser']['new_password']);
+
+						$this->Session->setFlash('Your password has been changed successfully.', 'default', ['class' => 'alert alert-success']);
 						$this->setRequestData([]);
-					}else{
-						$this->Session->setFlash('Current password not correct.Please, try again.','default',array('class' => 'alert alert-danger'));
+					} else {
+						$this->Session->setFlash('Current password not correct.Please, try again.', 'default', ['class' => 'alert alert-danger']);
 					}
-				}else{
-					
-					$this->Session->setFlash('New and confirm password not matched.Please, try again.','default',array('class' => 'alert alert-danger'));
+				} else {
+					$this->Session->setFlash('New and confirm password not matched.Please, try again.', 'default', ['class' => 'alert alert-danger']);
 				}
-				
-				
-			}else{
-				$this->Session->setFlash('User record not found.Please, try again.','default',array('class' => 'alert alert-danger'));
+			} else {
+				$this->Session->setFlash('User record not found.Please, try again.', 'default', ['class' => 'alert alert-danger']);
 			}
-			
 		}
 	}
 	
 	function datasheet(){
 		
-		$this->layout='staff_inner_layout';
+		$this->viewBuilder()->setLayout('staff_inner_layout');
 		$this->set('title_for_layout',SITENAME.' Product Datasheet');
 		$this->checkSatffSession();
 		$user_id=$this->Session->read('Customer.id');
@@ -204,7 +197,7 @@ class StaffsController extends AppController
 	
 	function document($product_code=null,$type=null,$num=null){
 		
-		$this->layout='staff_inner_layout';
+		$this->viewBuilder()->setLayout('staff_inner_layout');
 		$this->set('title_for_layout',SITENAME.' Product Datasheet');
 		$this->checkSatffSession();
 		$user_id=$this->Session->read('Customer.id');
@@ -249,7 +242,7 @@ class StaffsController extends AppController
 	}	
 	
 	function replyto($conformance_id=null,$emp_id=null){
-		$this->layout='staff_inner_layout';
+		$this->viewBuilder()->setLayout('staff_inner_layout');
 		$this->set('title_for_layout',SITENAME.' Conformance Reply');
 		$this->checkSatffSession();
 	
@@ -368,7 +361,7 @@ class StaffsController extends AppController
 	}	
 	function conformance($complaint_id=null){
 		
-		$this->layout='staff_inner_layout';
+		$this->viewBuilder()->setLayout('staff_inner_layout');
 		$this->set('title_for_layout',SITENAME.' Conformance List');
 		$this->checkSatffSession();
 		
@@ -445,7 +438,7 @@ class StaffsController extends AppController
 	
 	// function detail($complaint_id=null){
 		
-		// $this->layout='staff_inner_layout';
+		// $this->viewBuilder()->setLayout('staff_inner_layout');
 		// $this->set('title_for_layout',SITENAME.' Conformance List');
 		// $this->checkSatffSession();
 		// $user_id=$this->Session->read('Customer.id');
@@ -455,7 +448,7 @@ class StaffsController extends AppController
 	
 	function conformancelist(){
 		
-		$this->layout='staff_inner_layout';
+		$this->viewBuilder()->setLayout('staff_inner_layout');
 		$this->set('title_for_layout',SITENAME.' Conformance List');
 		$this->checkSatffSession();
 		 $user_id=$this->Session->read('Customer.id');
@@ -538,7 +531,7 @@ class StaffsController extends AppController
 	
 	function detail($nc_number=null,$type=null){
 		
-		$this->layout='staff_inner_layout';
+		$this->viewBuilder()->setLayout('staff_inner_layout');
 		$this->set('title_for_layout',SITENAME.' Conformance Detail');
 		$this->checkSatffSession();
 		 $user_id=$this->Session->read('Customer.id');
@@ -619,7 +612,7 @@ class StaffsController extends AppController
 
 	function admin_detail($nc_number=null,$type=null){
 		
-		$this->layout='admin_layout';
+		$this->viewBuilder()->setLayout('admin_layout');
 		$this->set('title_for_layout',SITENAME.' Conformance Detail');
 		$this->checkAdminSession();
 		
@@ -697,7 +690,7 @@ class StaffsController extends AppController
 	}
 	function admin_replyto($conformance_id=null){
 		
-		$this->layout='admin_layout';
+		$this->viewBuilder()->setLayout('admin_layout');
 		$this->set('title_for_layout',SITENAME.' Conformance Reply');
 		$this->checkAdminSession();
 		$admin_id = $this->Session->read('User.id');
@@ -746,7 +739,7 @@ class StaffsController extends AppController
 	}	
 	function admin_conformancelist(){
 		
-		$this->layout='admin_layout';
+		$this->viewBuilder()->setLayout('admin_layout');
 		$this->set('title_for_layout',SITENAME.' Conformance List');
 		$this->checkAdminSession();
 		$user_id=$this->Session->read('Customer.id');
@@ -1158,7 +1151,7 @@ class StaffsController extends AppController
 		
 	}
 	function admin_reminder($conformance_id=null,$emp_id=null){
-		$this->layout='admin_layout';
+		$this->viewBuilder()->setLayout('admin_layout');
 		$this->set('title_for_layout',SITENAME.' Conformance Edit');
 		$this->checkAdminSession();
 		$user_id=$this->Session->read('User.id');
@@ -1192,7 +1185,7 @@ class StaffsController extends AppController
 	}	
 	
 	function admin_edit($conformance_id=null,$emp_id=null){
-		$this->layout='admin_layout';
+		$this->viewBuilder()->setLayout('admin_layout');
 		$this->set('title_for_layout',SITENAME.' Conformance Edit');
 		$this->checkAdminSession();
 	
@@ -1255,7 +1248,7 @@ class StaffsController extends AppController
 	
 	}
 	function edit($conformance_id=null,$emp_id=null){
-		$this->layout='staff_inner_layout';
+		$this->viewBuilder()->setLayout('staff_inner_layout');
 		$this->set('title_for_layout',SITENAME.' Conformance Reply');
 		$this->checkSatffSession();
 	

@@ -836,41 +836,40 @@ class UsersController extends AppController
 		$department = $this->Department->find('all');
 		$this->set('departmentArr',$department);
 	}
-	function edit_staff($id=null)
+	public function editStaff(?string $id = null): void
 	{
 		$this->viewBuilder()->setLayout('admin_layout');
-		$this->set('title_for_layout',SITENAME.' Edit Staff Page');
+		$this->set('title_for_layout', SITENAME . ' Edit Staff Page');
 		$this->checkAdminSession();
-		$admin_id=$this->Session->read('User.id');
-	
-		$staffArr = $this->NappUser->find('first',array('conditions'=>array('NappUser.id'=>$id)));
-		if(!empty($this->requestData())){	
+
+		$staffArr = $this->NappUser->find('first', ['conditions' => ['NappUser.id' => $id]]);
+		if (!empty($this->requestData())) {
 			$data = $this->requestData();
-			$email = $data['NappUser']['email'];		
-			$staffArrnew = $this->NappUser->find('first',array('conditions'=>array('NappUser.id !='=>$id,'NappUser.email'=>$email)));
-			if(empty($staffArrnew)){				
+			$email = $data['NappUser']['email'];
+			$staffArrnew = $this->NappUser->find('first', [
+				'conditions' => ['NappUser.id !=' => $id, 'NappUser.email' => $email],
+			]);
+			if (empty($staffArrnew)) {
 				$data['NappUser']['id'] = $id;
 				$this->setRequestData($data);
-				
+
 				if ($this->NappUser->save($data)) {
-						
-					$this->Session->setFlash('updated successfully','default',array('class' => 'alert alert-success'));
+					$this->Session->setFlash('updated successfully', 'default', ['class' => 'alert alert-success']);
 					$this->redirect(['action' => 'staff']);
-				}else{
-					$this->Session->setFlash('Your profile has not updated','default',array('class' => 'alert alert-danger'));				
+				} else {
+					$this->Session->setFlash('Your profile has not updated', 'default', ['class' => 'alert alert-danger']);
 				}
-			}else{
-				$this->Session->setFlash('This employee id is already exist','default',array('class' => 'alert alert-danger'));				
+			} else {
+				$this->Session->setFlash('This employee id is already exist', 'default', ['class' => 'alert alert-danger']);
 			}
 		}
-		
-		
-		$this->set('staffArr',$staffArr);
+
+		$this->set('staffArr', $staffArr);
 		$this->setRequestData(is_array($staffArr) ? $staffArr : []);
-		
+
 		$department = $this->Department->find('all');
-		$this->set('departmentArr',$department);
-	} 
+		$this->set('departmentArr', $department);
+	}
 	
 	function edit_new_staff($id=null)
 	{
@@ -907,42 +906,36 @@ class UsersController extends AppController
 		$department = $this->Department->find('all');
 		$this->set('departmentArr',$department);
 	} 
-	function natspec_presentation_status($user_id=null,$status=null,$type=null){
-	
+	public function natspecPresentationStatus($user_id = null, $status = null, $type = null): void
+	{
 		$this->autoRender = false;
-		
-		$update['NappUser']['id']=$user_id;
-		$update['NappUser']['is_natspec_presentation']=$status;
-		// echo '<pre>';
-		// print_r($update);
-		// die();
+
+		$update['NappUser']['id'] = $user_id;
+		$update['NappUser']['is_natspec_presentation'] = $status;
 		$this->NappUser->save($update);
-		$this->Session->setFlash('natspec presentation status has been updated','default',array('class' => 'alert alert-success'));
-		if($type == 1){
+		$this->Session->setFlash('natspec presentation status has been updated', 'default', ['class' => 'alert alert-success']);
+		if ($type == 1) {
 			$this->redirect(['action' => 'staff']);
-		}else{
-			$this->redirect(['action' => 'customer']);	
-		}	
-	}	
-	
-	
-	
-	
-	function cpd_presentation_status($user_id=null,$status=null,$type=null){
-	
+		} else {
+			$this->redirect(['action' => 'customer']);
+		}
+	}
+
+	public function cpdPresentationStatus($user_id = null, $status = null, $type = null): void
+	{
 		$this->autoRender = false;
-		
-		$update['NappUser']['id']=$user_id;
-		$update['NappUser']['is_cpd_presentation']=$status;
+
+		$update['NappUser']['id'] = $user_id;
+		$update['NappUser']['is_cpd_presentation'] = $status;
 		$this->NappUser->save($update);
-		$this->Session->setFlash('cpd presentation status has been updated','default',array('class' => 'alert alert-success'));
-		if($type == 1){
+		$this->Session->setFlash('cpd presentation status has been updated', 'default', ['class' => 'alert alert-success']);
+		if ($type == 1) {
 			$this->redirect(['action' => 'staff']);
-		}else{
-			$this->redirect(['action' => 'customer']);	
-		}		
-		
-	}	
+		} else {
+			$this->redirect(['action' => 'customer']);
+		}
+	}
+
 	function accesstouser($custId=null){
 		
 		$this->autoRender = false;
@@ -999,34 +992,43 @@ class UsersController extends AppController
 		
 	}
 	
-	function loginhisotry()
+	public function loginhisotry(): void
 	{
 		$this->viewBuilder()->setLayout('admin_layout');
-		$this->set('title_for_layout',SITENAME.' Login History');
+		$this->set('title_for_layout', SITENAME . ' Login History');
 		$this->checkAdminSession();
-		$name = '';
-		
-		$this->LoginHistory->bindModel(
-		array('belongsTo' => array('User' => array(
-			'className' => 'User',			 
-			'foreignKey' => 'user_id',				
-			'conditions' => array(),
-			'fields' => '',
-			'order' => array(),
-		))));
-		$this->LoginHistory->bindModel(
-		array('belongsTo' => array('NappUser' => array(
-			'className' => 'NappUser',			 
-			'foreignKey' => 'user_id',				
-			'conditions' => array(),
-			'fields' => array('name','lname','email'),
-			'order' => array(),
-		))));
-		$this->paginate = array('conditions'=>array(),'page' => 1, 'limit' => 10,'order'=>'LoginHistory.id desc');
-		$this->LoginHistory->recursive = 2;
-		$LoginHistoryArr = $this->Paginator->paginate('LoginHistory');	
-		//echo '<pre>'; print_r($LoginHistoryArr); die;
-		$this->set('LoginHistoryArr',$LoginHistoryArr);	
-		
+
+		$loginHistory = $this->fetchTable('LoginHistory');
+		$query = $loginHistory->find()
+			->contain(['User', 'NappUser'])
+			->orderDesc($loginHistory->aliasField('id'));
+
+		$this->paginate = [
+			'limit' => 10,
+			'order' => ['LoginHistory.id' => 'DESC'],
+			'sortableFields' => [
+				'LoginHistory.id',
+				'LoginHistory.role',
+				'LoginHistory.logintime',
+				'LoginHistory.logouttime',
+			],
+		];
+		$paged = $this->paginate($query);
+
+		$LoginHistoryArr = [];
+		foreach ($paged as $entity) {
+			$row = $entity->toArray();
+			unset($row['user'], $row['napp_user']);
+			$userRow = ($entity->user !== null) ? $entity->user->toArray() : [];
+			$nappRow = ($entity->napp_user !== null) ? $entity->napp_user->toArray() : [];
+			$LoginHistoryArr[] = [
+				'LoginHistory' => $row,
+				'User' => $userRow,
+				'NappUser' => $nappRow,
+			];
+		}
+
+		$this->set('LoginHistoryArr', $LoginHistoryArr);
+		$this->set('loginHistoryPaginated', $paged);
 	}
 }

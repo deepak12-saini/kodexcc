@@ -61,6 +61,25 @@ return function (RouteBuilder $routes): void {
             ['controller' => 'Mailers', 'action' => 'sendSpecificationEmail'],
             ['pass' => ['id'], 'id' => '\d+'],
         );
+        // Legacy underscore URLs: DashedRoute expects `label-stocks`, not `label_stocks`.
+        $builder->connect(
+            '/label_stocks',
+            ['controller' => 'LabelStocks', 'action' => 'index'],
+        );
+        $builder->connect(
+            '/package_stocks',
+            ['controller' => 'PackageStocks', 'action' => 'index'],
+        );
+        // Legacy: admin/purchases/resource_requirement → Admin\PurchasesController::resourceRequirement
+        $builder->connect(
+            '/purchases/resource_requirement',
+            ['controller' => 'Purchases', 'action' => 'resourceRequirement'],
+        );
+        // Legacy underscore: admin/productions/batch_count_sheet → batchCountSheet
+        $builder->connect(
+            '/productions/batch_count_sheet',
+            ['controller' => 'Productions', 'action' => 'batchCountSheet'],
+        );
         $builder->fallbacks();
     });
 
@@ -107,10 +126,72 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/video', ['controller' => 'Fronts', 'action' => 'video']);
         $builder->connect('/durotech-institute-of-waterproofing', ['controller' => 'Fronts', 'action' => 'institute_waterproofing']);
 
+        // Legacy cron URL (CakePHP 2 used AppController\Sales::cronjob without /admin prefix).
+        $builder->connect(
+            '/sales/cronjob',
+            ['prefix' => 'Admin', 'controller' => 'Sales', 'action' => 'cronjob'],
+        );
+
         $builder->connect('/bathroom-floor-waterproofing', ['controller' => 'Fronts', 'action' => 'bathroom_floor_waterproofing']);
         $builder->connect('/bathroom-waterproofing', ['controller' => 'Fronts', 'action' => 'bathroom_waterproofing']);
         $builder->connect('/shower-waterproofing', ['controller' => 'Fronts', 'action' => 'shower_waterproofing']);
-        
+
+        // Legacy staff URLs: `label_stocks` (underscore) → LabelStocksController (no Admin prefix).
+        $builder->connect(
+            '/label_stocks',
+            ['controller' => 'LabelStocks', 'action' => 'index'],
+        );
+        $builder->connect(
+            '/label_stocks/{action}/*',
+            ['controller' => 'LabelStocks'],
+        );
+        $builder->connect(
+            '/package_stocks',
+            ['controller' => 'PackageStocks', 'action' => 'index'],
+        );
+        $builder->connect(
+            '/package_stocks/{action}/*',
+            ['controller' => 'PackageStocks'],
+        );
+        // Legacy staff URL: purchases/resource_requirement (underscore) → resource_requirement action.
+        $builder->connect(
+            '/purchases/resource_requirement',
+            ['controller' => 'Purchases', 'action' => 'resource_requirement'],
+        );
+        $builder->connect(
+            '/purchases/resource-requirement',
+            ['controller' => 'Purchases', 'action' => 'resource_requirement'],
+        );
+        // Legacy staff URL (underscore) → camelCase action for CakePHP 5.
+        $builder->connect(
+            '/staffs/change_password',
+            ['controller' => 'Staffs', 'action' => 'changePassword'],
+        );
+
+        // Legacy staff Productions URLs (underscore paths).
+        $builder->connect(
+            '/productions/batch_register_add',
+            ['controller' => 'Productions', 'action' => 'batchRegisterAdd'],
+        );
+        $builder->connect(
+            '/productions/batch_register_edit/{id}',
+            ['controller' => 'Productions', 'action' => 'batchRegisterEdit'],
+            ['pass' => ['id'], 'id' => '\d+'],
+        );
+        $builder->connect(
+            '/productions/batch_count_sheet',
+            ['controller' => 'Productions', 'action' => 'batchCountSheet'],
+        );
+        $builder->connect(
+            '/productions/batch_count_sheet_add',
+            ['controller' => 'Productions', 'action' => 'batchCountSheetAdd'],
+        );
+        $builder->connect(
+            '/productions/batch_count_sheet_edit/{id}',
+            ['controller' => 'Productions', 'action' => 'batchCountSheetEdit'],
+            ['pass' => ['id'], 'id' => '\d+'],
+        );
+
         /*
          * ...and connect the rest of 'Pages' controller's URLs.
          */

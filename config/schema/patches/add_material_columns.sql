@@ -1,0 +1,16 @@
+-- Material module fields used by the app (init_schema placeholders omitted these).
+
+ALTER TABLE `material`
+  ADD COLUMN `material_type` VARCHAR(255) NULL DEFAULT NULL,
+  ADD COLUMN `package_type` VARCHAR(64) NULL DEFAULT NULL,
+  ADD COLUMN `weight` VARCHAR(255) NULL DEFAULT NULL,
+  ADD COLUMN `quantity` VARCHAR(255) NULL DEFAULT NULL;
+
+ALTER TABLE `material_order`
+  ADD COLUMN `order_id` VARCHAR(64) NULL DEFAULT NULL,
+  ADD COLUMN `material_id` INT UNSIGNED NULL DEFAULT NULL,
+  ADD COLUMN `material_type` VARCHAR(255) NULL DEFAULT NULL,
+  ADD COLUMN `weight` VARCHAR(255) NULL DEFAULT NULL,
+  ADD COLUMN `quantity` VARCHAR(255) NULL DEFAULT NULL,
+  ADD COLUMN `lastmodification` DATETIME NULL DEFAULT NULL,
+  ADD COLUMN `admin_id` INT UNSIGNED NULL DEFAULT NULL;

@@ -1,13 +1,16 @@
 		<?php
 			$chkuserpermission = $this->requestAction('/app/chkuserpermission');
-		
-		?>	
+			// CakePHP 5: request controller is PascalCase; normalize for legacy underscore comparisons.
+			$currentController = \Cake\Utility\Inflector::underscore((string) $this->request->getParam('controller'));
+			$currentAction = \Cake\Utility\Inflector::underscore((string) $this->request->getParam('action'));
+
+		?>
 			<script type="text/javascript">
 				try{ace.settings.check('main-container' , 'fixed')}catch(e){}
 			</script>
 
 			<!-- #section:basics/sidebar -->
-			<div id="sidebar" class="sidebar responsive menu-min" data-sidebar="true" data-sidebar-scroll="true" data-sidebar-hover="true">
+			<div id="sidebar" class="sidebar responsive" data-sidebar="true" data-sidebar-scroll="true" data-sidebar-hover="true">
 			<!-- <div id="sidebar" class="sidebar                  responsive"> -->
 				<script type="text/javascript">
 					try{ace.settings.check('sidebar' , 'fixed')}catch(e){}
@@ -16,7 +19,7 @@
 				
 
 				<ul class="nav nav-list">
-					<li class="<?php if ($this->params['controller']=='staffs' && $this->params['action']=='dashboard') {echo 'active';}?>">
+					<li class="<?php if ($currentController=='staffs' && $currentAction=='dashboard') {echo 'active';}?>">
 						<a href="<?php echo SITEURL?>staffs/dashboard">
 							<i class="menu-icon fa fa-tachometer"></i>
 							<span class="menu-text"> Dashboard </span>
@@ -28,7 +31,7 @@
 					<?php						
 						if(in_array(12,$chkuserpermission) ){
 					?>
-					<li class="<?php if ($this->params['controller']=='clients') { echo 'active';}?>">
+					<li class="<?php if ($currentController=='clients') { echo 'active';}?>">
 						<a href="<?php echo SITEURL?>clients">
 							<i class="menu-icon fa fa-user"></i>
 							<span class="menu-text"> CRM </span>
@@ -40,8 +43,8 @@
 					<?php						
 						if(in_array(32,$chkuserpermission) ){
 					?>
-					<li class="<?php if ($this->params['controller']=='label_stocks') { echo 'active';}?>">
-						<a href="<?php echo SITEURL?>label_stocks">
+					<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'labelstocks') { echo 'active';}?>">
+						<a href="<?php echo SITEURL?>label-stocks">
 							<i class="menu-icon fa fa-user"></i>
 							<span class="menu-text"> Label Stock </span>
 						</a>
@@ -52,8 +55,8 @@
 					<?php						
 						if(in_array(33,$chkuserpermission) ){
 					?>
-					<li class="<?php if ($this->params['controller']=='label_stocks') { echo 'active';}?>">
-						<a href="<?php echo SITEURL?>package_stocks">
+					<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'packagestocks') { echo 'active';}?>">
+						<a href="<?php echo SITEURL?>package-stocks">
 							<i class="menu-icon fa fa-user"></i>
 							<span class="menu-text"> Package Stock </span>
 						</a>
@@ -64,7 +67,7 @@
 					<?php						
 						if(in_array(13,$chkuserpermission) ){
 					?>
-					<li class="<?php if ($this->params['controller']=='duro_orders' && ($this->params['action']=='index')) { echo 'active'; }?>"> 
+					<li class="<?php if ($currentController=='duro_orders' && ($currentAction=='index')) { echo 'active'; }?>"> 
 						<a href="#" class="dropdown-toggle">
 							<i class="menu-icon fa fa-building"></i>
 							<span class="menu-text">Duro Order </span>
@@ -73,7 +76,7 @@
 						</a>
 						<b class="arrow"></b>
 						<ul class="submenu">
-							<li class="<?php if ($this->params['controller']=='duro_orders') { echo 'active';}?>">
+							<li class="<?php if ($currentController=='duro_orders') { echo 'active';}?>">
 								<a href="<?php echo SITEURL?>duro_orders">
 									<i class="menu-icon fa fa-file"></i>
 									<span class="menu-text"> Duro Order List </span>
@@ -84,7 +87,7 @@
 						</ul>
 					</li>
 					<?php } ?>
-					<li class="<?php if ($this->params['controller']=='users' && ($this->params['action']=='cpdpresentation' ||   $this->params['action']=='presentation' ||   $this->params['action']=='questionlist'  ||  $this->params['action']=='cert'  ||  $this->params['action']=='welcomemailer')) { echo 'active'; }?>" style="display:none;"> 
+					<li class="<?php if ($currentController=='users' && ($currentAction=='cpdpresentation' ||   $currentAction=='presentation' ||   $currentAction=='questionlist'  ||  $currentAction=='cert'  ||  $currentAction=='welcomemailer')) { echo 'active'; }?>" style="display:none;"> 
 						<a href="#" class="dropdown-toggle">
 							<i class="menu-icon fa fa-building"></i>
 							<span class="menu-text">Architect </span>
@@ -94,35 +97,35 @@
 						<b class="arrow"></b>
 						<ul class="submenu">			
 							
-							<li class="<?php if ($this->params['controller']=='users' && $this->params['action']=='presentation') {echo 'active';}?>">
+							<li class="<?php if ($currentController=='users' && $currentAction=='presentation') {echo 'active';}?>">
 								<a href="<?php echo SITEURL;?>users/presentation">
 									<i class="menu-icon fa fa-setting"></i>
 									Architect Presentation
 								</a>
 								<b class="arrow"></b>
 							</li>
-							<li class="<?php if ($this->params['controller']=='users' && $this->params['action']=='cpdpresentation') {echo 'active';}?>">
+							<li class="<?php if ($currentController=='users' && $currentAction=='cpdpresentation') {echo 'active';}?>">
 								<a href="<?php echo SITEURL;?>users/cpdpresentation">
 									<i class="menu-icon fa fa-setting"></i>
 									Workshop  CPD Presentation
 								</a>
 								<b class="arrow"></b>
 							</li>
-							<li class="<?php if ($this->params['controller']=='users' && $this->params['action']=='questionlist') {echo 'active';}?>">
+							<li class="<?php if ($currentController=='users' && $currentAction=='questionlist') {echo 'active';}?>">
 								<a href="<?php echo SITEURL;?>users/questionlist">
 									<i class="menu-icon fa fa-setting"></i>
 									Architect  CPD Questionnair
 								</a>
 								<b class="arrow"></b>
 							</li>
-							<li  class="<?php if ($this->params['controller']=='users' && $this->params['action']=='welcomemailer') { echo 'active';}?>">
+							<li  class="<?php if ($currentController=='users' && $currentAction=='welcomemailer') { echo 'active';}?>">
 								<a href="<?php echo SITEURL;?>users/welcomemailer">
 									<i class="menu-icon fa fa-setting"></i>
 									CPD Presentation Mailer
 								</a>
 								<b class="arrow"></b>
 							</li>
-							<li class="" class="<?php if ($this->params['controller']=='users' && $this->params['action']=='cert') { echo 'active';}?>">
+							<li class="" class="<?php if ($currentController=='users' && $currentAction=='cert') { echo 'active';}?>">
 								<a href="<?php echo SITEURL;?>users/cert">
 									<i class="menu-icon fa fa-setting"></i>
 									Send Certificate 
@@ -134,7 +137,7 @@
 					<?php						
 						if(in_array(30,$chkuserpermission) ){
 					?>	
-					<li class="<?php if ($this->params['controller']=='purchases') { echo 'active';}?>">
+					<li class="<?php if (strtolower((string)$this->request->getParam('controller')) === 'purchases') { echo 'active';}?>">
 						<a href="<?php echo SITEURL?>purchases">
 							<i class="menu-icon fa fa-file"></i>
 							<span class="menu-text">Purchase Request</span>
@@ -146,7 +149,7 @@
 					<?php						
 						if(in_array(28,$chkuserpermission) ){
 					?>
-					<li class="<?php if ($this->params['controller']=='ProductionReports') {echo 'active';}?>">
+					<li class="<?php if ($currentController=='production_reports') {echo 'active';}?>">
 						<a href="<?php echo SITEURL?>production-reports">
 							<i class="menu-icon fa fa-money "></i>
 							<span class="menu-text">Production Report</span></b>
@@ -156,7 +159,7 @@
 					<?php						
 						if(in_array(22,$chkuserpermission) ){
 					?>
-					<li class="<?php if ($this->params['controller']=='productions') {echo 'active';}?>">
+					<li class="<?php if ($currentController=='productions') {echo 'active';}?>">
 						<a href="#" class="dropdown-toggle">
 							<i class="menu-icon fa fa-file "></i>
 							<span class="menu-text">Production App</span>
@@ -169,14 +172,14 @@
 						<ul class="submenu">
 							
 							
-								<li class="<?php if ($this->params['controller']=='productions' && $this->params['action']=='index') {echo 'active';}?>">
+								<li class="<?php if ($currentController=='productions' && $currentAction=='index') {echo 'active';}?>">
 								<a href="<?php echo SITEURL.'productions'; ?>">
 									<i class="menu-icon fa fa-setting"></i>
 									Batches Made 
 								</a>
 								<b class="arrow"></b>
 							</li>
-							<li class="<?php if ($this->params['controller']=='productions' && $this->params['action']=='batch_count_sheet') {echo 'active';}?>">
+							<li class="<?php if ($currentController=='productions' && $currentAction=='batch_count_sheet') {echo 'active';}?>">
 								<a href="<?php echo SITEURL.'productions/batch_count_sheet'; ?>">
 									<i class="menu-icon fa fa-setting"></i>
 									QC Result
@@ -187,7 +190,7 @@
 						</ul>
 					</li>	
 					<?php } ?>
-					<!--li class="<?php if (($this->params['controller']=='users') && $this->params['action']=='labfile') {echo 'active';}?>">
+					<!--li class="<?php if (($currentController=='users') && $currentAction=='labfile') {echo 'active';}?>">
 						<a href="<?php echo SITEURL?>users/labfile">
 							<i class="menu-icon fa fa-money "></i>
 							<span class="menu-text">Price List</span></b>
@@ -215,14 +218,14 @@
 						</a>
 					</li>
 					<?php } ?>
-					<!--li class="<?php if ($this->params['controller']=='users' && $this->params['action']=='contact') {echo 'active';}?>">
+					<!--li class="<?php if ($currentController=='users' && $currentAction=='contact') {echo 'active';}?>">
 						<a href="<?php echo SITEURL.'users/contact'; ?>">
 							<i class="menu-icon fa fa-users"></i>
 							<span class="menu-text">Dept Members</span>
 						</a>
 						<b class="arrow"></b>
 					</li>
-					<li class="<?php if (($this->params['controller']=='products') && ($this->params['action']=='label') || $this->params['action']=='datasheet') {echo 'active';}?>">
+					<li class="<?php if (($currentController=='products') && ($currentAction=='label') || $currentAction=='datasheet') {echo 'active';}?>">
 						<a href="<?php echo SITEURL?>products/label">
 							<i class="menu-icon fa fa-file "></i>
 							<span class="menu-text">Product Label</span></b>
@@ -232,7 +235,7 @@
 							
 						if(in_array(6,$chkuserpermission) || in_array(7,$chkuserpermission)){
 					?>
-					<li class="<?php if ($this->params['controller']=='tasks') {echo 'active';}?>">
+					<li class="<?php if ($currentController=='tasks') {echo 'active';}?>">
 						<a href="<?php echo SITEURL.'tasks/type'; ?>">
 							<i class="menu-icon fa fa-flask"></i>
 							<span class="menu-text">DuroLab</span>
@@ -244,7 +247,7 @@
 					<?php						
 						if(in_array(10,$chkuserpermission) ){
 					?>
-					<li class="<?php if ($this->params['controller']=='natas') {echo 'active';}?>">
+					<li class="<?php if ($currentController=='natas') {echo 'active';}?>">
 						<a href="<?php echo SITEURL.'natas'; ?>">
 							<i class="menu-icon fa fa-certificate"></i>
 							<span class="menu-text"> NATA </span>
@@ -252,7 +255,7 @@
 						<b class="arrow"></b>
 					</li>
 					<?php } ?>
-					<li class="<?php if ($this->params['controller']=='sheets') {echo 'active';}?>">
+					<li class="<?php if ($currentController=='sheets') {echo 'active';}?>">
 						<a href="<?php echo SITEURL?>sheets">
 							<i class="menu-icon fa fa-file-excel-o"></i>
 							<span class="menu-text"> Smart Sheet </span>
@@ -263,7 +266,7 @@
 					<?php						
 						if(in_array(21,$chkuserpermission)){
 						?>
-						<li class="<?php if ($this->params['controller']=='materials') {echo 'active';}?>">
+						<li class="<?php if ($currentController=='materials') {echo 'active';}?>">
 						<a href="#" class="dropdown-toggle">
 							<i class="menu-icon fa fa-file "></i>
 							<span class="menu-text">Material Order</span>
@@ -275,14 +278,14 @@
 
 						<ul class="submenu">
 						
-							<li class="<?php if (($this->params['controller']=='materials') && ($this->params['action']=='index' || $this->params['action']=='add' || $this->params['action']=='edit' )) {echo 'active'; } ?>">
+							<li class="<?php if (($currentController=='materials') && ($currentAction=='index')) {echo 'active'; } ?>">
 								<a href="<?php echo SITEURL?>materials">
 									<i class="menu-icon fa fa-user"></i>
 									 Materials 
 								</a>
 								<b class="arrow"></b>
 							</li>
-							<li class="<?php if (($this->params['controller']=='materials') && ($this->params['action']=='order')){ echo 'active'; } ?>">
+							<li class="<?php if (($currentController=='materials') && ($currentAction=='order')){ echo 'active'; } ?>">
 								<a href="<?php echo SITEURL?>materials/order">
 									<i class="menu-icon fa fa-user"></i>
 									 Materials Order
@@ -296,7 +299,7 @@
 						if(in_array(20,$chkuserpermission) ){
 					?>
 					
-					<li class="<?php if (($this->params['controller']=='purchases') ||  ($this->params['controller']=='organisations') || ($this->params['controller']=='documents') ||  ($this->params['controller']=='audits') ||  ($this->params['controller']=='complaints') || ($this->params['controller']=='staffs') || ($this->params['controller']=='hrs')) { echo 'active'; } ?>" >
+					<li class="<?php if (($currentController=='purchases') ||  ($currentController=='organisations') || ($currentController=='documents') ||  ($currentController=='audits') ||  ($currentController=='complaints') || ($currentController=='staffs') || ($currentController=='hrs')) { echo 'active'; } ?>" >
 					   
 						<a href="#" class="dropdown-toggle">
 							<i class="menu-icon fa fa-certificate"></i>
@@ -305,20 +308,20 @@
 						</a>	
 						<ul class="submenu">
 						
-						<li class="<?php if (($this->params['controller']=='staffs') && ($this->params['action']=='document') || $this->params['action']=='datasheet') {echo 'active';}?>">
+						<li class="<?php if (($currentController=='staffs') && ($currentAction=='document') || $currentAction=='datasheet') {echo 'active';}?>">
 							<a href="<?php echo SITEURL?>staffs/datasheet">
 								<i class="menu-icon fa fa-file "></i>
 								<span class="menu-text">Product Document</span></b>
 							</a>
 						</li>
 						
-						<li class="<?php if (($this->params['controller']=='staffs') && ($this->params['action']=='conformancelist')) {echo 'active';}?>">
+						<li class="<?php if (($currentController=='staffs') && ($currentAction=='conformancelist')) {echo 'active';}?>">
 							<a href="<?php echo SITEURL?>staffs/conformancelist">
 								<i class="menu-icon fa fa-tasks "></i>
 								<span class="menu-text">Non Conformance</span></b>
 							</a>
 						</li>
-						<li class="<?php if ($this->params['controller']=='complaints') {echo 'active';}?>">
+						<li class="<?php if ($currentController=='complaints') {echo 'active';}?>">
 							<a href="<?php echo SITEURL?>complaints">
 								<i class="menu-icon fa fa-image "></i>
 								<span class="menu-text">Complaints  List</span></b>
@@ -327,7 +330,7 @@
 						<?php						
 						if(in_array(23,$chkuserpermission) ){
 						?>
-						<li class="<?php if ($this->params['controller']=='pos') { echo 'active';}?>">
+						<li class="<?php if ($currentController=='pos') { echo 'active';}?>">
 							<a href="<?php echo SITEURL?>pos">
 								<i class="menu-icon fa fa-user"></i>
 								<span class="menu-text"> DT PO </span>
@@ -339,7 +342,7 @@
 						<?php						
 						if(in_array(11,$chkuserpermission) ){
 						?>
-							<li class="<?php if ($this->params['controller']=='hrs') {echo 'active';}?>">
+							<li class="<?php if ($currentController=='hrs') {echo 'active';}?>">
 								<a href="#" class="dropdown-toggle">
 									<i class="menu-icon fa fa-file "></i>
 									<span class="menu-text"> HR </span>
@@ -351,63 +354,63 @@
 
 								<ul class="submenu">
 									
-									<li class="<?php if ($this->params['controller']=='hrs'  && $this->params['action']=='index') {echo 'active';}?>">
+									<li class="<?php if ($currentController=='hrs'  && $currentAction=='index') {echo 'active';}?>">
 										<a href="<?php echo SITEURL;?>hrs">
 											<i class="menu-icon fa fa-setting"></i>
 											Training Need Assessment
 										</a>
 										<b class="arrow"></b>
 									</li>
-									<li class="<?php if ($this->params['controller']=='hrs'  && $this->params['action']=='attendence') {echo 'active';}?>">
+									<li class="<?php if ($currentController=='hrs'  && $currentAction=='attendence') {echo 'active';}?>">
 										<a href="<?php echo SITEURL;?>hrs/attendence">
 											<i class="menu-icon fa fa-setting"></i>
 											Attendence
 										</a>
 										<b class="arrow"></b>
 									</li>
-									<li class="<?php if ($this->params['controller']=='hrs'  && $this->params['action']=='performancefeedback') {echo 'active';}?>">
+									<li class="<?php if ($currentController=='hrs'  && $currentAction=='performancefeedback') {echo 'active';}?>">
 										<a href="<?php echo SITEURL;?>hrs/performancefeedback">
 											<i class="menu-icon fa fa-setting"></i>
 											Performance Feedback
 										</a>
 										<b class="arrow"></b>
 									</li>
-									<li class="<?php if ($this->params['controller']=='hrs'  && $this->params['action']=='newjoining') {echo 'active';}?>">
+									<li class="<?php if ($currentController=='hrs'  && $currentAction=='newjoining') {echo 'active';}?>">
 										<a href="<?php echo SITEURL;?>hrs/newjoining">
 											<i class="menu-icon fa fa-setting"></i>
 											New Joining 
 										</a>
 										<b class="arrow"></b>
 									</li>
-									<li class="<?php if ($this->params['controller']=='hrs'  && $this->params['action']=='reportorganization') {echo 'active';}?>">
+									<li class="<?php if ($currentController=='hrs'  && $currentAction=='reportorganization') {echo 'active';}?>">
 										<a href="<?php echo SITEURL;?>hrs/reportorganization">
 											<i class="menu-icon fa fa-setting"></i>
 											Joining Report to the Organization
 										</a>
 										<b class="arrow"></b>
 									</li>
-									<li class="<?php if ($this->params['controller']=='hrs'  && $this->params['action']=='res_during_leave') {echo 'active';}?>">
+									<li class="<?php if ($currentController=='hrs'  && $currentAction=='res_during_leave') {echo 'active';}?>">
 										<a href="<?php echo SITEURL;?>hrs/res_during_leave">
 											<i class="menu-icon fa fa-setting"></i>
 											Responsibilties During Leave
 										</a>
 										<b class="arrow"></b>
 									</li>
-									<li class="<?php if ($this->params['controller']=='hrs'  && $this->params['action']=='format_training_calendars') {echo 'active';}?>">
+									<li class="<?php if ($currentController=='hrs'  && $currentAction=='format_training_calendars') {echo 'active';}?>">
 										<a href="<?php echo SITEURL;?>hrs/format_training_calendars">
 											<i class="menu-icon fa fa-setting"></i>
 											Format Training Calendars
 										</a>
 										<b class="arrow"></b>
 									</li>
-										<li class="<?php if ($this->params['controller']=='hrs'  && $this->params['action']=='format_evaluation_employe') {echo 'active';}?>">
+										<li class="<?php if ($currentController=='hrs'  && $currentAction=='format_evaluation_employe') {echo 'active';}?>">
 										<a href="<?php echo SITEURL;?>hrs/format_evaluation_employe">
 											<i class="menu-icon fa fa-setting"></i>
 											Format Evaluation Employe
 										</a>
 										<b class="arrow"></b>
 									</li>
-									<li class="<?php if ($this->params['controller']=='hrs'  && $this->params['action']=='hr_appraisal_form') {echo 'active';}?>">
+									<li class="<?php if ($currentController=='hrs'  && $currentAction=='hr_appraisal_form') {echo 'active';}?>">
 										<a href="<?php echo SITEURL;?>hrs/hr_appraisal_form">
 										<i class="menu-icon fa fa-setting"></i>
 											Performance Appraisal Form
@@ -421,7 +424,7 @@
 							<?php						
 								if(in_array(19,$chkuserpermission) ){
 							?>	
-							<li class="<?php if ($this->params['controller']=='audits') {echo 'active';}?>">
+							<li class="<?php if ($currentController=='audits') {echo 'active';}?>">
 								<a href="#" class="dropdown-toggle">
 									<i class="menu-icon fa fa-thumbs-up "></i>
 									<span class="menu-text"> Quality Assurance </span>
@@ -433,7 +436,7 @@
 
 								<ul class="submenu">							
 									
-									<li class="<?php if ($this->params['controller']=='audits'  && $this->params['action']=='index') {echo 'active';}?>">
+									<li class="<?php if ($currentController=='audits'  && $currentAction=='index') {echo 'active';}?>">
 										<a href="<?php echo SITEURL;?>audits">
 											<i class="menu-icon fa fa-setting"></i>
 											Audit
@@ -441,7 +444,7 @@
 										<b class="arrow"></b>
 									</li>
 									
-									<li class="<?php if ($this->params['controller']=='audits'  && $this->params['action']=='circularinternalauditlist') {echo 'active';}?>">
+									<li class="<?php if ($currentController=='audits'  && $currentAction=='circularinternalauditlist') {echo 'active';}?>">
 										<a href="<?php echo SITEURL;?>audits/circularinternalauditlist">
 											<i class="menu-icon fa fa-setting"></i>
 											Circular Internal Audit
@@ -456,7 +459,7 @@
 					<?php						
 						if(in_array(17,$chkuserpermission) ){
 					?>	
-					<li class="<?php if ($this->params['controller']=='documents') {echo 'active';}?>">
+					<li class="<?php if ($currentController=='documents') {echo 'active';}?>">
 						<a href="#" class="dropdown-toggle">
 							<i class="menu-icon fa fa-bars "></i>
 							<span class="menu-text"> Document</span>
@@ -468,21 +471,21 @@
 
 						<ul class="submenu">
 							
-							<li class="<?php if ($this->params['controller']=='documents' && $this->params['action']=='index') {echo 'active';}?>">
+							<li class="<?php if ($currentController=='documents' && $currentAction=='index') {echo 'active';}?>">
 								<a href="<?php echo SITEURL?>documents">
 									<i class="menu-icon fa fa-setting"></i>
 									Record of library
 								</a>
 								<b class="arrow"></b>
 							</li>
-							<li class="<?php if ($this->params['controller']=='documents' && $this->params['action']=='receiving_insepction') {echo 'active';}?>">
+							<li class="<?php if ($currentController=='documents' && $currentAction=='receiving_insepction') {echo 'active';}?>">
 								<a href="<?php echo SITEURL?>documents/receiving_insepction">
 									<i class="menu-icon fa fa-setting"></i>
 									Receive Inspection
 								</a>
 								<b class="arrow"></b>
 							</li>
-							<li class="<?php if ($this->params['controller']=='documents' && $this->params['action']=='preventive_maintenance') {echo 'active';}?>">
+							<li class="<?php if ($currentController=='documents' && $currentAction=='preventive_maintenance') {echo 'active';}?>">
 								<a href="<?php echo SITEURL?>documents/preventive_maintenance">
 									<i class="menu-icon fa fa-setting"></i>
 									Preventive Maintenance
@@ -490,14 +493,14 @@
 								<b class="arrow"></b>
 							</li>
 							
-							<li class="<?php if ($this->params['controller']=='documents' && $this->params['action']=='executive_duty_requisition') {echo 'active';}?>">
+							<li class="<?php if ($currentController=='documents' && $currentAction=='executive_duty_requisition') {echo 'active';}?>">
 								<a href="<?php echo SITEURL?>documents/executive_duty_requisition">
 									<i class="menu-icon fa fa-setting"></i>
 									Executive Duty Requisition
 								</a>
 								<b class="arrow"></b>
 							</li>
-							<li class="<?php if ($this->params['controller']=='documents' && $this->params['action']=='calibration_equipment') {echo 'active';}?>">
+							<li class="<?php if ($currentController=='documents' && $currentAction=='calibration_equipment') {echo 'active';}?>">
 								<a href="<?php echo SITEURL?>documents/calibration_equipment">
 									<i class="menu-icon fa fa-setting"></i>
 									Calibration Equipment
@@ -505,7 +508,7 @@
 								<b class="arrow"></b>
 							</li>
 							
-							<li class="<?php if ($this->params['controller']=='documents' && $this->params['action']=='admin_nc_closure') {echo 'active';}?>">
+							<li class="<?php if ($currentController=='documents' && $currentAction=='admin_nc_closure') {echo 'active';}?>">
 								<a href="<?php echo SITEURL?>admin/documents/nc_closure">
 									<i class="menu-icon fa fa-setting"></i>
 									Format For NC and NC Closure
@@ -519,7 +522,7 @@
 					<?php						
 						if(in_array(18,$chkuserpermission) ){
 					?>	
-					<li class="<?php if ($this->params['controller']=='organisations' || $this->params['controller']=='purchases') {echo 'active';}?>">
+					<li class="<?php if ($currentController=='organisations' || $currentController=='purchases') {echo 'active';}?>">
 						<a href="" class="dropdown-toggle">
 							<i class="menu-icon fa fa-briefcase"></i>
 							<span class="menu-text"> Organisation </span>
@@ -531,7 +534,7 @@
 
 						<ul class="submenu">
 							
-							<li class="<?php if ($this->params['controller']=='organisations') {echo 'active';}?>">
+							<li class="<?php if ($currentController=='organisations') {echo 'active';}?>">
 								 
 								<a href="<?php echo SITEURL;?>organisations/circular"> 
 									<i class="menu-icon fa fa-setting"></i>
@@ -539,7 +542,7 @@
 								</a>
 								<b class="arrow"></b>
 							</li>
-							<li class="<?php if ($this->params['controller']=='purchases' && $this->params['action']=='index') {echo 'active';}?>">
+							<li class="<?php if ($currentController === 'purchases' && $currentAction === 'index') {echo 'active';}?>">
 								 
 								<a href="<?php echo SITEURL;?>purchases"> 
 									<i class="menu-icon fa fa-setting"></i>
@@ -547,9 +550,9 @@
 								</a>
 								<b class="arrow"></b>
 							</li>
-							<li class="<?php if ($this->params['controller']=='purchases'  && $this->params['action']=='resource_requirement') {echo 'active';}?>">
+							<li class="<?php if ($currentController === 'purchases' && $currentAction === 'resource_requirement') {echo 'active';}?>">
 								 
-								<a href="<?php echo SITEURL;?>purchases/resource_requirement"> 
+								<a href="<?php echo SITEURL;?>purchases/resource-requirement"> 
 									<i class="menu-icon fa fa-setting"></i>
 									Resource Requirement
 								</a>
@@ -608,7 +611,7 @@
 						</ul>	
 					</li-->	
 						
-					<li class="<?php if (($this->params['controller']=='staffs') && ($this->params['action']=='profile'  ||  $this->params['action']=='change_password') ) {echo 'active';}?>">
+					<li class="<?php if (($currentController=='staffs') && ($currentAction=='profile'  ||  $currentAction=='change_password') ) {echo 'active';}?>">
 						<a href="#" class="dropdown-toggle">
 							<i class="menu-icon fa fa-cog "></i>
 							<span class="menu-text"> Settings </span>
@@ -620,7 +623,7 @@
 
 						<ul class="submenu">
 							
-							<li class="<?php if ($this->params['controller']=='staffs' && $this->params['action']=='profile') { echo 'active'; }?>">
+							<li class="<?php if ($currentController=='staffs' && $currentAction=='profile') { echo 'active'; }?>">
 								<a href="<?php echo SITEURL;?>staffs/profile">
 									<i class="menu-icon fa fa-setting"></i>
 									Profile
@@ -629,7 +632,7 @@
 								<b class="arrow"></b>
 							</li>
 							
-							<li class="<?php if ($this->params['controller']=='staffs' && $this->params['action']=='change_password') {echo 'active';}?>">
+							<li class="<?php if ($currentController=='staffs' && $currentAction=='change_password') {echo 'active';}?>">
 								<a href="<?php echo SITEURL;?>staffs/change_password">
 									<i class="menu-icon fa fa-setting"></i>
 									Change Password

@@ -10,5 +10,7 @@ class FeedbackTable extends Table
     public function initialize(array $config): void
     {
         parent::initialize($config);
+        $this->setTable('feedback');
+        $this->setPrimaryKey('id');
     }
 }

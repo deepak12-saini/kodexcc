@@ -12,6 +12,9 @@ class NappUserTable extends Table
         parent::initialize($config);
         $this->setTable('napp_user');
 
+        $this->belongsTo('Department', [
+            'foreignKey' => 'dept_id',
+        ]);
         $this->hasMany('LabAssign', [
             'foreignKey' => 'customer_id',
         ]);

@@ -10,5 +10,6 @@ class MaterialOrderTable extends Table
     public function initialize(array $config): void
     {
         parent::initialize($config);
+        $this->setTable('material_order');
     }
 }

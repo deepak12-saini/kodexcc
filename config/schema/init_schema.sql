@@ -383,6 +383,20 @@ CREATE TABLE IF NOT EXISTS `client` (
   `type` VARCHAR(255) NULL,
   `user_id` INT NULL,
   `value` TEXT NULL,
+  `fname` VARCHAR(255) NULL,
+  `lname` VARCHAR(255) NULL,
+  `mobile` VARCHAR(50) NULL,
+  `landline` VARCHAR(50) NULL,
+  `company` VARCHAR(255) NULL,
+  `address1` VARCHAR(500) NULL,
+  `address2` VARCHAR(500) NULL,
+  `city` VARCHAR(255) NULL,
+  `state` VARCHAR(255) NULL,
+  `zip` VARCHAR(50) NULL,
+  `country` VARCHAR(255) NULL,
+  `website` VARCHAR(255) NULL,
+  `job_title` VARCHAR(255) NULL,
+  `chat` TINYINT UNSIGNED NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -410,6 +424,11 @@ CREATE TABLE IF NOT EXISTS `client_comment` (
   `type` VARCHAR(255) NULL,
   `user_id` INT NULL,
   `value` TEXT NULL,
+  `client_id` INT UNSIGNED NULL,
+  `admin_id` INT UNSIGNED NULL,
+  `emp_id` INT UNSIGNED NULL,
+  `comment` TEXT NULL,
+  `documents` VARCHAR(255) NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -1447,6 +1466,8 @@ CREATE TABLE IF NOT EXISTS `hr_training_need_assessment_record` (
 
 CREATE TABLE IF NOT EXISTS `lab_assign` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `customer_id` INT UNSIGNED NULL,
+  `lab_id` INT UNSIGNED NULL,
   `cart_session_id` INT NULL,
   `category_id` INT NULL,
   `created` DATETIME NULL,
@@ -1469,7 +1490,9 @@ CREATE TABLE IF NOT EXISTS `lab_assign` (
   `type` VARCHAR(255) NULL,
   `user_id` INT NULL,
   `value` TEXT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `idx_lab_assign_customer_id` (`customer_id`),
+  KEY `idx_lab_assign_lab_id` (`lab_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `lab_file` (
@@ -1636,56 +1659,32 @@ CREATE TABLE IF NOT EXISTS `mailer` (
 
 CREATE TABLE IF NOT EXISTS `material` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `cart_session_id` INT NULL,
-  `category_id` INT NULL,
-  `created` DATETIME NULL,
+  `material_type` VARCHAR(255) NULL,
+  `package_type` VARCHAR(64) NULL,
+  `weight` VARCHAR(255) NULL,
+  `quantity` VARCHAR(255) NULL,
   `description` TEXT NULL,
-  `email` VARCHAR(255) NULL,
-  `image` VARCHAR(255) NULL,
-  `ip` VARCHAR(255) NULL,
-  `message` TEXT NULL,
+  `created` DATETIME NULL,
   `modified` DATETIME NULL,
-  `name` VARCHAR(255) NULL,
-  `password` VARCHAR(255) NULL,
-  `phone` VARCHAR(50) NULL,
-  `product_id` INT NULL,
-  `session_id` INT NULL,
-  `sheet_id` INT NULL,
-  `slug` VARCHAR(255) NULL,
-  `status` INT NULL,
-  `task_id` INT NULL,
-  `title` VARCHAR(255) NULL,
-  `type` VARCHAR(255) NULL,
-  `user_id` INT NULL,
-  `value` TEXT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `material_order` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `cart_session_id` INT NULL,
-  `category_id` INT NULL,
-  `created` DATETIME NULL,
-  `description` TEXT NULL,
-  `email` VARCHAR(255) NULL,
-  `image` VARCHAR(255) NULL,
-  `ip` VARCHAR(255) NULL,
-  `message` TEXT NULL,
-  `modified` DATETIME NULL,
+  `order_id` VARCHAR(64) NULL,
+  `material_id` INT UNSIGNED NULL,
+  `material_type` VARCHAR(255) NULL,
+  `weight` VARCHAR(255) NULL,
+  `quantity` VARCHAR(255) NULL,
   `name` VARCHAR(255) NULL,
-  `password` VARCHAR(255) NULL,
-  `phone` VARCHAR(50) NULL,
-  `product_id` INT NULL,
-  `session_id` INT NULL,
-  `sheet_id` INT NULL,
-  `slug` VARCHAR(255) NULL,
-  `status` INT NULL,
-  `task_id` INT NULL,
-  `title` VARCHAR(255) NULL,
-  `type` VARCHAR(255) NULL,
-  `user_id` INT NULL,
-  `value` TEXT NULL,
-  PRIMARY KEY (`id`)
+  `status` INT NOT NULL DEFAULT 0,
+  `user_id` INT UNSIGNED NULL,
+  `admin_id` INT UNSIGNED NULL,
+  `created` DATETIME NULL,
+  `lastmodification` DATETIME NULL,
+  `modified` DATETIME NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_material_order_order_id` (`order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `napp_user` (
@@ -1718,56 +1717,31 @@ CREATE TABLE IF NOT EXISTS `napp_user` (
 
 CREATE TABLE IF NOT EXISTS `nata_category` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `cart_session_id` INT NULL,
-  `category_id` INT NULL,
-  `created` DATETIME NULL,
-  `description` TEXT NULL,
-  `email` VARCHAR(255) NULL,
-  `image` VARCHAR(255) NULL,
-  `ip` VARCHAR(255) NULL,
-  `message` TEXT NULL,
-  `modified` DATETIME NULL,
+  `parent_id` INT UNSIGNED NOT NULL DEFAULT 0,
+  `unique_id` INT UNSIGNED NULL,
   `name` VARCHAR(255) NULL,
-  `password` VARCHAR(255) NULL,
-  `phone` VARCHAR(50) NULL,
-  `product_id` INT NULL,
-  `session_id` INT NULL,
-  `sheet_id` INT NULL,
-  `slug` VARCHAR(255) NULL,
-  `status` INT NULL,
-  `task_id` INT NULL,
-  `title` VARCHAR(255) NULL,
-  `type` VARCHAR(255) NULL,
-  `user_id` INT NULL,
-  `value` TEXT NULL,
-  PRIMARY KEY (`id`)
+  `make_model_type` VARCHAR(255) NULL,
+  `created` DATETIME NULL,
+  `modified` DATETIME NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_nata_category_parent` (`parent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `nata_event` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `cart_session_id` INT NULL,
-  `category_id` INT NULL,
-  `created` DATETIME NULL,
+  `cate_id` INT UNSIGNED NULL,
+  `month` VARCHAR(32) NULL,
+  `year` VARCHAR(16) NULL,
+  `date` DATE NULL,
   `description` TEXT NULL,
-  `email` VARCHAR(255) NULL,
-  `image` VARCHAR(255) NULL,
-  `ip` VARCHAR(255) NULL,
-  `message` TEXT NULL,
+  `status` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  `user_id` INT UNSIGNED NULL,
+  `admin_id` INT UNSIGNED NULL,
+  `created` DATETIME NULL,
   `modified` DATETIME NULL,
-  `name` VARCHAR(255) NULL,
-  `password` VARCHAR(255) NULL,
-  `phone` VARCHAR(50) NULL,
-  `product_id` INT NULL,
-  `session_id` INT NULL,
-  `sheet_id` INT NULL,
-  `slug` VARCHAR(255) NULL,
-  `status` INT NULL,
-  `task_id` INT NULL,
-  `title` VARCHAR(255) NULL,
-  `type` VARCHAR(255) NULL,
-  `user_id` INT NULL,
-  `value` TEXT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `idx_nata_event_cate` (`cate_id`),
+  KEY `idx_nata_event_year` (`year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `notification` (
@@ -2043,6 +2017,17 @@ CREATE TABLE IF NOT EXISTS `project` (
 
 CREATE TABLE IF NOT EXISTS `purchase` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `purchase_type` INT NOT NULL DEFAULT 0,
+  `permitted_by` INT UNSIGNED NULL,
+  `prepared_by` INT UNSIGNED NULL,
+  `authorized_by` INT UNSIGNED NULL,
+  `unique_id` VARCHAR(255) NULL,
+  `item_details` TEXT NULL,
+  `requisitioner_name` VARCHAR(255) NULL,
+  `date` DATE NULL,
+  `name_of_receiver` VARCHAR(255) NULL,
+  `final_result` TEXT NULL,
+  `ignore_id` INT NOT NULL DEFAULT 0,
   `cart_session_id` INT NULL,
   `category_id` INT NULL,
   `created` DATETIME NULL,
@@ -2065,34 +2050,29 @@ CREATE TABLE IF NOT EXISTS `purchase` (
   `type` VARCHAR(255) NULL,
   `user_id` INT NULL,
   `value` TEXT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `idx_purchase_type` (`purchase_type`),
+  KEY `idx_permitted_by` (`permitted_by`),
+  KEY `idx_prepared_by` (`prepared_by`),
+  KEY `idx_authorized_by` (`authorized_by`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `purchase_requirement` (
+CREATE TABLE IF NOT EXISTS `purchase_requirements` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `cart_session_id` INT NULL,
-  `category_id` INT NULL,
+  `purchase_id` INT UNSIGNED NULL,
+  `item_name` VARCHAR(255) NULL,
+  `comments` TEXT NULL,
+  `quantity` VARCHAR(50) NULL,
+  `description_item` TEXT NULL,
+  `resource_requirement` TEXT NULL,
+  `purpose_project` VARCHAR(255) NULL,
+  `time` VARCHAR(255) NULL,
+  `budget` VARCHAR(255) NULL,
+  `remark` TEXT NULL,
   `created` DATETIME NULL,
-  `description` TEXT NULL,
-  `email` VARCHAR(255) NULL,
-  `image` VARCHAR(255) NULL,
-  `ip` VARCHAR(255) NULL,
-  `message` TEXT NULL,
   `modified` DATETIME NULL,
-  `name` VARCHAR(255) NULL,
-  `password` VARCHAR(255) NULL,
-  `phone` VARCHAR(50) NULL,
-  `product_id` INT NULL,
-  `session_id` INT NULL,
-  `sheet_id` INT NULL,
-  `slug` VARCHAR(255) NULL,
-  `status` INT NULL,
-  `task_id` INT NULL,
-  `title` VARCHAR(255) NULL,
-  `type` VARCHAR(255) NULL,
-  `user_id` INT NULL,
-  `value` TEXT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `idx_purchase_requirements_purchase_id` (`purchase_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `question` (
@@ -2802,6 +2782,8 @@ CREATE TABLE IF NOT EXISTS `staff_client` (
   `type` VARCHAR(255) NULL,
   `user_id` INT NULL,
   `value` TEXT NULL,
+  `staff_id` INT UNSIGNED NULL,
+  `client_id` INT UNSIGNED NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -2941,31 +2923,16 @@ CREATE TABLE IF NOT EXISTS `user_answer` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `user_permission` (
+CREATE TABLE IF NOT EXISTS `user_permissions` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `cart_session_id` INT NULL,
-  `category_id` INT NULL,
+  `user_id` INT UNSIGNED NOT NULL,
+  `permssion_id` INT UNSIGNED NOT NULL,
+  `meta_val` VARCHAR(255) NULL,
   `created` DATETIME NULL,
-  `description` TEXT NULL,
-  `email` VARCHAR(255) NULL,
-  `image` VARCHAR(255) NULL,
-  `ip` VARCHAR(255) NULL,
-  `message` TEXT NULL,
   `modified` DATETIME NULL,
-  `name` VARCHAR(255) NULL,
-  `password` VARCHAR(255) NULL,
-  `phone` VARCHAR(50) NULL,
-  `product_id` INT NULL,
-  `session_id` INT NULL,
-  `sheet_id` INT NULL,
-  `slug` VARCHAR(255) NULL,
-  `status` INT NULL,
-  `task_id` INT NULL,
-  `title` VARCHAR(255) NULL,
-  `type` VARCHAR(255) NULL,
-  `user_id` INT NULL,
-  `value` TEXT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `idx_user_permissions_user` (`user_id`),
+  KEY `idx_user_permissions_perm` (`permssion_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `voc_certificate` (

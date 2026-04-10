@@ -104,7 +104,7 @@ class UsersController extends AppController
 						$this->Session->setFlash('You account has been activated successfully.','default',array('class' => 'alert alert-success'));	
 						$this->Session->write('Customer', $cus_arr['NappUser']);
 						$this->Session->write('is_customer', 1);			
-						$this->redirect('dashboard');
+						$this->redirect(['action' => 'dashboard']);
 					}else{
 						$semployeeid =  base64_encode(base64_encode(base64_encode($cus_arr['NappUser']['email'])));
 						$staff_to = 'kal@durotechindustries.com.au';				
@@ -146,7 +146,7 @@ class UsersController extends AppController
 		$is_staff=$this->Session->read('is_staff');
 		
 		if(!empty($is_customer)){
-			$this->redirect('dashboard');
+			$this->redirect(['action' => 'dashboard']);
 		}else if(!empty($is_staff)){
 			$this->redirect('/staffs/dashboard');
 		}		
@@ -169,7 +169,7 @@ class UsersController extends AppController
 				if($cus_arr['NappUser']['is_staff_id'] == 0){					
 					$this->Session->write('Customer', $cus_arr['NappUser']);
 					$this->Session->write('is_customer', 1);			
-					$this->redirect('dashboard');
+					$this->redirect(['action' => 'dashboard']);
 				}else{
 					$this->Session->write('Customer', $cus_arr['NappUser']);
 					$this->Session->write('is_staff', 1);			
@@ -192,7 +192,7 @@ class UsersController extends AppController
 		$is_staff=$this->Session->read('is_staff');
 		
 		if(!empty($is_customer)){
-			$this->redirect('dashboard');
+			$this->redirect(['action' => 'dashboard']);
 		}else if(!empty($is_staff)){
 			$this->redirect('/staffs/dashboard');
 		}		
@@ -218,7 +218,7 @@ class UsersController extends AppController
 					$this->LoginHistory->save($insert);	
 					$this->Session->write('Customer', $cus_arr['NappUser']);
 					$this->Session->write('is_customer', 1);			
-					$this->redirect('dashboard');
+					$this->redirect(['action' => 'dashboard']);
 				}else{
 					$insert['LoginHistory']['user_id'] = $cus_arr['NappUser']['id'];
 					$insert['LoginHistory']['role'] = 'Staff';

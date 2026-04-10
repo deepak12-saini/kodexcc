@@ -10,5 +10,9 @@ class NataEventTable extends Table
     public function initialize(array $config): void
     {
         parent::initialize($config);
+        $this->setTable('nata_event');
+        $this->belongsTo('NataCategory', [
+            'foreignKey' => 'cate_id',
+        ]);
     }
 }
