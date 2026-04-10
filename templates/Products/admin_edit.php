@@ -9,7 +9,7 @@
 	<div class="row">
 		<div class="col-xs-12">
 	<?php $p = $product_arr['Product'] ?? []; ?>
-		<?php echo $this->Form->create(null, ['class' => 'form-horizontal', 'role' => 'form', 'type' => 'file']); ?>
+		<?php echo $this->Form->create(null, ['class' => 'form-horizontal', 'role' => 'form', 'type' => 'file', 'secure' => false]); ?>
 		<input type="hidden"  name="data[Product][id]" value="<?php echo h($p['id'] ?? ''); ?>" >
 			<div class="form-group">
 				<label class="col-sm-3 control-label no-padding-right" for="form-field-1"> Category: </label>
