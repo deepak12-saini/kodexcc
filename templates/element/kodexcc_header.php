@@ -2,6 +2,7 @@
 $getpro = $this->requestAction('/app/getcate');
 ?>
 <nav id="mob-menu" class="mobile-menu-nav" role="navigation" aria-label="Mobile Menu">	<ul class="mobile_menu-ul">
+	<?php /* Products — uncomment to restore
 	<li class="mobile_menu-li has-submenu ">
 		<a class="mobile_menu-a" href="<?php echo SITEURL.'products'; ?>">Products</a>
 		<ul class="mobile_menu_submenu-ul">		
@@ -32,7 +33,9 @@ $getpro = $this->requestAction('/app/getcate');
 			</li>	
 		</ul>
 	</li>
+	*/ ?>
 
+	<?php /* Documents & Brochures — uncomment to restore
 	<li class="mobile_menu-li has-submenu ">
 		<a class="mobile_menu-a" href="">Documents &#038; Brochures</a>
 		<ul class="mobile_menu_submenu-ul">
@@ -42,25 +45,49 @@ $getpro = $this->requestAction('/app/getcate');
 				
 		</ul>
 	</li>
+	*/ ?>
 
 	<li class="mobile_menu-li no-submenu ">
-		<a class="mobile_menu-a" href="about-us">About us</a>
+		<a class="mobile_menu-a" href="<?php echo SITEURL; ?>about-us">About us</a>
+	</li>
+	<li class="mobile_menu-li has-submenu ">
+		<a class="mobile_menu-a" href="javascript:void(0)">Capabilities</a>
+		<ul class="mobile_menu_submenu-ul">
+			<li class="mobile_menu_submenu-li no-submenu">
+				<a class="mobile_menu_submenu-a" href="<?php echo SITEURL; ?>contact-us">Private Label Programmes</a>
+			</li>
+			<li class="mobile_menu_submenu-li no-submenu">
+				<a class="mobile_menu_submenu-a" href="<?php echo SITEURL; ?>contact-us">Custom Formulation</a>
+			</li>
+			<li class="mobile_menu_submenu-li no-submenu">
+				<a class="mobile_menu_submenu-a" href="<?php echo SITEURL; ?>contact-us">Confidential Supply</a>
+			</li>
+		</ul>
 	</li>
 	<li class="mobile_menu-li no-submenu ">
-		<a class="mobile_menu-a" href="contact-us">Contact us</a>
+		<a class="mobile_menu-a" href="<?php echo SITEURL; ?>contact-us">Contact us</a>
 	</li>
 </ul>
 </nav>
 
-<div class="site-header-base">
-	<header class="site-header">
-		<div class="header-cols">
+<div class="site-header-base kx-chrome">
+	<header class="site-header kx-header" id="kx-header">
+		<div class="kx-header__bar header-cols">
 			<div class="col col-l">
-				<a href="<?php echo SITEURL; ?>" ><img class="site-logo" src="<?php echo SITEURL ;?>wp-content/kodex-white-logo.png" alt="kodex" ></a>
+				<a class="kx-logo" href="<?php echo SITEURL; ?>" aria-label="KodexCC home">
+					<span class="kx-logo__crop">
+						<img class="site-logo" src="<?php echo SITEURL ;?>wp-content/kodex-white-logo.png" alt="KodexCC">
+					</span>
+					<span class="kx-logo__text">
+						<span class="kx-logo__name">KodexCC</span>
+						<span class="kx-logo__tag">Private Label OEM</span>
+					</span>
+				</a>
 			</div>
 			<div class="col col-m">
-			<nav class="header-menu">	
+			<nav class="header-menu kx-nav" aria-label="Primary">	
 			<ul class="sitemenu-ul">
+				<?php /* Products — uncomment to restore
 				<li class="sitemenu-li has-submenu">
 				<a class="sitemenu-a" href="<?php echo SITEURL.'products'; ?>">Products</a>
 				<ul class="sitemenu_submenu-ul">
@@ -133,7 +160,9 @@ $getpro = $this->requestAction('/app/getcate');
 				
 				
 				</ul>
-				</li>			
+				</li>
+				*/ ?>
+				<?php /* Documents & Brochures — uncomment to restore
 				<li class="sitemenu-li has-submenu">
 					<a class="sitemenu-a" href="<?php echo SITEURL ;?>product-data-sheets">Documents &#038; Brochures</a>
 					<ul class="sitemenu_submenu-ul">
@@ -149,31 +178,33 @@ $getpro = $this->requestAction('/app/getcate');
 					
 					</ul>
 				</li>
+				*/ ?>
 				<li class="sitemenu-li no-submenu">
-					<a class="sitemenu-a" href="<?php echo SITEURL ;?>about-us">About us</a>
+					<a class="sitemenu-a" href="<?php echo SITEURL ;?>about-us">About</a>
 				</li>
 				<li class="sitemenu-li has-submenu">
-					<a class="sitemenu-a" href="javascript:void(0)">Services</a>
-					<ul class="sitemenu_submenu-ul">
+					<a class="sitemenu-a" href="javascript:void(0)">Capabilities</a>
+					<ul class="sitemenu_submenu-ul kx-dropdown">
 						<li class="sitemenu_submenu-li no-submenu">
-							<a class="sitemenu_submenu-a" href="<?php echo SITEURL ;?>bathroom-floor-waterproofing">Bathroom Floor Waterproofing</a>
+							<a class="sitemenu_submenu-a" href="<?php echo SITEURL ;?>contact-us">Private Label Programmes</a>
 						</li>
 						<li class="sitemenu_submenu-li no-submenu">
-							<a class="sitemenu_submenu-a" href="<?php echo SITEURL ;?>bathroom-waterproofing">Bathroom Waterproofing</a>
+							<a class="sitemenu_submenu-a" href="<?php echo SITEURL ;?>contact-us">Custom Formulation</a>
 						</li>
 						<li class="sitemenu_submenu-li no-submenu">
-							<a class="sitemenu_submenu-a" href="<?php echo SITEURL ;?>shower-waterproofing">Shower Waterproofing</a>
+							<a class="sitemenu_submenu-a" href="<?php echo SITEURL ;?>contact-us">Confidential Supply</a>
 						</li>
-					
 					</ul>
 				</li>
-				
 				<li class="sitemenu-li no-submenu">
-					<a class="sitemenu-a" href="<?php echo SITEURL ;?>contact-us">Contact us</a>
+					<a class="sitemenu-a" href="<?php echo SITEURL ;?>contact-us">Contact</a>
+				</li>
+				<li class="sitemenu-li no-submenu kx-nav-cta-li">
+					<a class="kx-nav-cta" href="<?php echo SITEURL ;?>contact-us">Partner With Us</a>
 				</li>
 			</ul>			
 		</nav>
-			<a href="#mob-menu" class="mburger mburger--collapse"><b></b><b></b><b></b></a>
+			<a href="#mob-menu" class="mburger mburger--collapse kx-burger" aria-label="Open menu"><b></b><b></b><b></b></a>
 		</div>			
 	</div>		
 </header>

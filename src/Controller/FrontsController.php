@@ -44,17 +44,17 @@ class FrontsController extends AppController{
 		
 		$this->set('ismobile',$res);
 		
-		$this->set('meta_title','Top Sealants and Waterproofing Solutions in Australia - Kodexcc');
-		$this->set('meta_description','Discover premium sealants and waterproofing solutions in Australia at Kodexcc. Trusted and effective products. Call 1800 418 495 for assistance.');
+		$this->set('meta_title','KodexCC | Private Label Technology-Driven OEM Manufacturing');
+		$this->set('meta_description','KodexCC is a specialist private label OEM manufacturer of advanced polymers, sealants, silicones, and coatings. Confidential manufacturing for global brands.');
 	
 	} 
 	
 	public function about(){
 		$this->viewBuilder()->setLayout('customkggc_layout');
 		
-		$this->set('meta_title','About Us | Expert Sealants and Waterproofing Solutions for the Australian Market');
-		$this->set('meta_description','Based Kodex specializing in providing professional sealant and waterproofing solutions for residential and commercial properties. Trust us to keep your space dry and protected.');
-		$this->set('meta_keyword','company specializing in construction materials. Sealants, Primer, Waterproofing Solutions, Australian, Construction Materials, Building Supplies');		
+		$this->set('meta_title','About KodexCC | Private Label Technology-Driven OEM Manufacturing');
+		$this->set('meta_description','KodexCC is a specialist private label OEM manufacturer of advanced polymers, sealants, silicones, and coatings. Confidential manufacturing for global brands.');
+		$this->set('meta_keyword','private label manufacturing, OEM manufacturer, polymers, sealants, silicones, coatings, confidential manufacturing');
 	}
 	
 	
@@ -209,9 +209,9 @@ class FrontsController extends AppController{
 		
 		$this->Session->write('session',1);
 		
-		$this->set('meta_title','Contact Us for Professional Sealants & Waterproofing Solutions in Australia. Call us opening hours 1800 418 495');
-		$this->set('meta_description','Based company providing professional services for waterproofing and sealing solutions. Contact us for more information and a free quote.');
-		$this->set('meta_keyword','Sealants, Primer, Waterproofing Solutions, Contact Us, Australia');
+		$this->set('meta_title','Contact KodexCC | Confidential Private Label OEM Enquiries');
+		$this->set('meta_description','Contact KodexCC for confidential private label manufacturing of polymers, sealants, silicones, and coatings. Call 1800 418 495.');
+		$this->set('meta_keyword','private label OEM, confidential manufacturing, contact KodexCC, polymers, sealants, silicones, coatings');
 		
 		
 		
