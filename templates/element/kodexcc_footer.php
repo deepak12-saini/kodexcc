@@ -2,15 +2,13 @@
 	<div class="kx-footer">
 		<div class="kx-footer__top">
 			<div class="kx-footer__brand">
-				<a class="kx-footer__logo" href="<?php echo SITEURL; ?>" aria-label="KodexCC home">
-					<span class="kx-footer__logo-crop">
-						<img src="<?php echo SITEURL; ?>wp-content/kodex-white-logo.png" alt="KodexCC">
-					</span>
-					<span class="kx-footer__logo-text">
-						<span class="kx-footer__logo-name">KodexCC</span>
-						<span class="kx-footer__logo-tag">Private Label OEM Manufacturing</span>
-					</span>
-				</a>
+			<a class="kx-footer__logo" href="<?php echo SITEURL; ?>" aria-label="KodexCC home">
+				<span class="kx-footer__logo-mark" aria-hidden="true">K</span>
+				<span class="kx-footer__logo-text">
+					<span class="kx-footer__logo-name">KodexCC</span>
+					<span class="kx-footer__logo-tag">Private Label OEM Manufacturing</span>
+				</span>
+			</a>
 				<p class="kx-footer__lede">
 					Confidential manufacturing of advanced polymers, sealants, silicones, and coatings for global brands.
 				</p>

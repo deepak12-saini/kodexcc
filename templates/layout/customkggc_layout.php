@@ -38,7 +38,7 @@
 	<link rel='stylesheet' href='<?php echo SITEURL ;?>wp-content/themes/enviro/tool/mmenujs/mmenu.css' type='text/css' media='all' />
 	<link rel='stylesheet' href='<?php echo SITEURL ;?>wp-content/themes/enviro/style696e.css?ver=1636523509' type='text/css' media='all' />
 	<link rel='stylesheet' href='<?php echo SITEURL ;?>wp-content/themes/enviro/css/globalb9c0.css?ver=1642475174' type='text/css' media='all' />
-	<link rel='stylesheet' href='<?php echo SITEURL ;?>css/kodex-oem-chrome.css?v=4' type='text/css' media='all' />
+	<link rel='stylesheet' href='<?php echo SITEURL ;?>css/kodex-oem-chrome.css?v=5' type='text/css' media='all' />
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">

@@ -56,22 +56,23 @@
 	color: #fff;
 }
 
-.kx-logo__crop {
-	display: block;
-	height: 34px;
-	width: 108px;
-	overflow: hidden;
+.kx-logo__mark {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.35rem;
+	height: 2.35rem;
+	border: 1px solid rgba(255, 255, 255, 0.35);
+	font-family: var(--kx-font-display);
+	font-size: 1.05rem;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	color: #fff;
 	flex-shrink: 0;
 }
 
-.kx-logo__crop .site-logo {
-	height: 52px !important;
-	width: auto !important;
-	max-width: none !important;
-	display: block;
-	object-fit: cover;
-	object-position: left top;
-	margin: 0 !important;
+.kx-logo__crop {
+	display: none;
 }
 
 .kx-logo__text {
@@ -222,7 +223,7 @@ body:has(#kx-page) .kx-header.is-scrolled {
 }
 
 @media (max-width: 980px) {
-	.kx-logo__text {
+	.kx-logo__tag {
 		display: none;
 	}
 
@@ -277,20 +278,22 @@ body:has(#kx-page) .kx-header.is-scrolled {
 	color: #fff;
 }
 
-.kx-footer__logo-crop {
-	display: block;
-	width: 96px;
-	height: 32px;
-	overflow: hidden;
+.kx-footer__logo-mark {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.35rem;
+	height: 2.35rem;
+	border: 1px solid rgba(255, 255, 255, 0.35);
+	font-family: var(--kx-font-display);
+	font-size: 1.05rem;
+	font-weight: 700;
+	color: #fff;
 	flex-shrink: 0;
 }
 
-.kx-footer__logo-crop img {
-	height: 48px;
-	width: auto;
-	display: block;
-	object-fit: cover;
-	object-position: left top;
+.kx-footer__logo-crop {
+	display: none;
 }
 
 .kx-footer__logo-text {

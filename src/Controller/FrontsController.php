@@ -59,13 +59,7 @@ class FrontsController extends AppController{
 	
 	
 	public function bathroom_floor_waterproofing(){
-		$this->viewBuilder()->setLayout('customkggc_layout');
-		
-		$this->set('meta_title','Bathroom Floor Waterproofing:  Keep Your Bathroom Safe and Dry');
-		$this->set('meta_description','Bathroom floor waterproofing is essential for protecting your home from water damage. The various waterproofing options available.');
-		$this->set('meta_keyword','Shower waterproofing,Wet area waterproofing, Australian waterproofing ');	
-		$this->set('page','bathroom-floor-waterproofing');	
-		$this->render('/Fronts/service');
+		return $this->redirect('/contact-us');
 	}
 
     public function bathroomFloorWaterproofing()
@@ -74,13 +68,7 @@ class FrontsController extends AppController{
     }
 	
 	public function bathroom_waterproofing(){
-		$this->viewBuilder()->setLayout('customkggc_layout');
-		
-		$this->set('meta_title','Professional Bathroom Waterproofing Services in Sydney');
-		$this->set('meta_description','Bathroom waterproofing is an essential aspect of any bathroom renovation or construction project in Australia.');
-		$this->set('meta_keyword','Bathroom waterproofing, Waterproofing solutions,  Wet area waterproofing, Waterproofing membranes,  Shower waterproofing,   Bathroom renovation,  Bathroom tiles, Bathroom flooring, Australian waterproofing');	
-		$this->set('page','bathroom-waterproofing');
-		$this->render('/Fronts/service');		
+		return $this->redirect('/contact-us');
 	}
 
     public function bathroomWaterproofing()
@@ -90,13 +78,7 @@ class FrontsController extends AppController{
 	
 	public function shower_waterproofing()
 	{
-		$this->viewBuilder()->setLayout('customkggc_layout');
-		
-		$this->set('meta_title','Expert Guide to Shower Waterproofing: Tips and Products');
-		$this->set('meta_description','Shower waterproofing is an essential process to prevent water damage and leakage in your bathroom.');
-		$this->set('meta_keyword','Shower waterproofing,Wet area waterproofing, Australian waterproofing ');			
-		$this->set('page','shower-waterproofing');	
-		$this->render('/Fronts/service');
+		return $this->redirect('/contact-us');
 	}
 
     public function showerWaterproofing()
@@ -220,11 +202,7 @@ class FrontsController extends AppController{
 		
 	public function documents_brochures()
 	{
-		$this->viewBuilder()->setLayout('customkggc_layout');
-	
-		$this->set('meta_title','High-Quality Sealants, Primers, and Waterproofing Solutions: The Ultimate Brochures for Australia');
-		$this->set('meta_description','based kodex specializing in high-quality sealants, primers, and waterproofing solutions for all your building needs. Our products are designed to provide long-lasting protection and durability. Browse our range of products and order online today.');
-		$this->set('meta_keyword','Sealants, Primer, Waterproofing Solutions, Australia, Documents, Brochures, Building Materials, Construction, Home Improvement');
+		return $this->redirect('/contact-us');
 	}	
 
     // CakePHP 5 maps dashed routes to camelCase actions.
@@ -235,32 +213,7 @@ class FrontsController extends AppController{
 	
 	public function product_data_sheets()
 	{
-		$this->viewBuilder()->setLayout('customkggc_layout');
-	
-		$this->set('meta_title','Product Data Sheets - Kodex');
-		$this->set('meta_description','');
-		$this->set('meta_keyword','');
-		
-		$rows = $this->Category->find()
-            ->where(['Category.status' => 1])
-            ->contain(['Product' => function ($q) {
-                return $q->where(['Product.status' => 1]);
-            }])
-            ->orderBy(['Category.category_name' => 'ASC'])
-            ->enableHydration(false)
-            ->toArray();
-        $category = array_map(function ($row) {
-            return [
-                'Category' => $row,
-                'Product' => $row['product'] ?? [],
-            ];
-        }, $rows);
-		$this->set('category', $category);
-		
-		$this->set('meta_title','Sealants and Waterproofing Solutions - Product Data Sheets for Australian Customers');
-		$this->set('meta_description','kodex specializing in the manufacture and supply of high-quality sealants and waterproofing solutions for various applications. Our product data sheets provide comprehensive information on product specifications, performance, and usage instructions. Trust us to protect your buildings and structures from the elements.');
-		$this->set('meta_keyword','Sealants and Waterproofing Solutions, Australian kodex, High-Quality, Effective, Wide Range of Applications.');
-		
+		return $this->redirect('/contact-us');
 	}
 
     public function productDataSheets()
@@ -271,32 +224,7 @@ class FrontsController extends AppController{
 	
 	public function product_msds()
 	{
-		$this->viewBuilder()->setLayout('customkggc_layout');
-	
-		$this->set('meta_title','Product MSDS - Kodex');
-		$this->set('meta_description','');
-		$this->set('meta_keyword','');
-		
-		$rows = $this->Category->find()
-            ->where(['Category.status' => 1])
-            ->contain(['Product' => function ($q) {
-                return $q->where(['Product.status' => 1]);
-            }])
-            ->orderBy(['Category.category_name' => 'ASC'])
-            ->enableHydration(false)
-            ->toArray();
-        $category = array_map(function ($row) {
-            return [
-                'Category' => $row,
-                'Product' => $row['product'] ?? [],
-            ];
-        }, $rows);
-		$this->set('category', $category);
-		
-		$this->set('meta_title','Sealants and Waterproofing Solutions - Product Data Sheets for Australian Customers');
-		$this->set('meta_description','kodex specializing in the manufacture and supply of high-quality sealants and waterproofing solutions for various applications. Our product data sheets provide comprehensive information on product specifications, performance, and usage instructions. Trust us to protect your buildings and structures from the elements.');
-		$this->set('meta_keyword','Sealants and Waterproofing Solutions, Australian kodex, High-Quality, Effective, Wide Range of Applications.');
-		
+		return $this->redirect('/contact-us');
 	}
 
     public function productMsds()

@@ -52,21 +52,21 @@ $this->Html->script('kodex-oem-home', ['block' => true]);
 						<i class="fas fa-head-side-brain"></i>
 					</span>
 					<h3 class="kx-stats__title">12 years+<br>of history</h3>
-					<p class="kx-stats__text">Kodex has been developing and manufacturing environmentally sustainable and innovative solutions for decades.</p>
+					<p class="kx-stats__text">KodexCC has been developing and manufacturing advanced materials and private label solutions for over a decade.</p>
 				</article>
 				<article class="kx-stats__item">
 					<span class="kx-stats__icon" aria-hidden="true">
-						<i class="fas fa-map-marked-alt"></i>
+						<i class="fas fa-user-shield"></i>
 					</span>
-					<h3 class="kx-stats__title">National reseller<br>network</h3>
-					<p class="kx-stats__text">Through our national reseller network, our products are easily accessible for construction projects across Australia.</p>
+					<h3 class="kx-stats__title">Confidential<br>partnerships</h3>
+					<p class="kx-stats__text">We work behind the brand — protecting client identities, formulations, and programmes under strict confidentiality.</p>
 				</article>
 				<article class="kx-stats__item">
 					<span class="kx-stats__icon" aria-hidden="true">
 						<i class="fas fa-handshake"></i>
 					</span>
 					<h3 class="kx-stats__title">Our experienced<br>team</h3>
-					<p class="kx-stats__text">Our experienced chemists and engineers are dedicated to formulating products that meet and exceed the expectations of our customers.</p>
+					<p class="kx-stats__text">Our chemists and engineers formulate high-performance polymers, sealants, silicones, and coatings for brand partners.</p>
 				</article>
 			</div>
 		</div>

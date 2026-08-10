@@ -75,9 +75,7 @@ $getpro = $this->requestAction('/app/getcate');
 		<div class="kx-header__bar header-cols">
 			<div class="col col-l">
 				<a class="kx-logo" href="<?php echo SITEURL; ?>" aria-label="KodexCC home">
-					<span class="kx-logo__crop">
-						<img class="site-logo" src="<?php echo SITEURL ;?>wp-content/kodex-white-logo.png" alt="KodexCC">
-					</span>
+					<span class="kx-logo__mark" aria-hidden="true">K</span>
 					<span class="kx-logo__text">
 						<span class="kx-logo__name">KodexCC</span>
 						<span class="kx-logo__tag">Private Label OEM</span>
