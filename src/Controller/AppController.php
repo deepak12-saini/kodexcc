@@ -167,6 +167,32 @@ class AppController extends Controller
 			exit();
 		}
 	}
+
+	/**
+	 * HRMS portal session guard (separate from public site and CRM admin).
+	 */
+	function checkHrSession(): void
+	{
+		if (!$this->Session->read('is_hr_user')) {
+			$this->Flash->error('You need to be logged in to access the HRMS portal.');
+			$this->redirect('/hrms');
+			exit();
+		}
+	}
+
+	/**
+	 * @param list<string> $roles
+	 */
+	function requireHrRole(array $roles): void
+	{
+		$this->checkHrSession();
+		$role = (string)$this->Session->read('hr_role');
+		if (!in_array($role, $roles, true)) {
+			$this->Flash->error('You do not have permission for this area.');
+			$this->redirect('/hrms/dashboard');
+			exit();
+		}
+	}
 	
 	//Function 'checkCustomerSession' for admin check in controller
 	function checkcommonSession() {

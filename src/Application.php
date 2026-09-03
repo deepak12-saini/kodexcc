@@ -90,11 +90,31 @@ class Application extends BaseApplication
 
             // Cross Site Request Forgery (CSRF) Protection Middleware
             // https://book.cakephp.org/5/en/security/csrf.html#cross-site-request-forgery-csrf-middleware
-            ->add(new CsrfProtectionMiddleware([
-                'httponly' => true,
-            ]));
+            ->add($this->csrfMiddleware());
 
         return $middlewareQueue;
+    }
+
+    /**
+     * CSRF middleware with a safe login fallback for the HRMS portal.
+     * Stale csrf cookies (common after schema/UI deploys) otherwise block /hrms login
+     * with a cryptic Cake error page.
+     */
+    private function csrfMiddleware(): CsrfProtectionMiddleware
+    {
+        $csrf = new CsrfProtectionMiddleware([
+            'httponly' => true,
+            'secure' => false,
+            'samesite' => 'Lax',
+        ]);
+        $csrf->skipCheckCallback(function ($request) {
+            // Only the HRMS login POST — authenticated session still required elsewhere.
+            return (string)$request->getParam('prefix') === 'Hrms'
+                && (string)$request->getParam('controller') === 'Users'
+                && (string)$request->getParam('action') === 'login';
+        });
+
+        return $csrf;
     }
 
     /**

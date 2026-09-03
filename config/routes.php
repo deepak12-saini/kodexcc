@@ -53,6 +53,15 @@ return function (RouteBuilder $routes): void {
      * Admin prefix: enables URL generation for ['prefix' => 'Admin', 'controller' => 'Users', ...]
      * e.g. /admin/users/login, /admin/users/forgot-password, /admin/users/dashboard
      */
+    /*
+     * HRMS internal portal (separate from public site): /hrms/...
+     */
+    $routes->prefix('Hrms', function (RouteBuilder $builder): void {
+        $builder->setRouteClass(DashedRoute::class);
+        $builder->connect('/', ['controller' => 'Users', 'action' => 'login']);
+        $builder->fallbacks();
+    });
+
     $routes->prefix('Admin', function (RouteBuilder $builder): void {
         $builder->setRouteClass(DashedRoute::class);
         // Legacy URL `admin/mailers/sendemail/{id}` → MailersController::sendSpecificationEmail (not AppController::sendemail).
@@ -118,6 +127,7 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/questionary', ['controller' => 'Fronts', 'action' => 'questionary']);
         $builder->connect('/tmclead', ['controller' => 'Fronts', 'action' => 'newlead']);
         $builder->connect('/admin', ['controller' => 'Users', 'action' => 'login', 'prefix' => 'Admin']);
+        $builder->connect('/hrms', ['controller' => 'Users', 'action' => 'login', 'prefix' => 'Hrms']);
         $builder->connect('/contact-us', ['controller' => 'Fronts', 'action' => 'contact']);
         $builder->connect('/technical-literature/*', ['controller' => 'Fronts', 'action' => 'technical_literature']);
         $builder->connect('/durooem', ['controller' => 'Fronts', 'action' => 'durooem']);
