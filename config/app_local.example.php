@@ -21,6 +21,13 @@ return [
     'debug' => filter_var(env('DEBUG', true), FILTER_VALIDATE_BOOLEAN),
 
     /*
+     * India Standard Time (IST) for attendance / leave.
+     */
+    'App' => [
+        'defaultTimezone' => env('APP_DEFAULT_TIMEZONE', 'Asia/Kolkata'),
+    ],
+
+    /*
      * Security and encryption configuration
      *
      * - salt - A random string used in security hashing methods.
@@ -51,6 +58,7 @@ return [
             'password' => 'secret',
 
             'database' => 'my_app',
+            'timezone' => '+05:30',
             /*
              * If not using the default 'public' schema with the PostgreSQL driver
              * set it here.
