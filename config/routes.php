@@ -58,6 +58,11 @@ return function (RouteBuilder $routes): void {
      */
     $routes->prefix('Hrms', function (RouteBuilder $builder): void {
         $builder->setRouteClass(DashedRoute::class);
+        $builder->prefix('It', function (RouteBuilder $it): void {
+            $it->setRouteClass(DashedRoute::class);
+            $it->connect('/', ['controller' => 'Dashboard', 'action' => 'index']);
+            $it->fallbacks();
+        });
         $builder->connect('/', ['controller' => 'Users', 'action' => 'login']);
         $builder->fallbacks();
     });

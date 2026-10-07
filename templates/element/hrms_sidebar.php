@@ -1,6 +1,7 @@
 <?php
 $role = (string)($hrRole ?? '');
 $isAdminHr = in_array($role, ['admin', 'hr'], true);
+$isIt = $role === 'it';
 $isManager = $role === 'manager';
 $base = SITEURL . 'hrms/';
 $path = trim((string)$this->request->getPath(), '/');
@@ -49,6 +50,35 @@ $ico = [
 	'out' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 17H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/><path d="M15 16l5-5-5-5M20 11H9"/></svg>',
 	'shift' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/><circle cx="12" cy="12" r="3.5"/></svg>',
 ];
+
+$itActive = function (string $section) use ($here): bool {
+	if ($section === 'dashboard') {
+		return $here === 'it' || $here === 'it/dashboard' || str_starts_with($here, 'it/dashboard/');
+	}
+	return $here === 'it/' . $section || str_starts_with($here, 'it/' . $section . '/');
+};
+$itLink = function (string $href, string $label, bool $active, bool $child = false) use ($base): void {
+	echo '<a class="hrms-nav-link' . ($child ? ' is-child' : '') . ($active ? ' is-active' : '') . '" href="' . $base . 'it/' . $href . '">';
+	echo '<span>' . h($label) . '</span></a>';
+};
+$renderItMenu = function () use ($itLink, $itActive): void {
+	$assetType = (string)$this->request->getQuery('type');
+	echo '<div class="hrms-nav-label">Admin & IT</div>';
+	$itLink('', 'IT Dashboard', $itActive('dashboard'));
+	$itLink('assets', 'Assets', $itActive('assets') && $assetType === '');
+	$itLink('assets?type=computer', 'Computers', $itActive('assets') && $assetType === 'computer', true);
+	$itLink('assets?type=laptop', 'Laptops', $itActive('assets') && $assetType === 'laptop', true);
+	$itLink('assets?type=monitor', 'Monitors', $itActive('assets') && $assetType === 'monitor', true);
+	$itLink('assets?type=printer', 'Printers', $itActive('assets') && $assetType === 'printer', true);
+	$itLink('assets?type=other', 'Other Equipment', $itActive('assets') && $assetType === 'other', true);
+	$itLink('assignments', 'Employee Assignments', $itActive('assignments'));
+	$itLink('tickets', 'IT Tickets', $itActive('tickets'));
+	$itLink('repairs', 'Repairs & Service', $itActive('repairs'));
+	$itLink('purchases', 'Purchase Requests', $itActive('purchases'));
+	$itLink('vendors', 'Vendors', $itActive('vendors'));
+	$itLink('maintenance', 'Maintenance', $itActive('maintenance'));
+	$itLink('reports', 'Reports', $itActive('reports'));
+};
 ?>
 <div class="hrms-brand">
 	<span class="hrms-mark">K</span>
@@ -58,6 +88,9 @@ $ico = [
 	</div>
 </div>
 <nav class="hrms-nav">
+	<?php if ($isIt): ?>
+		<?php $renderItMenu(); ?>
+	<?php else: ?>
 	<?php $link('dashboard', 'Dashboard', $ico['dash'], 'dashboard'); ?>
 
 	<?php if ($isAdminHr): ?>
@@ -71,8 +104,9 @@ $ico = [
 
 		<div class="hrms-nav-label">Time</div>
 		<?php
-		$link('attendances', 'Attendance', $ico['clock'], 'attendances');
-		$link('attendances/reports', 'Reports', $ico['chart'], 'attendances/reports');
+		// Attendance menu removed while Admin & IT is in use.
+		// $link('attendances', 'Attendance', $ico['clock'], 'attendances');
+		// $link('attendances/reports', 'Reports', $ico['chart'], 'attendances/reports');
 		$link('leaves', 'Leave Requests', $ico['leave'], 'leaves');
 		$link('leaves/calendar', 'Leave Calendar', $ico['cal'], 'leaves/calendar');
 		$link('leave-types', 'Leave Types', $ico['cal'], 'leave-types');
@@ -87,16 +121,17 @@ $ico = [
 		$link('holidays/calendar', 'Calendar', $ico['cal'], 'holidays/calendar');
 		$link('audit-logs', 'Audit Log', $ico['chart'], 'audit-logs');
 		?>
+		<?php $renderItMenu(); ?>
 	<?php elseif ($isManager): ?>
 		<div class="hrms-nav-label">Team</div>
 		<?php
 		$link('employees', 'My Team', $ico['users'], 'employees');
-		$link('attendances', 'Team Attendance', $ico['clock'], 'attendances');
+		// $link('attendances', 'Team Attendance', $ico['clock'], 'attendances');
 		$link('leaves', 'Leave Approvals', $ico['leave'], 'leaves');
 		?>
 		<div class="hrms-nav-label">Self</div>
 		<?php
-		$link('my/attendance', 'My Attendance', $ico['clock'], 'my/attendance');
+		// $link('my/attendance', 'My Attendance', $ico['clock'], 'my/attendance');
 		$link('my/leaves', 'My Leaves', $ico['leave'], 'my/leaves');
 		$link('my/requests', 'My Requests', $ico['doc'], 'my/requests');
 		$link('my/add-request', 'Submit Request', $ico['doc'], 'my/add-request');
@@ -106,7 +141,7 @@ $ico = [
 	<?php else: ?>
 		<div class="hrms-nav-label">Self Service</div>
 		<?php
-		$link('my/attendance', 'Clock In / Out', $ico['clock'], 'my/attendance');
+		// $link('my/attendance', 'Clock In / Out', $ico['clock'], 'my/attendance');
 		$link('my/leaves', 'My Leaves', $ico['leave'], 'my/leaves');
 		$link('my/requests', 'My Requests', $ico['doc'], 'my/requests');
 		$link('my/add-request', 'Submit Request', $ico['doc'], 'my/add-request');
@@ -117,6 +152,7 @@ $ico = [
 		?>
 	<?php endif; ?>
 
+	<?php endif; ?>
 	<div class="hrms-nav-label">Account</div>
 	<?php
 	$link('users/change-password', 'Change Password', $ico['key'], 'users/change-password');

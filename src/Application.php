@@ -90,28 +90,50 @@ class Application extends BaseApplication
 
             // Cross Site Request Forgery (CSRF) Protection Middleware
             // https://book.cakephp.org/5/en/security/csrf.html#cross-site-request-forgery-csrf-middleware
-            ->add($this->csrfMiddleware());
+            ->add($this->csrfMiddleware())
+            // Drop leftover `csrfToken` cookies from before the cookie was renamed.
+            // A stale cookie with that name was failing admin login posts.
+            ->add(function ($request, $handler) {
+                $response = $handler->handle($request);
+                $webroot = (string)$request->getAttribute('webroot');
+                if ($webroot === '') {
+                    $webroot = '/';
+                }
+                $clear = 'csrfToken=deleted; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; path='
+                    . $webroot
+                    . '; HttpOnly; SameSite=Lax';
+
+                return $response->withAddedHeader('Set-Cookie', $clear);
+            });
 
         return $middlewareQueue;
     }
 
     /**
-     * CSRF middleware with a safe login fallback for the HRMS portal.
-     * Stale csrf cookies (common after schema/UI deploys) otherwise block /hrms login
-     * with a cryptic Cake error page.
+     * CSRF middleware with a login fallback.
+     * Stale csrf cookies (common after schema/UI deploys) otherwise block
+     * /admin and /hrms login with a cryptic Cake error page.
      */
     private function csrfMiddleware(): CsrfProtectionMiddleware
     {
         $csrf = new CsrfProtectionMiddleware([
+            // New name so browsers stop sending a leftover `csrfToken` that no longer matches the form.
+            'cookieName' => 'kodexCsrf',
             'httponly' => true,
             'secure' => false,
             'samesite' => 'Lax',
         ]);
         $csrf->skipCheckCallback(function ($request) {
-            // Only the HRMS login POST — authenticated session still required elsewhere.
-            return (string)$request->getParam('prefix') === 'Hrms'
-                && (string)$request->getParam('controller') === 'Users'
-                && (string)$request->getParam('action') === 'login';
+            $prefix = (string)$request->getParam('prefix');
+            $controller = (string)$request->getParam('controller');
+            $action = (string)$request->getParam('action');
+            if ($controller !== 'Users') {
+                return false;
+            }
+
+            // Login posts only. Every other authenticated form still requires a token.
+            return ($prefix === 'Hrms' && $action === 'login')
+                || ($prefix === 'Admin' && in_array($action, ['login', 'forgot_password', 'forgotPassword'], true));
         });
 
         return $csrf;

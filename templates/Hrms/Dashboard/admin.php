@@ -3,27 +3,10 @@ $this->set('pageTitle', 'Admin Dashboard');
 ?>
 <div class="hrms-cards">
 	<div class="hrms-card"><div class="label">Total Employees</div><div class="value"><?php echo (int)$total; ?></div></div>
-	<div class="hrms-card"><div class="label">Present Today</div><div class="value"><?php echo (int)$present; ?></div></div>
-	<div class="hrms-card"><div class="label">Absent Today</div><div class="value"><?php echo (int)$absent; ?></div></div>
 	<div class="hrms-card"><div class="label">On Leave</div><div class="value"><?php echo (int)$onLeave; ?></div></div>
-	<div class="hrms-card"><div class="label">Late Today</div><div class="value"><?php echo (int)$late; ?></div></div>
 	<div class="hrms-card"><div class="label">Pending Leaves</div><div class="value"><?php echo (int)$pendingLeave; ?></div></div>
-	<div class="hrms-card"><div class="label">Pending Approvals</div><div class="value"><?php echo (int)$pendingCorrections; ?></div></div>
 </div>
-
-<div class="hrms-panel">
-	<h2>Attendance (last 7 days)</h2>
-	<div class="hrms-chart-wrap">
-		<canvas id="attChart"></canvas>
-	</div>
-</div>
-
-<div class="hrms-cards">
-	<div class="hrms-card"><div class="label">Month Present</div><div class="value"><?php echo (int)$monthlySummary['present']; ?></div></div>
-	<div class="hrms-card"><div class="label">Month Absent</div><div class="value"><?php echo (int)$monthlySummary['absent']; ?></div></div>
-	<div class="hrms-card"><div class="label">Month Half Day</div><div class="value"><?php echo (int)$monthlySummary['half_day']; ?></div></div>
-	<div class="hrms-card"><div class="label">Month Late</div><div class="value"><?php echo (int)$monthlySummary['late']; ?></div></div>
-</div>
+<?php /* Attendance cards and chart removed. */ ?>
 
 <div class="hrms-panel">
 	<h2>Department-wise headcount</h2>
@@ -69,21 +52,4 @@ $this->set('pageTitle', 'Admin Dashboard');
 	</div>
 </div>
 
-<script>
-const ctx = document.getElementById('attChart');
-new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: <?php echo json_encode($chartLabels); ?>,
-    datasets: [{
-      label: 'Present',
-      data: <?php echo json_encode($chartPresent); ?>,
-      borderColor: '#1a4a73',
-      backgroundColor: 'rgba(26,74,115,.15)',
-      tension: .3,
-      fill: true
-    }]
-  },
-  options: { responsive: true, maintainAspectRatio: false }
-});
-</script>
+<?php /* Attendance chart removed. */ ?>

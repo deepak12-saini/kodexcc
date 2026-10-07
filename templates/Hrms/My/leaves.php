@@ -70,11 +70,57 @@ $fmtLeaveWhen = function ($item) use ($fmtTime): string {
 		</div>
 		<div>
 			<label>Start Date</label>
-			<input type="date" name="start_date" id="leave-start-date" value="<?php echo date('Y-m-d'); ?>" required>
+			<?php
+			$leaveYearNow = (int)date('Y');
+			$leaveYears = range($leaveYearNow - 2, $leaveYearNow + 1);
+			$leaveMonths = [
+				1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'May', 6 => 'Jun',
+				7 => 'Jul', 8 => 'Aug', 9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dec',
+			];
+			$todayD = (int)date('j');
+			$todayM = (int)date('n');
+			$todayY = (int)date('Y');
+			?>
+			<div class="hrms-date-parts" data-date-group="start">
+				<select id="leave-start-d" aria-label="Start day" required>
+					<?php for ($d = 1; $d <= 31; $d++): ?>
+						<option value="<?php echo $d; ?>"<?php echo $d === $todayD ? ' selected' : ''; ?>><?php echo sprintf('%02d', $d); ?></option>
+					<?php endfor; ?>
+				</select>
+				<select id="leave-start-m" aria-label="Start month" required>
+					<?php foreach ($leaveMonths as $num => $label): ?>
+						<option value="<?php echo $num; ?>"<?php echo $num === $todayM ? ' selected' : ''; ?>><?php echo $label; ?></option>
+					<?php endforeach; ?>
+				</select>
+				<select id="leave-start-y" aria-label="Start year" required>
+					<?php foreach ($leaveYears as $y): ?>
+						<option value="<?php echo $y; ?>"<?php echo $y === $todayY ? ' selected' : ''; ?>><?php echo $y; ?></option>
+					<?php endforeach; ?>
+				</select>
+			</div>
+			<input type="hidden" name="start_date" id="leave-start-date" value="<?php echo date('Y-m-d'); ?>" required>
+			<small class="hrms-field-hint">Past dates are allowed for backdated leave.</small>
 		</div>
 		<div id="leave-end-wrap">
 			<label>End Date</label>
-			<input type="date" name="end_date" id="leave-end-date" value="<?php echo date('Y-m-d'); ?>" required>
+			<div class="hrms-date-parts" data-date-group="end">
+				<select id="leave-end-d" aria-label="End day" required>
+					<?php for ($d = 1; $d <= 31; $d++): ?>
+						<option value="<?php echo $d; ?>"<?php echo $d === $todayD ? ' selected' : ''; ?>><?php echo sprintf('%02d', $d); ?></option>
+					<?php endfor; ?>
+				</select>
+				<select id="leave-end-m" aria-label="End month" required>
+					<?php foreach ($leaveMonths as $num => $label): ?>
+						<option value="<?php echo $num; ?>"<?php echo $num === $todayM ? ' selected' : ''; ?>><?php echo $label; ?></option>
+					<?php endforeach; ?>
+				</select>
+				<select id="leave-end-y" aria-label="End year" required>
+					<?php foreach ($leaveYears as $y): ?>
+						<option value="<?php echo $y; ?>"<?php echo $y === $todayY ? ' selected' : ''; ?>><?php echo $y; ?></option>
+					<?php endforeach; ?>
+				</select>
+			</div>
+			<input type="hidden" name="end_date" id="leave-end-date" value="<?php echo date('Y-m-d'); ?>" required>
 		</div>
 		<div id="leave-half-wrap" style="display:none;">
 			<label>Half Day Session</label>
@@ -127,21 +173,83 @@ $fmtLeaveWhen = function ($item) use ($fmtTime): string {
 	var etWrap = document.getElementById('leave-end-time-wrap');
 	var endDate = document.getElementById('leave-end-date');
 	var startDate = document.getElementById('leave-start-date');
-	function sync() {
+	var startParts = {
+		d: document.getElementById('leave-start-d'),
+		m: document.getElementById('leave-start-m'),
+		y: document.getElementById('leave-start-y')
+	};
+	var endParts = {
+		d: document.getElementById('leave-end-d'),
+		m: document.getElementById('leave-end-m'),
+		y: document.getElementById('leave-end-y')
+	};
+
+	function daysInMonth(year, month) {
+		return new Date(year, month, 0).getDate();
+	}
+
+	function clampDay(parts) {
+		var y = parseInt(parts.y.value, 10);
+		var m = parseInt(parts.m.value, 10);
+		var max = daysInMonth(y, m);
+		var opts = parts.d.options;
+		for (var i = 0; i < opts.length; i++) {
+			var dayNum = parseInt(opts[i].value, 10);
+			opts[i].disabled = dayNum > max;
+			opts[i].hidden = dayNum > max;
+		}
+		if (parseInt(parts.d.value, 10) > max) {
+			parts.d.value = String(max);
+		}
+	}
+
+	function partsToIso(parts) {
+		clampDay(parts);
+		var y = parts.y.value;
+		var m = ('0' + parts.m.value).slice(-2);
+		var d = ('0' + parts.d.value).slice(-2);
+		return y + '-' + m + '-' + d;
+	}
+
+	function setPartsFromIso(parts, iso) {
+		if (!iso || iso.length < 10) return;
+		var bits = iso.split('-');
+		parts.y.value = String(parseInt(bits[0], 10));
+		parts.m.value = String(parseInt(bits[1], 10));
+		parts.d.value = String(parseInt(bits[2], 10));
+		clampDay(parts);
+	}
+
+	function syncHiddenFromParts() {
+		startDate.value = partsToIso(startParts);
+		if (dur.value !== 'full_day') {
+			setPartsFromIso(endParts, startDate.value);
+		}
+		endDate.value = partsToIso(endParts);
+		if (endDate.value < startDate.value) {
+			setPartsFromIso(endParts, startDate.value);
+			endDate.value = startDate.value;
+		}
+	}
+
+	function syncDurationUi() {
 		var v = dur.value;
 		endWrap.style.display = v === 'full_day' ? '' : 'none';
 		halfWrap.style.display = v === 'half_day' ? '' : 'none';
 		stWrap.style.display = v === 'hourly' ? '' : 'none';
 		etWrap.style.display = v === 'hourly' ? '' : 'none';
-		if (v !== 'full_day') {
-			endDate.value = startDate.value;
-		}
 		endDate.required = v === 'full_day';
+		endParts.d.required = v === 'full_day';
+		endParts.m.required = v === 'full_day';
+		endParts.y.required = v === 'full_day';
+		syncHiddenFromParts();
 	}
-	dur.addEventListener('change', sync);
-	startDate.addEventListener('change', function () {
-		if (dur.value !== 'full_day') endDate.value = startDate.value;
+
+	['d', 'm', 'y'].forEach(function (key) {
+		startParts[key].addEventListener('change', syncHiddenFromParts);
+		endParts[key].addEventListener('change', syncHiddenFromParts);
 	});
-	sync();
+	dur.addEventListener('change', syncDurationUi);
+	syncDurationUi();
 })();
 </script>

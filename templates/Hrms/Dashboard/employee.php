@@ -2,26 +2,8 @@
 $this->set('pageTitle', 'My Dashboard');
 $base = SITEURL . 'hrms/';
 ?>
-<div class="hrms-cards">
-	<div class="hrms-card">
-		<div class="label">Today</div>
-		<div class="value" style="font-size:1.1rem;">
-			<?php if (!empty($todayAtt)): ?>
-				<span class="badge badge-ok"><?php echo h(strtoupper($todayAtt->status)); ?></span>
-				<div style="margin-top:.5rem;font-size:.85rem;color:#667085;">
-					In: <?php echo $todayAtt->clock_in ? h($todayAtt->clock_in->format('H:i')) : '—'; ?>
-					· Out: <?php echo $todayAtt->clock_out ? h($todayAtt->clock_out->format('H:i')) : '—'; ?>
-				</div>
-			<?php else: ?>
-				<span class="badge badge-muted">Not marked</span>
-			<?php endif; ?>
-		</div>
-	</div>
-</div>
-
 <div class="hrms-actions">
-	<a class="hrms-btn hrms-btn-primary" href="<?php echo $base; ?>my/attendance">Clock In / Out</a>
-	<a class="hrms-btn hrms-btn-ghost" href="<?php echo $base; ?>my/leaves">Apply Leave</a>
+	<a class="hrms-btn hrms-btn-primary" href="<?php echo $base; ?>my/leaves">Apply Leave</a>
 	<a class="hrms-btn hrms-btn-ghost" href="<?php echo $base; ?>my/profile">My Profile</a>
 </div>
 

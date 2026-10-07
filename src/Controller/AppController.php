@@ -18,6 +18,8 @@ namespace App\Controller;
 
 use App\Model\LegacyModelAdapter;
 use Cake\Controller\Controller;
+use Cake\Http\Exception\RedirectException;
+use Cake\Routing\Router;
 
 class LegacySessionAdapter
 {
@@ -170,13 +172,15 @@ class AppController extends Controller
 
 	/**
 	 * HRMS portal session guard (separate from public site and CRM admin).
+	 * Throws RedirectException so CakePHP can emit Location headers (exit() after
+	 * redirect() left a blank page when the session had expired).
 	 */
 	function checkHrSession(): void
 	{
 		if (!$this->Session->read('is_hr_user')) {
+			$this->getRequest()->getSession()->delete('Flash');
 			$this->Flash->error('You need to be logged in to access the HRMS portal.');
-			$this->redirect('/hrms');
-			exit();
+			throw new RedirectException($this->hrLoginUrl());
 		}
 	}
 
@@ -189,9 +193,15 @@ class AppController extends Controller
 		$role = (string)$this->Session->read('hr_role');
 		if (!in_array($role, $roles, true)) {
 			$this->Flash->error('You do not have permission for this area.');
-			$this->redirect('/hrms/dashboard');
-			exit();
+			throw new RedirectException(
+				Router::url(['prefix' => 'Hrms', 'controller' => 'Dashboard', 'action' => 'index'])
+			);
 		}
+	}
+
+	protected function hrLoginUrl(): string
+	{
+		return Router::url(['prefix' => 'Hrms', 'controller' => 'Users', 'action' => 'login']);
 	}
 	
 	//Function 'checkCustomerSession' for admin check in controller

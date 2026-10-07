@@ -23,6 +23,11 @@ class MyController extends HrmsController
 
     public function attendance()
     {
+        // Attendance is turned off. Admin & IT is the active module.
+        $this->Flash->error('Attendance is not available.');
+
+        return $this->redirect(['controller' => 'Dashboard', 'action' => 'index']);
+
         $empId = (int)$this->Session->read('hr_employee_id');
         if (!$empId) {
             return $this->redirectDenied();

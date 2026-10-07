@@ -133,11 +133,8 @@ class EmployeesController extends HrmsController
         }
 
         $this->set('pageTitle', $employee->full_name);
-        $attendances = $this->fetchTable('HrAttendances')->find()
-            ->where(['employee_id' => $id])
-            ->orderBy(['attendance_date' => 'DESC'])
-            ->limit(30)
-            ->all();
+        // Attendance history is disabled.
+        $attendances = [];
         $leaveRequests = $this->fetchTable('HrLeaveRequests')->find()
             ->contain(['HrLeaveTypes'])
             ->where(['employee_id' => $id])

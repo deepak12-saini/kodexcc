@@ -5,6 +5,15 @@ namespace App\Controller\Hrms;
 
 class AttendancesController extends HrmsController
 {
+    public function beforeFilter(\Cake\Event\EventInterface $event)
+    {
+        parent::beforeFilter($event);
+        // Attendance is turned off. Admin & IT is the active module.
+        $this->Flash->error('Attendance is not available.');
+
+        return $this->redirect(['prefix' => 'Hrms', 'controller' => 'Dashboard', 'action' => 'index']);
+    }
+
     public function index()
     {
         $this->checkHrSession();

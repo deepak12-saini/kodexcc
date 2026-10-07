@@ -14,24 +14,23 @@ class DashboardController extends HrmsController
         $this->set('pageTitle', 'Dashboard');
 
         $role = (string)$this->Session->read('hr_role');
+        if ($role === 'it') {
+            return $this->redirect(['prefix' => 'Hrms/It', 'controller' => 'Dashboard', 'action' => 'index']);
+        }
         $employeeId = $this->Session->read('hr_employee_id');
         $today = date('Y-m-d');
         $employees = $this->fetchTable('HrEmployees');
-        $attendances = $this->fetchTable('HrAttendances');
+        // Attendance counts are disabled.
         $leaves = $this->fetchTable('HrLeaveRequests');
 
         if (in_array($role, ['admin', 'hr'], true)) {
             $total = $employees->find()->where(['status' => 'active'])->count();
-            $present = $attendances->find()->where(['attendance_date' => $today, 'status IN' => ['present', 'late', 'half_day']])->count();
-            $absent = $attendances->find()->where(['attendance_date' => $today, 'status' => 'absent'])->count();
             $onLeave = $leaves->find()->where([
                 'status' => 'approved',
                 'start_date <=' => $today,
                 'end_date >=' => $today,
             ])->count();
-            $late = $attendances->find()->where(['attendance_date' => $today, 'status' => 'late'])->count();
             $pendingLeave = $leaves->find()->where(['status' => 'pending'])->count();
-            $pendingCorrections = $attendances->find()->where(['correction_status' => 'pending'])->count();
 
             $birthdays = $employees->find()
                 ->where(['status' => 'active', 'date_of_birth IS NOT' => null])
@@ -55,28 +54,9 @@ class DashboardController extends HrmsController
                 ->all()
                 ->toList();
 
-            $monthStart = date('Y-m-01');
-            $chartLabels = [];
-            $chartPresent = [];
-            for ($i = 6; $i >= 0; $i--) {
-                $d = date('Y-m-d', strtotime("-{$i} days"));
-                $chartLabels[] = date('d M', strtotime($d));
-                $chartPresent[] = $attendances->find()->where([
-                    'attendance_date' => $d,
-                    'status IN' => ['present', 'late', 'half_day'],
-                ])->count();
-            }
-
-            $monthlySummary = [
-                'present' => $attendances->find()->where(['attendance_date >=' => $monthStart, 'status IN' => ['present', 'late']])->count(),
-                'absent' => $attendances->find()->where(['attendance_date >=' => $monthStart, 'status' => 'absent'])->count(),
-                'half_day' => $attendances->find()->where(['attendance_date >=' => $monthStart, 'status' => 'half_day'])->count(),
-                'late' => $attendances->find()->where(['attendance_date >=' => $monthStart, 'status' => 'late'])->count(),
-            ];
-
             $this->set(compact(
-                'total', 'present', 'absent', 'onLeave', 'late', 'pendingLeave', 'pendingCorrections',
-                'birthdays', 'newJoiners', 'deptCounts', 'chartLabels', 'chartPresent', 'monthlySummary'
+                'total', 'onLeave', 'pendingLeave',
+                'birthdays', 'newJoiners', 'deptCounts'
             ));
             $this->render('admin');
             return;
@@ -84,10 +64,6 @@ class DashboardController extends HrmsController
 
         // Employee / Manager self dashboard
         if ($employeeId) {
-            $todayAtt = $attendances->find()->where([
-                'employee_id' => $employeeId,
-                'attendance_date' => $today,
-            ])->first();
             $this->ensureLeaveBalances((int)$employeeId);
             $balances = $this->fetchTable('HrLeaveBalances')->find()
                 ->contain(['HrLeaveTypes'])
@@ -99,7 +75,7 @@ class DashboardController extends HrmsController
             ->orderBy(['HrLeaveRequests.id' => 'DESC'])
             ->limit(5)
             ->all();
-            $this->set(compact('todayAtt', 'balances', 'myLeaves'));
+            $this->set(compact('balances', 'myLeaves'));
         }
 
         if ($role === 'manager' && $employeeId) {

@@ -13,10 +13,20 @@ class HrmsController extends AppController
     {
         parent::beforeFilter($event);
         $this->callConstants();
-        $this->viewBuilder()->setLayout('hrms_layout');
+
+        $controller = (string)$this->request->getParam('controller');
+        $action = (string)$this->request->getParam('action');
+        $isLogin = $controller === 'Users' && $action === 'login';
+        $isLogout = $controller === 'Users' && $action === 'logout';
+
+        $this->viewBuilder()->setLayout($isLogin ? 'hrms_login' : 'hrms_layout');
         $this->set('hrUser', $this->Session->read('HrUser'));
         $this->set('hrRole', $this->Session->read('hr_role'));
         $this->set('hrEmployeeId', $this->Session->read('hr_employee_id'));
+
+        if (!$isLogin && !$isLogout) {
+            $this->checkHrSession();
+        }
     }
 
     protected function hrIsAdminOrHr(): bool
