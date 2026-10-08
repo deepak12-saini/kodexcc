@@ -245,7 +245,10 @@ a.hrms-card:hover {
 }
 
 /* —— Table —— */
+.hrms-table-scroll { overflow-x: auto; }
 .hrms-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.hrms-table-scroll .hrms-table th,
+.hrms-table-scroll .hrms-table td { white-space: nowrap; }
 .hrms-table th, .hrms-table td {
   padding: 0.78rem 0.55rem;
   border-bottom: 1px solid var(--hrms-border);

@@ -10,10 +10,14 @@ class AssignmentsController extends ItController
         $this->set('pageTitle', 'Employee Assignments');
         $q = trim((string)$this->request->getQuery('q'));
         $status = (string)$this->request->getQuery('status');
+        $type = (string)$this->request->getQuery('type');
         $query = $this->fetchTable('ItAssetAssignments')->find()
             ->contain(['ItAssets', 'HrEmployees']);
         if (in_array($status, ['assigned', 'returned', 'transferred'], true)) {
             $query->where(['ItAssetAssignments.status' => $status]);
+        }
+        if (isset(self::ASSET_TYPES[$type])) {
+            $query->where(['ItAssets.asset_type' => $type]);
         }
         if ($q !== '') {
             $query->leftJoinWith('ItAssets')->leftJoinWith('HrEmployees')->where([
@@ -28,7 +32,8 @@ class AssignmentsController extends ItController
             'order' => ['ItAssetAssignments.id' => 'DESC'],
             'sortableFields' => ['ItAssetAssignments.assigned_date', 'ItAssetAssignments.status', 'ItAssetAssignments.id'],
         ]);
-        $this->set(compact('q', 'status'));
+        $assetTypes = self::ASSET_TYPES;
+        $this->set(compact('q', 'status', 'type', 'assetTypes'));
     }
 
     public function assign($assetId = null)

@@ -39,7 +39,7 @@ $csvQuery['export'] = 'csv';
 <?php if (isset($costTotal)): ?>
 	<div class="hrms-cards"><div class="hrms-card"><div class="label">Total actual repair cost</div><div class="value" style="font-size:1.2rem;"><?php echo $this->It->money($costTotal); ?></div></div></div>
 <?php endif; ?>
-<div class="hrms-panel">
+<div class="hrms-panel hrms-table-scroll">
 	<h2><?php echo h($title); ?></h2>
 	<table class="hrms-table">
 		<thead>

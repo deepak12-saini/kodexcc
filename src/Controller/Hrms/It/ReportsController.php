@@ -50,6 +50,7 @@ class ReportsController extends ItController
         $query = $this->applyReportFilters(
             $this->fetchTable('ItAssetAssignments')->find()->contain(['ItAssets', 'HrEmployees'])->orderBy(['ItAssetAssignments.id' => 'DESC']),
             [
+                'type' => ['label' => 'Hardware', 'column' => 'ItAssets.asset_type', 'options' => self::ASSET_TYPES],
                 'status' => ['label' => 'Status', 'column' => 'ItAssetAssignments.status', 'options' => [
                     'assigned' => 'Assigned',
                     'returned' => 'Returned',
@@ -64,11 +65,21 @@ class ReportsController extends ItController
         return $this->run(
             'Assignment report',
             'it-assignments.csv',
-            ['Asset', 'Employee', 'Code', 'Assigned', 'Returned', 'Status', 'Condition out', 'Condition in'],
+            ['Asset', 'Hardware', 'Brand', 'Model', 'Serial', 'Processor', 'RAM', 'Storage', 'Location', 'Employee', 'Code', 'Assigned', 'Returned', 'Status', 'Condition out', 'Condition in'],
             $query,
             function ($row) {
+                $asset = $row->it_asset;
+
                 return [
-                    $row->it_asset->asset_code ?? '',
+                    $asset->asset_code ?? '',
+                    self::ASSET_TYPES[$asset->asset_type ?? ''] ?? ($asset->asset_type ?? ''),
+                    $asset->brand ?? '',
+                    $asset->model ?? '',
+                    $asset->serial_number ?? '',
+                    $asset->processor ?? '',
+                    $asset->ram ?? '',
+                    $asset->storage ?? '',
+                    $asset->location ?? '',
                     $row->hr_employee->full_name ?? '',
                     $row->hr_employee->employee_code ?? '',
                     $this->plainDate($row->assigned_date),
@@ -359,7 +370,15 @@ class ReportsController extends ItController
         if ($kind === 'assignment_q') {
             $query->where([
                 'OR' => [
-                    'ItAssetAssignments.asset_id IN' => $this->fetchTable('ItAssets')->find()->select(['id'])->where(['asset_code LIKE' => $like]),
+                    'ItAssetAssignments.asset_id IN' => $this->fetchTable('ItAssets')->find()->select(['id'])->where([
+                        'OR' => [
+                            'asset_code LIKE' => $like,
+                            'asset_type LIKE' => $like,
+                            'brand LIKE' => $like,
+                            'model LIKE' => $like,
+                            'serial_number LIKE' => $like,
+                        ],
+                    ]),
                     'ItAssetAssignments.employee_id IN' => $this->fetchTable('HrEmployees')->find()->select(['id'])->where([
                         'OR' => [
                             'full_name LIKE' => $like,
