@@ -2,10 +2,10 @@
 /**
  * About KodexCC — Private Label OEM Manufacturing
  */
-$this->Html->css('kodex-oem-home', ['block' => true]);
+$this->Html->css('/css/kodex-oem-home.css?v=4', ['block' => true]);
 $this->Html->script('kodex-oem-home', ['block' => true]);
 ?>
-<main class="kx-home kx-page" id="kx-page">
+<main class="kx-home kx-page kx-about-page" id="kx-page">
 
 	<section class="kx-page-hero" aria-label="About KodexCC">
 		<div class="kx-page-hero__media" aria-hidden="true">

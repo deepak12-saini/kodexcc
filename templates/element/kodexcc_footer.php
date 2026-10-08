@@ -63,6 +63,10 @@
 					<h3 class="kx-footer__heading">Partnership Enquiries</h3>
 					<ul class="kx-footer__contact">
 						<li>
+							<span class="kx-footer__label">Address</span>
+							<a class="kx-footer__address" href="https://maps.google.com/?q=E-07A+Phase+7+Industrial+Area+Focal+Point+Mohali+Punjab+160055" target="_blank" rel="noopener">E - 07A, Phase 7, Industrial Area Focal Point, Mohali, Punjab - 160055 India</a>
+						</li>
+						<li>
 							<span class="kx-footer__label">Phone</span>
 							<a href="tel:1800418495">1800 418 495</a>
 						</li>

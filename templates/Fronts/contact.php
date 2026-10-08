@@ -2,7 +2,7 @@
 /**
  * Contact KodexCC — Confidential partnership enquiries
  */
-$this->Html->css('kodex-oem-home', ['block' => true]);
+$this->Html->css('/css/kodex-oem-home.css?v=2', ['block' => true]);
 $this->Html->script('kodex-oem-home', ['block' => true]);
 ?>
 <?php if (empty($isLocalEnv)): ?>

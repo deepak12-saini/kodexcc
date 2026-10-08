@@ -5,8 +5,10 @@
 :root {
 	--kx-navy: #07111f;
 	--kx-navy-mid: #0d1f35;
-	--kx-blue: #1a4a73;
-	--kx-steel: #3d6f9c;
+	--kx-blue: #438eb9;
+	--kx-steel: #438eb9;
+	--kx-red: #d12023;
+	--kx-red-dark: #b01b1e;
 	--kx-font-display: "Syne", "Segoe UI", sans-serif;
 	--kx-font-body: "Outfit", "Segoe UI", sans-serif;
 	--kx-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -18,7 +20,7 @@
 	background: rgba(7, 17, 31, 0.92) !important;
 	border-radius: 0 !important;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-	padding: 0 clamp(1rem, 3vw, 2.5rem) !important;
+	padding: 1rem clamp(1rem, 3vw, 2.5rem) !important;
 	backdrop-filter: blur(14px);
 	-webkit-backdrop-filter: blur(14px);
 	transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
@@ -51,9 +53,19 @@
 .kx-logo {
 	display: inline-flex;
 	align-items: center;
-	gap: 0.85rem;
 	text-decoration: none !important;
 	color: #fff;
+	background: transparent;
+	line-height: 0;
+}
+
+.kx-logo__img {
+	display: block;
+	height: 3.85rem;
+	width: auto;
+	max-width: 14rem;
+	object-fit: contain;
+	background: transparent;
 }
 
 .kx-logo__mark {
@@ -154,8 +166,8 @@
 	min-height: 2.4rem !important;
 	line-height: 1 !important;
 	padding: 0 1.15rem !important;
-	border: 1px solid rgba(255, 255, 255, 0.35) !important;
-	background: transparent !important;
+	border: 1px solid #d12023 !important;
+	background: #d12023 !important;
 	color: #fff !important;
 	font-family: var(--kx-font-body) !important;
 	font-size: 0.75rem !important;
@@ -167,8 +179,8 @@
 }
 
 .kx-nav-cta:hover {
-	background: #1e5a8a !important;
-	border-color: #1e5a8a !important;
+	background: #b01b1e !important;
+	border-color: #b01b1e !important;
 	color: #fff !important;
 	transform: translateY(-1px);
 }
@@ -246,7 +258,7 @@ body:has(#kx-page) .kx-header.is-scrolled {
 .kx-footer-oem.site-footer,
 .site-footer.kx-footer-oem {
 	background:
-		radial-gradient(ellipse 70% 60% at 100% 0%, rgba(26, 74, 115, 0.22), transparent 55%),
+		radial-gradient(ellipse 70% 60% at 100% 0%, rgba(67, 142, 185, 0.22), transparent 55%),
 		linear-gradient(180deg, #0a1628 0%, #07111f 100%) !important;
 	color: rgba(255, 255, 255, 0.72);
 	border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -410,6 +422,12 @@ body:has(#kx-page) .kx-header.is-scrolled {
 	text-decoration: none !important;
 }
 
+.kx-footer__address {
+	display: block;
+	max-width: 18rem;
+	line-height: 1.45;
+}
+
 .kx-footer__contact a:hover {
 	color: #fff !important;
 }
@@ -444,8 +462,8 @@ body:has(#kx-page) .kx-header.is-scrolled {
 	justify-content: center;
 	min-height: 2.6rem;
 	padding: 0 1.25rem;
-	background: #1e5a8a;
-	border: 1px solid #1e5a8a;
+	background: #d12023;
+	border: 1px solid #d12023;
 	color: #fff !important;
 	font-size: 0.75rem !important;
 	font-weight: 600 !important;
@@ -456,8 +474,8 @@ body:has(#kx-page) .kx-header.is-scrolled {
 }
 
 .kx-footer__cta:hover {
-	background: #16476e;
-	border-color: #16476e;
+	background: #b01b1e;
+	border-color: #b01b1e;
 	color: #fff !important;
 	transform: translateY(-2px);
 }

@@ -74,12 +74,8 @@ $getpro = $this->requestAction('/app/getcate');
 	<header class="site-header kx-header" id="kx-header">
 		<div class="kx-header__bar header-cols">
 			<div class="col col-l">
-				<a class="kx-logo" href="<?php echo SITEURL; ?>" aria-label="KodexCC home">
-					<span class="kx-logo__mark" aria-hidden="true">K</span>
-					<span class="kx-logo__text">
-						<span class="kx-logo__name">KodexCC</span>
-						<span class="kx-logo__tag">Private Label OEM</span>
-					</span>
+				<a class="kx-logo" href="<?php echo SITEURL; ?>" aria-label="Kodex home">
+					<img class="kx-logo__img" src="<?php echo SITEURL; ?>img/kodex-logo.png" alt="Kodex" width="148" height="82">
 				</a>
 			</div>
 			<div class="col col-m">
