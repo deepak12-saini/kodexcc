@@ -157,6 +157,11 @@ class MyController extends HrmsController
 
     public function leaves()
     {
+        // Leave self-service is commented until the client confirms the module.
+        $this->Flash->error('Leave is not available.');
+
+        return $this->redirect(['prefix' => 'Hrms', 'controller' => 'Dashboard', 'action' => 'index']);
+
         $empId = (int)$this->Session->read('hr_employee_id');
         if (!$empId) {
             return $this->redirectDenied();

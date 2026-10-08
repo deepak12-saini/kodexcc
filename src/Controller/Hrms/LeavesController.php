@@ -5,6 +5,15 @@ namespace App\Controller\Hrms;
 
 class LeavesController extends HrmsController
 {
+    public function beforeFilter(\Cake\Event\EventInterface $event)
+    {
+        parent::beforeFilter($event);
+        // Leave is turned off until the client confirms. Uncomment this return to restore it.
+        $this->Flash->error('Leave is not available.');
+
+        return $this->redirect(['prefix' => 'Hrms', 'controller' => 'Dashboard', 'action' => 'index']);
+    }
+
     public function index()
     {
         $this->checkHrSession();

@@ -3,8 +3,10 @@ $this->set('pageTitle', 'Admin Dashboard');
 ?>
 <div class="hrms-cards">
 	<div class="hrms-card"><div class="label">Total Employees</div><div class="value"><?php echo (int)$total; ?></div></div>
+	<?php /* Leave cards commented until the client confirms the leave module.
 	<div class="hrms-card"><div class="label">On Leave</div><div class="value"><?php echo (int)$onLeave; ?></div></div>
 	<div class="hrms-card"><div class="label">Pending Leaves</div><div class="value"><?php echo (int)$pendingLeave; ?></div></div>
+	*/ ?>
 </div>
 <?php /* Attendance cards and chart removed. */ ?>
 

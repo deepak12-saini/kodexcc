@@ -102,14 +102,14 @@ $renderItMenu = function () use ($itLink, $itActive): void {
 		$link('shifts', 'Shifts', $ico['shift'], 'shifts');
 		?>
 
-		<div class="hrms-nav-label">Time</div>
 		<?php
-		// Attendance menu removed while Admin & IT is in use.
+		// Time menu (attendance and leave) is commented until the client confirms it should return.
+		// <div class="hrms-nav-label">Time</div>
 		// $link('attendances', 'Attendance', $ico['clock'], 'attendances');
 		// $link('attendances/reports', 'Reports', $ico['chart'], 'attendances/reports');
-		$link('leaves', 'Leave Requests', $ico['leave'], 'leaves');
-		$link('leaves/calendar', 'Leave Calendar', $ico['cal'], 'leaves/calendar');
-		$link('leave-types', 'Leave Types', $ico['cal'], 'leave-types');
+		// $link('leaves', 'Leave Requests', $ico['leave'], 'leaves');
+		// $link('leaves/calendar', 'Leave Calendar', $ico['cal'], 'leaves/calendar');
+		// $link('leave-types', 'Leave Types', $ico['cal'], 'leave-types');
 		?>
 
 		<div class="hrms-nav-label">Resources</div>
@@ -126,13 +126,14 @@ $renderItMenu = function () use ($itLink, $itActive): void {
 		<div class="hrms-nav-label">Team</div>
 		<?php
 		$link('employees', 'My Team', $ico['users'], 'employees');
+		// Attendance and leave stay off until the client confirms.
 		// $link('attendances', 'Team Attendance', $ico['clock'], 'attendances');
-		$link('leaves', 'Leave Approvals', $ico['leave'], 'leaves');
+		// $link('leaves', 'Leave Approvals', $ico['leave'], 'leaves');
 		?>
 		<div class="hrms-nav-label">Self</div>
 		<?php
 		// $link('my/attendance', 'My Attendance', $ico['clock'], 'my/attendance');
-		$link('my/leaves', 'My Leaves', $ico['leave'], 'my/leaves');
+		// $link('my/leaves', 'My Leaves', $ico['leave'], 'my/leaves');
 		$link('my/requests', 'My Requests', $ico['doc'], 'my/requests');
 		$link('my/add-request', 'Submit Request', $ico['doc'], 'my/add-request');
 		$link('holidays/calendar', 'Calendar', $ico['cal'], 'holidays/calendar');
@@ -142,7 +143,7 @@ $renderItMenu = function () use ($itLink, $itActive): void {
 		<div class="hrms-nav-label">Self Service</div>
 		<?php
 		// $link('my/attendance', 'Clock In / Out', $ico['clock'], 'my/attendance');
-		$link('my/leaves', 'My Leaves', $ico['leave'], 'my/leaves');
+		// $link('my/leaves', 'My Leaves', $ico['leave'], 'my/leaves');
 		$link('my/requests', 'My Requests', $ico['doc'], 'my/requests');
 		$link('my/add-request', 'Submit Request', $ico['doc'], 'my/add-request');
 		$link('my/documents', 'My Documents', $ico['doc'], 'my/documents');

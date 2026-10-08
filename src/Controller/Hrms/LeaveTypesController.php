@@ -5,6 +5,15 @@ namespace App\Controller\Hrms;
 
 class LeaveTypesController extends HrmsController
 {
+    public function beforeFilter(\Cake\Event\EventInterface $event)
+    {
+        parent::beforeFilter($event);
+        // Leave types stay off with the leave module until the client confirms.
+        $this->Flash->error('Leave is not available.');
+
+        return $this->redirect(['prefix' => 'Hrms', 'controller' => 'Dashboard', 'action' => 'index']);
+    }
+
     public function index()
     {
         $this->requireHrRole(['admin', 'hr']);

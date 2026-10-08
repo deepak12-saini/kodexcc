@@ -3,10 +3,13 @@ $this->set('pageTitle', 'My Dashboard');
 $base = SITEURL . 'hrms/';
 ?>
 <div class="hrms-actions">
+	<?php /* Leave is commented until the client confirms.
 	<a class="hrms-btn hrms-btn-primary" href="<?php echo $base; ?>my/leaves">Apply Leave</a>
-	<a class="hrms-btn hrms-btn-ghost" href="<?php echo $base; ?>my/profile">My Profile</a>
+	*/ ?>
+	<a class="hrms-btn hrms-btn-primary" href="<?php echo $base; ?>my/profile">My Profile</a>
 </div>
 
+<?php /*
 <div class="hrms-panel">
 	<h2>Leave Balance</h2>
 	<table class="hrms-table">
@@ -58,3 +61,4 @@ $base = SITEURL . 'hrms/';
 		</tbody>
 	</table>
 </div>
+*/ ?>
