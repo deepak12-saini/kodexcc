@@ -3,7 +3,7 @@
  * KodexCC Homepage — Private Label OEM Manufacturing
  */
 $this->Html->css('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap', ['block' => true]);
-$this->Html->css('/css/kodex-oem-home.css?v=3', ['block' => true]);
+$this->Html->css('/css/kodex-oem-home.css?v=6', ['block' => true]);
 $this->Html->script('kodex-oem-home', ['block' => true]);
 ?>
 <main class="kx-home" id="kx-home">
@@ -12,7 +12,7 @@ $this->Html->script('kodex-oem-home', ['block' => true]);
 	<section class="kx-hero" aria-label="Hero">
 		<div class="kx-hero__media" aria-hidden="true">
 			<img
-				src="<?php echo SITEURL; ?>wp-content/uploads/Liquid-Polyurethane.jpg"
+				src="<?php echo SITEURL; ?>img/kodex-corporate-hero.jpg?v=2"
 				alt=""
 				class="kx-hero__img"
 				fetchpriority="high"
