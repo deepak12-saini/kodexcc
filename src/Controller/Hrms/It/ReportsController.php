@@ -14,11 +14,20 @@ class ReportsController extends ItController
 
     public function assets(): ?Response
     {
+        $query = $this->applyReportFilters(
+            $this->fetchTable('ItAssets')->find()->contain(['ItVendors'])->orderBy(['ItAssets.id' => 'DESC']),
+            [
+                'type' => ['label' => 'Type', 'column' => 'ItAssets.asset_type', 'options' => self::ASSET_TYPES],
+                'status' => ['label' => 'Status', 'column' => 'ItAssets.status', 'options' => $this->statusOptions(self::ASSET_STATUSES)],
+                'q' => ['label' => 'Code, brand, or serial', 'type' => 'search', 'kind' => 'asset_q'],
+            ]
+        );
+
         return $this->run(
             'Asset report',
             'it-assets.csv',
             ['Code', 'Type', 'Brand', 'Model', 'Serial', 'Status', 'Location', 'Vendor', 'Purchase date', 'Cost'],
-            $this->fetchTable('ItAssets')->find()->contain(['ItVendors'])->orderBy(['ItAssets.id' => 'DESC']),
+            $query,
             function ($row) {
                 return [
                     $row->asset_code,
@@ -38,11 +47,25 @@ class ReportsController extends ItController
 
     public function assignments(): ?Response
     {
+        $query = $this->applyReportFilters(
+            $this->fetchTable('ItAssetAssignments')->find()->contain(['ItAssets', 'HrEmployees'])->orderBy(['ItAssetAssignments.id' => 'DESC']),
+            [
+                'status' => ['label' => 'Status', 'column' => 'ItAssetAssignments.status', 'options' => [
+                    'assigned' => 'Assigned',
+                    'returned' => 'Returned',
+                    'transferred' => 'Transferred',
+                ]],
+                'q' => ['label' => 'Asset or employee', 'type' => 'search', 'kind' => 'assignment_q'],
+                'from' => ['label' => 'Assigned from', 'type' => 'date', 'column' => 'ItAssetAssignments.assigned_date', 'op' => '>='],
+                'to' => ['label' => 'Assigned to', 'type' => 'date', 'column' => 'ItAssetAssignments.assigned_date', 'op' => '<='],
+            ]
+        );
+
         return $this->run(
             'Assignment report',
             'it-assignments.csv',
             ['Asset', 'Employee', 'Code', 'Assigned', 'Returned', 'Status', 'Condition out', 'Condition in'],
-            $this->fetchTable('ItAssetAssignments')->find()->contain(['ItAssets', 'HrEmployees'])->orderBy(['ItAssetAssignments.id' => 'DESC']),
+            $query,
             function ($row) {
                 return [
                     $row->it_asset->asset_code ?? '',
@@ -60,11 +83,29 @@ class ReportsController extends ItController
 
     public function history(): ?Response
     {
+        $query = $this->applyReportFilters(
+            $this->fetchTable('ItAssetEvents')->find()->contain(['ItAssets'])->orderBy(['ItAssetEvents.id' => 'DESC']),
+            [
+                'event' => ['label' => 'Event', 'column' => 'ItAssetEvents.event_type', 'options' => [
+                    'created' => 'Created',
+                    'updated' => 'Updated',
+                    'assigned' => 'Assigned',
+                    'returned' => 'Returned',
+                    'transferred' => 'Transferred',
+                    'repair' => 'Repair',
+                    'maintenance' => 'Maintenance',
+                ]],
+                'q' => ['label' => 'Asset code', 'type' => 'search', 'kind' => 'history_q'],
+                'from' => ['label' => 'From', 'type' => 'date', 'column' => 'ItAssetEvents.created', 'op' => '>='],
+                'to' => ['label' => 'To', 'type' => 'date', 'column' => 'ItAssetEvents.created', 'op' => '<='],
+            ]
+        );
+
         return $this->run(
             'Asset history',
             'it-asset-history.csv',
             ['When', 'Asset', 'Event', 'From', 'To', 'Summary'],
-            $this->fetchTable('ItAssetEvents')->find()->contain(['ItAssets'])->orderBy(['ItAssetEvents.id' => 'DESC']),
+            $query,
             function ($row) {
                 return [
                     $this->plainDate($row->created, true),
@@ -80,11 +121,21 @@ class ReportsController extends ItController
 
     public function tickets(): ?Response
     {
+        $query = $this->applyReportFilters(
+            $this->fetchTable('ItTickets')->find()->contain(['HrEmployees', 'ItAssets'])->orderBy(['ItTickets.id' => 'DESC']),
+            [
+                'status' => ['label' => 'Status', 'column' => 'ItTickets.status', 'options' => $this->statusOptions(self::TICKET_STATUSES)],
+                'category' => ['label' => 'Category', 'column' => 'ItTickets.category', 'options' => self::TICKET_CATEGORIES],
+                'priority' => ['label' => 'Priority', 'column' => 'ItTickets.priority', 'options' => $this->statusOptions(self::TICKET_PRIORITIES)],
+                'q' => ['label' => 'Ticket or employee', 'type' => 'search', 'kind' => 'ticket_q'],
+            ]
+        );
+
         return $this->run(
             'IT ticket report',
             'it-tickets.csv',
             ['Ticket', 'Employee', 'Asset', 'Category', 'Priority', 'Status', 'Opened', 'Resolved'],
-            $this->fetchTable('ItTickets')->find()->contain(['HrEmployees', 'ItAssets'])->orderBy(['ItTickets.id' => 'DESC']),
+            $query,
             function ($row) {
                 return [
                     $row->ticket_no,
@@ -102,11 +153,16 @@ class ReportsController extends ItController
 
     public function repairs(): ?Response
     {
+        $query = $this->applyReportFilters(
+            $this->fetchTable('ItRepairs')->find()->contain(['ItAssets', 'ItVendors'])->orderBy(['ItRepairs.id' => 'DESC']),
+            $this->repairFilterDefs()
+        );
+
         return $this->run(
             'Repair report',
             'it-repairs.csv',
             ['Repair', 'Asset', 'Vendor', 'Status', 'Sent', 'Returned', 'Estimated', 'Actual', 'Warranty'],
-            $this->fetchTable('ItRepairs')->find()->contain(['ItAssets', 'ItVendors'])->orderBy(['ItRepairs.id' => 'DESC']),
+            $query,
             function ($row) {
                 return [
                     $row->repair_no,
@@ -125,19 +181,20 @@ class ReportsController extends ItController
 
     public function repairCosts(): ?Response
     {
-        $query = $this->fetchTable('ItRepairs')->find()->contain(['ItAssets', 'ItVendors'])->orderBy(['ItRepairs.id' => 'DESC']);
-        $all = $query->all();
-        $total = 0.0;
-        foreach ($all as $row) {
-            $total += (float)$row->actual_cost;
-        }
-        $this->set('costTotal', $total);
+        $defs = $this->repairFilterDefs();
+        $query = $this->applyReportFilters(
+            $this->fetchTable('ItRepairs')->find()->contain(['ItAssets', 'ItVendors'])->orderBy(['ItRepairs.id' => 'DESC']),
+            $defs
+        );
+        $sum = $this->applyReportFilters($this->fetchTable('ItRepairs')->find(), $defs);
+        $costRow = $sum->select(['total' => $sum->func()->sum('actual_cost')], true)->enableHydration(false)->first();
+        $this->set('costTotal', (float)($costRow['total'] ?? 0));
 
         return $this->run(
             'Repair costs',
             'it-repair-costs.csv',
             ['Repair', 'Asset', 'Vendor', 'Status', 'Actual cost'],
-            $this->fetchTable('ItRepairs')->find()->contain(['ItAssets', 'ItVendors'])->orderBy(['ItRepairs.id' => 'DESC']),
+            $query,
             function ($row) {
                 return [
                     $row->repair_no,
@@ -152,11 +209,20 @@ class ReportsController extends ItController
 
     public function purchases(): ?Response
     {
+        $query = $this->applyReportFilters(
+            $this->fetchTable('ItPurchaseRequests')->find()->contain(['Requesters', 'ItVendors'])->orderBy(['ItPurchaseRequests.id' => 'DESC']),
+            [
+                'status' => ['label' => 'Status', 'column' => 'ItPurchaseRequests.approval_status', 'options' => $this->statusOptions(self::PURCHASE_STATUSES)],
+                'from' => ['label' => 'Purchased from', 'type' => 'date', 'column' => 'ItPurchaseRequests.purchase_date', 'op' => '>='],
+                'to' => ['label' => 'Purchased to', 'type' => 'date', 'column' => 'ItPurchaseRequests.purchase_date', 'op' => '<='],
+            ]
+        );
+
         return $this->run(
             'Purchase report',
             'it-purchases.csv',
             ['Request', 'Item', 'Qty', 'Requester', 'Vendor', 'Status', 'Estimated', 'Actual', 'Purchased'],
-            $this->fetchTable('ItPurchaseRequests')->find()->contain(['Requesters', 'ItVendors'])->orderBy(['ItPurchaseRequests.id' => 'DESC']),
+            $query,
             function ($row) {
                 return [
                     $row->request_no,
@@ -175,11 +241,19 @@ class ReportsController extends ItController
 
     public function vendors(): ?Response
     {
+        $query = $this->applyReportFilters(
+            $this->fetchTable('ItVendors')->find()->orderBy(['ItVendors.id' => 'DESC']),
+            [
+                'status' => ['label' => 'Status', 'column' => 'ItVendors.status', 'options' => ['1' => 'Active', '0' => 'Inactive']],
+                'q' => ['label' => 'Vendor name', 'type' => 'search', 'column' => 'ItVendors.name'],
+            ]
+        );
+
         return $this->run(
             'Vendor report',
             'it-vendors.csv',
             ['Vendor', 'Contact', 'Phone', 'Email', 'GST', 'Status'],
-            $this->fetchTable('ItVendors')->find()->orderBy(['ItVendors.id' => 'DESC']),
+            $query,
             function ($row) {
                 return [
                     $row->name,
@@ -195,11 +269,21 @@ class ReportsController extends ItController
 
     public function maintenance(): ?Response
     {
+        $query = $this->applyReportFilters(
+            $this->fetchTable('ItMaintenance')->find()->contain(['ItAssets', 'ItVendors'])->orderBy(['ItMaintenance.id' => 'DESC']),
+            [
+                'status' => ['label' => 'Status', 'column' => 'ItMaintenance.status', 'options' => $this->statusOptions(self::MAINTENANCE_STATUSES)],
+                'q' => ['label' => 'Asset code', 'type' => 'search', 'kind' => 'history_q'],
+                'from' => ['label' => 'Scheduled from', 'type' => 'date', 'column' => 'ItMaintenance.scheduled_date', 'op' => '>='],
+                'to' => ['label' => 'Scheduled to', 'type' => 'date', 'column' => 'ItMaintenance.scheduled_date', 'op' => '<='],
+            ]
+        );
+
         return $this->run(
             'Maintenance report',
             'it-maintenance.csv',
             ['Asset', 'Type', 'Scheduled', 'Completed', 'Vendor', 'Person', 'Cost', 'Status'],
-            $this->fetchTable('ItMaintenance')->find()->contain(['ItAssets', 'ItVendors'])->orderBy(['ItMaintenance.id' => 'DESC']),
+            $query,
             function ($row) {
                 return [
                     $row->it_asset->asset_code ?? '',
@@ -213,6 +297,126 @@ class ReportsController extends ItController
                 ];
             }
         );
+    }
+    /**
+     * @param array<string, array<string, mixed>> $defs
+     */
+    private function applyReportFilters($query, array $defs)
+    {
+        $values = [];
+        foreach ($defs as $key => $def) {
+            $value = trim((string)$this->request->getQuery($key));
+            $values[$key] = $value;
+            if ($value === '') {
+                continue;
+            }
+            $type = (string)($def['type'] ?? 'select');
+            if ($type === 'select') {
+                $options = $def['options'] ?? [];
+                if (!array_key_exists($value, $options)) {
+                    continue;
+                }
+                $query->where([(string)$def['column'] => $value]);
+                continue;
+            }
+            if ($type === 'date') {
+                if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+                    continue;
+                }
+                $op = (string)($def['op'] ?? '=');
+                if (!in_array($op, ['=', '>=', '<='], true)) {
+                    continue;
+                }
+                $bound = $op === '<=' ? $value . ' 23:59:59' : $value;
+                $query->where([(string)$def['column'] . ' ' . $op => $bound]);
+                continue;
+            }
+            if ($type === 'search') {
+                $this->applySearch($query, (string)($def['kind'] ?? ''), (string)($def['column'] ?? ''), $value);
+            }
+        }
+        $this->set('reportFilters', $defs);
+        $this->set('reportFilterValues', $values);
+
+        return $query;
+    }
+
+    private function applySearch($query, string $kind, string $column, string $value): void
+    {
+        $like = '%' . $value . '%';
+        if ($kind === 'asset_q') {
+            $query->where([
+                'OR' => [
+                    'ItAssets.asset_code LIKE' => $like,
+                    'ItAssets.brand LIKE' => $like,
+                    'ItAssets.model LIKE' => $like,
+                    'ItAssets.serial_number LIKE' => $like,
+                ],
+            ]);
+
+            return;
+        }
+        if ($kind === 'assignment_q') {
+            $query->where([
+                'OR' => [
+                    'ItAssetAssignments.asset_id IN' => $this->fetchTable('ItAssets')->find()->select(['id'])->where(['asset_code LIKE' => $like]),
+                    'ItAssetAssignments.employee_id IN' => $this->fetchTable('HrEmployees')->find()->select(['id'])->where([
+                        'OR' => [
+                            'full_name LIKE' => $like,
+                            'employee_code LIKE' => $like,
+                        ],
+                    ]),
+                ],
+            ]);
+
+            return;
+        }
+        if ($kind === 'history_q') {
+            $query->where([
+                'asset_id IN' => $this->fetchTable('ItAssets')->find()->select(['id'])->where(['asset_code LIKE' => $like]),
+            ]);
+
+            return;
+        }
+        if ($kind === 'ticket_q') {
+            $query->where([
+                'OR' => [
+                    'ItTickets.ticket_no LIKE' => $like,
+                    'ItTickets.employee_id IN' => $this->fetchTable('HrEmployees')->find()->select(['id'])->where(['full_name LIKE' => $like]),
+                ],
+            ]);
+
+            return;
+        }
+        if ($column !== '') {
+            $query->where([$column . ' LIKE' => $like]);
+        }
+    }
+
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    private function repairFilterDefs(): array
+    {
+        return [
+            'status' => ['label' => 'Status', 'column' => 'ItRepairs.status', 'options' => $this->statusOptions(self::REPAIR_STATUSES)],
+            'from' => ['label' => 'Sent from', 'type' => 'date', 'column' => 'ItRepairs.sent_date', 'op' => '>='],
+            'to' => ['label' => 'Sent to', 'type' => 'date', 'column' => 'ItRepairs.sent_date', 'op' => '<='],
+        ];
+    }
+
+    /**
+     * @param list<string> $keys
+     * @return array<string, string>
+     */
+    private function statusOptions(array $keys): array
+    {
+        $out = [];
+        foreach ($keys as $key) {
+            $out[$key] = ucwords(str_replace('_', ' ', $key));
+        }
+
+        return $out;
     }
 
     private function run(string $title, string $file, array $header, $query, callable $map): ?Response

@@ -10,7 +10,9 @@ class PurchasesController extends ItController
         $this->set('pageTitle', 'Purchase Requests');
         $status = (string)$this->request->getQuery('status');
         $query = $this->fetchTable('ItPurchaseRequests')->find()->contain(['Requesters', 'HrDepartments', 'ItVendors']);
-        if (in_array($status, self::PURCHASE_STATUSES, true)) {
+        if ($status === 'pending') {
+            $query->where(['ItPurchaseRequests.approval_status IN' => ['requested', 'quotation', 'approved', 'purchased']]);
+        } elseif (in_array($status, self::PURCHASE_STATUSES, true)) {
             $query->where(['ItPurchaseRequests.approval_status' => $status]);
         }
         $this->hrPaginate($query, [

@@ -12,7 +12,9 @@ class TicketsController extends ItController
         $priority = (string)$this->request->getQuery('priority');
         $q = trim((string)$this->request->getQuery('q'));
         $query = $this->fetchTable('ItTickets')->find()->contain(['HrEmployees', 'ItAssets', 'AssignedUsers' => ['HrEmployees']]);
-        if (in_array($status, self::TICKET_STATUSES, true)) {
+        if ($status === 'active') {
+            $query->where(['ItTickets.status IN' => ['open', 'assigned', 'in_progress', 'waiting']]);
+        } elseif (in_array($status, self::TICKET_STATUSES, true)) {
             $query->where(['ItTickets.status' => $status]);
         }
         if (in_array($priority, self::TICKET_PRIORITIES, true)) {
