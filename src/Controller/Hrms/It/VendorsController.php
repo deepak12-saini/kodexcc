@@ -21,7 +21,7 @@ class VendorsController extends ItController
             ]);
         }
         $this->hrPaginate($query, [
-            'order' => ['ItVendors.name' => 'ASC'],
+            'order' => ['ItVendors.id' => 'DESC'],
             'sortableFields' => ['ItVendors.name', 'ItVendors.phone', 'ItVendors.id'],
         ]);
         $this->set(compact('q'));

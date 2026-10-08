@@ -12,7 +12,7 @@ class DepartmentsController extends HrmsController
         $this->set('title_for_layout', 'Departments');
         $this->hrPaginate(
             $this->fetchTable('HrDepartments')->find(),
-            ['limit' => 30, 'order' => ['HrDepartments.name' => 'ASC'], 'sortableFields' => ['HrDepartments.name']]
+            ['limit' => 30, 'order' => ['HrDepartments.id' => 'DESC'], 'sortableFields' => ['HrDepartments.name']]
         );
     }
 

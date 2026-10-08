@@ -13,7 +13,7 @@ class HolidaysController extends HrmsController
             $this->fetchTable('HrHolidays')->find(),
             [
                 'limit' => 30,
-                'order' => ['HrHolidays.holiday_date' => 'ASC'],
+                'order' => ['HrHolidays.id' => 'DESC'],
                 'sortableFields' => ['HrHolidays.holiday_date', 'HrHolidays.name'],
             ]
         );

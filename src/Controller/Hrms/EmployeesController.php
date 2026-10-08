@@ -37,7 +37,7 @@ class EmployeesController extends HrmsController
         }
 
         $this->hrPaginate($query, [
-            'order' => ['HrEmployees.full_name' => 'ASC'],
+            'order' => ['HrEmployees.id' => 'DESC'],
             'sortableFields' => [
                 'HrEmployees.full_name',
                 'HrEmployees.employee_code',

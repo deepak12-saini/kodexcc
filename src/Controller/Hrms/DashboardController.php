@@ -14,7 +14,7 @@ class DashboardController extends HrmsController
         $this->set('pageTitle', 'Dashboard');
 
         $role = (string)$this->Session->read('hr_role');
-        if ($role === 'it') {
+        if (in_array($role, ['it', 'admin'], true)) {
             return $this->redirect(['prefix' => 'Hrms/It', 'controller' => 'Dashboard', 'action' => 'index']);
         }
         $employeeId = $this->Session->read('hr_employee_id');

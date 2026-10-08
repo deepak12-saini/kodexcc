@@ -11,7 +11,7 @@ class DesignationsController extends HrmsController
         $this->set('pageTitle', 'Designations');
         $this->hrPaginate(
             $this->fetchTable('HrDesignations')->find()->contain(['HrDepartments']),
-            ['limit' => 30, 'order' => ['HrDesignations.name' => 'ASC'], 'sortableFields' => ['HrDesignations.name']]
+            ['limit' => 30, 'order' => ['HrDesignations.id' => 'DESC'], 'sortableFields' => ['HrDesignations.name']]
         );
     }
 

@@ -12,7 +12,7 @@ class AssetsController extends HrmsController
         $query = $this->fetchTable('HrAssets')->find()
             ->contain(['HrAssetAssignments' => ['HrEmployees']]);
         $this->hrPaginate($query, [
-            'order' => ['HrAssets.asset_code' => 'ASC'],
+            'order' => ['HrAssets.id' => 'DESC'],
             'sortableFields' => ['HrAssets.asset_code', 'HrAssets.name', 'HrAssets.status'],
         ]);
     }

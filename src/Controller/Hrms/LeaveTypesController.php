@@ -20,7 +20,7 @@ class LeaveTypesController extends HrmsController
         $this->set('pageTitle', 'Leave Types');
         $this->hrPaginate(
             $this->fetchTable('HrLeaveTypes')->find(),
-            ['limit' => 30, 'order' => ['HrLeaveTypes.name' => 'ASC'], 'sortableFields' => ['HrLeaveTypes.name', 'HrLeaveTypes.code']]
+            ['limit' => 30, 'order' => ['HrLeaveTypes.id' => 'DESC'], 'sortableFields' => ['HrLeaveTypes.name', 'HrLeaveTypes.code']]
         );
     }
 

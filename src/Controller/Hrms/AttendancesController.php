@@ -35,7 +35,7 @@ class AttendancesController extends HrmsController
 
         $this->hrPaginate($query, [
             'limit' => 30,
-            'order' => ['HrEmployees.full_name' => 'ASC'],
+            'order' => ['HrAttendances.id' => 'DESC'],
             'sortableFields' => ['HrEmployees.full_name', 'HrAttendances.status', 'HrAttendances.clock_in'],
         ]);
         $this->set(compact('date'));

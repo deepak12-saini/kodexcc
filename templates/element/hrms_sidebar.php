@@ -61,10 +61,12 @@ $itLink = function (string $href, string $label, bool $active, bool $child = fal
 	echo '<a class="hrms-nav-link' . ($child ? ' is-child' : '') . ($active ? ' is-active' : '') . '" href="' . $base . 'it/' . $href . '">';
 	echo '<span>' . h($label) . '</span></a>';
 };
-$renderItMenu = function () use ($itLink, $itActive): void {
+$renderItMenu = function (bool $withDashboard = true) use ($itLink, $itActive): void {
 	$assetType = (string)$this->request->getQuery('type');
 	echo '<div class="hrms-nav-label">Admin & IT</div>';
-	$itLink('', 'IT Dashboard', $itActive('dashboard'));
+	if ($withDashboard) {
+		$itLink('', 'IT Dashboard', $itActive('dashboard'));
+	}
 	$itLink('assets', 'Assets', $itActive('assets') && $assetType === '');
 	$itLink('assets?type=computer', 'Computers', $itActive('assets') && $assetType === 'computer', true);
 	$itLink('assets?type=laptop', 'Laptops', $itActive('assets') && $assetType === 'laptop', true);
@@ -91,7 +93,14 @@ $renderItMenu = function () use ($itLink, $itActive): void {
 	<?php if ($isIt): ?>
 		<?php $renderItMenu(); ?>
 	<?php else: ?>
-	<?php $link('dashboard', 'Dashboard', $ico['dash'], 'dashboard'); ?>
+	<?php if ($role === 'admin'): ?>
+		<a class="hrms-nav-link<?php echo $itActive('dashboard') ? ' is-active' : ''; ?>" href="<?php echo $base; ?>it/">
+			<span class="hrms-nav-ico" aria-hidden="true"><?php echo $ico['dash']; ?></span>
+			<span>IT Dashboard</span>
+		</a>
+	<?php else: ?>
+		<?php $link('dashboard', 'Dashboard', $ico['dash'], 'dashboard'); ?>
+	<?php endif; ?>
 
 	<?php if ($isAdminHr): ?>
 		<div class="hrms-nav-label">People</div>
@@ -121,7 +130,7 @@ $renderItMenu = function () use ($itLink, $itActive): void {
 		$link('holidays/calendar', 'Calendar', $ico['cal'], 'holidays/calendar');
 		$link('audit-logs', 'Audit Log', $ico['chart'], 'audit-logs');
 		?>
-		<?php $renderItMenu(); ?>
+		<?php $renderItMenu(false); ?>
 	<?php elseif ($isManager): ?>
 		<div class="hrms-nav-label">Team</div>
 		<?php

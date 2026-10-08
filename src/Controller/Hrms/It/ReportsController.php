@@ -18,7 +18,7 @@ class ReportsController extends ItController
             'Asset report',
             'it-assets.csv',
             ['Code', 'Type', 'Brand', 'Model', 'Serial', 'Status', 'Location', 'Vendor', 'Purchase date', 'Cost'],
-            $this->fetchTable('ItAssets')->find()->contain(['ItVendors'])->orderBy(['ItAssets.asset_code' => 'ASC']),
+            $this->fetchTable('ItAssets')->find()->contain(['ItVendors'])->orderBy(['ItAssets.id' => 'DESC']),
             function ($row) {
                 return [
                     $row->asset_code,
@@ -179,7 +179,7 @@ class ReportsController extends ItController
             'Vendor report',
             'it-vendors.csv',
             ['Vendor', 'Contact', 'Phone', 'Email', 'GST', 'Status'],
-            $this->fetchTable('ItVendors')->find()->orderBy(['ItVendors.name' => 'ASC']),
+            $this->fetchTable('ItVendors')->find()->orderBy(['ItVendors.id' => 'DESC']),
             function ($row) {
                 return [
                     $row->name,

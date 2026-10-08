@@ -11,7 +11,7 @@ class ShiftsController extends HrmsController
         $this->set('pageTitle', 'Shifts');
         $this->hrPaginate(
             $this->fetchTable('HrShifts')->find(),
-            ['limit' => 30, 'order' => ['HrShifts.start_time' => 'ASC'], 'sortableFields' => ['HrShifts.name', 'HrShifts.start_time']]
+            ['limit' => 30, 'order' => ['HrShifts.id' => 'DESC'], 'sortableFields' => ['HrShifts.name', 'HrShifts.start_time']]
         );
     }
 
