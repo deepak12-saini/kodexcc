@@ -89,18 +89,34 @@ class IsoController extends AppController
         $this->set('pageTitle', 'ISO 9001');
         $role = $this->isoRole() ?? '';
         $cards = [
-            ['label' => 'Documents waiting approval', 'count' => $this->countWhere('IsoDocuments', ['status' => 'in_review']), 'url' => 'documents?status=in_review', 'color' => '#438eb9'],
-            ['label' => 'Incoming awaiting QA', 'count' => $this->countWhere('IsoReceipts', ['inspection_result' => 'pending']), 'url' => 'receipts?inspection_result=pending', 'color' => '#F79263'],
-            ['label' => 'Open non-conformances', 'count' => $this->countWhere('IsoNonconformances', ['status' => 'open']), 'url' => 'nonconformances?status=open', 'color' => '#CC5D5E'],
-            ['label' => 'Overdue corrective actions', 'count' => $this->overdueActions(), 'url' => 'corrective?status=open', 'color' => '#AEC95B'],
+            ['label' => 'Documents waiting approval', 'count' => $this->countWhere('IsoDocuments', ['status' => 'in_review']), 'url' => 'documents?status=in_review', 'icon' => 'fa-file', 'tone' => 'blue', 'section' => 'documents'],
+            ['label' => 'Incoming awaiting QA', 'count' => $this->countWhere('IsoReceipts', ['inspection_result' => 'pending']), 'url' => 'receipts?inspection_result=pending', 'icon' => 'fa-inbox', 'tone' => 'orange', 'section' => 'receipts'],
+            ['label' => 'Open non-conformances', 'count' => $this->countWhere('IsoNonconformances', ['status' => 'open']), 'url' => 'nonconformances?status=open', 'icon' => 'fa-exclamation-triangle', 'tone' => 'red', 'section' => 'ncr'],
+            ['label' => 'Overdue corrective actions', 'count' => $this->overdueActions(), 'url' => 'corrective?status=open', 'icon' => 'fa-wrench', 'tone' => 'green', 'section' => 'corrective'],
         ];
-        $sectionOf = ['documents' => 'documents', 'receipts' => 'receipts', 'nonconformances' => 'ncr', 'corrective' => 'corrective'];
-        $cards = array_values(array_filter($cards, function (array $card) use ($role, $sectionOf): bool {
-            $path = strtok($card['url'], '?') ?: '';
-
-            return IsoAccess::canView($role, $sectionOf[$path] ?? 'overview');
+        $cards = array_values(array_filter($cards, function (array $card) use ($role): bool {
+            return IsoAccess::canView($role, $card['section']);
+        }));
+        $modules = [
+            ['section' => 'documents', 'label' => 'Documents', 'hint' => 'Controlled procedures and forms', 'icon' => 'fa-file', 'url' => 'documents'],
+            ['section' => 'training', 'label' => 'Training', 'hint' => 'Who was trained, and on what', 'icon' => 'fa-users', 'url' => 'training'],
+            ['section' => 'suppliers', 'label' => 'Suppliers', 'hint' => 'Approved supplier list', 'icon' => 'fa-truck', 'url' => 'suppliers'],
+            ['section' => 'materials', 'label' => 'Materials', 'hint' => 'Raw materials on the approved list', 'icon' => 'fa-cubes', 'url' => 'materials'],
+            ['section' => 'receipts', 'label' => 'Incoming material', 'hint' => 'Goods received and QA result', 'icon' => 'fa-inbox', 'url' => 'receipts'],
+            ['section' => 'batches', 'label' => 'Production', 'hint' => 'Batch records', 'icon' => 'fa-industry', 'url' => 'batches'],
+            ['section' => 'inspections', 'label' => 'QC inspections', 'hint' => 'In-process and final checks', 'icon' => 'fa-search', 'url' => 'inspections'],
+            ['section' => 'ncr', 'label' => 'Non-conformance', 'hint' => 'Failed checks that need action', 'icon' => 'fa-exclamation-triangle', 'url' => 'nonconformances'],
+            ['section' => 'corrective', 'label' => 'Corrective action', 'hint' => 'What was done to fix it', 'icon' => 'fa-wrench', 'url' => 'corrective'],
+            ['section' => 'maintenance', 'label' => 'Maintenance', 'hint' => 'Machine upkeep', 'icon' => 'fa-cogs', 'url' => 'maintenance'],
+            ['section' => 'audits', 'label' => 'Internal audit', 'hint' => 'Audit findings', 'icon' => 'fa-check-square', 'url' => 'audits'],
+            ['section' => 'complaints', 'label' => 'Complaints', 'hint' => 'Customer complaints', 'icon' => 'fa-comment', 'url' => 'complaints'],
+            ['section' => 'reviews', 'label' => 'Management review', 'hint' => 'Review meetings', 'icon' => 'fa-calendar', 'url' => 'reviews'],
+        ];
+        $modules = array_values(array_filter($modules, function (array $module) use ($role): bool {
+            return IsoAccess::canView($role, $module['section']);
         }));
         $this->set('cards', $cards);
+        $this->set('modules', $modules);
     }
 
     public function documents(): ?Response
