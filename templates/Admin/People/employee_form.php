@@ -37,7 +37,7 @@
 				<p class="kx-section">Login and ISO access</p>
 				<div class="kx-grid">
 					<label class="kx-field"><span>Username</span><input name="username" value="<?php echo h($entity->hr_user->username ?? ''); ?>"></label>
-					<label class="kx-field"><span>Password</span><input name="password" type="text" placeholder="<?php echo empty($entity->hr_user) ? 'Set a password to create the login' : 'Leave blank to keep the current password'; ?>"></label>
+					<label class="kx-field"><span>Password</span><input name="password" type="password" autocomplete="new-password" value="" placeholder="<?php echo empty($entity->hr_user) ? 'Set a password to create the login' : 'Leave blank to keep the current password'; ?>"></label>
 					<label class="kx-field kx-span"><span>ISO role</span>
 						<select name="iso_role">
 							<option value="">No ISO access</option>

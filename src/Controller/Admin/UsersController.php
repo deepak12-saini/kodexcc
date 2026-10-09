@@ -254,7 +254,7 @@ class UsersController extends AppController
 		$this->set('title_for_layout',SITENAME.' Admin Login Page');		
 		$admin_id=$this->Session->read('User.id');
 		if(!empty($admin_id)){
-			$this->redirect(['action' => 'dashboard']);
+			return $this->redirect(['action' => 'dashboard']);
 		}
 		if ($this->Session->read('is_iso_user')) {
 			$this->redirect('/admin/iso');
@@ -271,13 +271,13 @@ class UsersController extends AppController
 				$this->Session->write('User', $admin_arr['User']);
 				$this->Session->write('is_admin', 1);
 				$this->Session->write('iso_role', 'super_admin');
-				$this->redirect(['action' => 'dashboard']);
-			}else if ($this->loginIsoUser((string)($this->requestData()['User']['username'] ?? ''), (string)($this->requestData()['User']['password'] ?? ''))) {
-				$this->redirect('/admin/iso');
-			}else{
-				//$this->Session->setFlash(__('Wrong username/password', true));
-				$this->Session->setFlash('Wrong username/password','default',array('class' => 'alert alert-danger'));
+				return $this->redirect(['action' => 'dashboard']);
 			}
+			$isoLogin = $this->loginIsoUser((string)($this->requestData()['User']['username'] ?? ''), (string)($this->requestData()['User']['password'] ?? ''));
+			if ($isoLogin === true) {
+				return $this->redirect('/admin/iso');
+			}
+			$this->Session->setFlash($isoLogin,'default',array('class' => 'alert alert-danger'));
 		}
 		
 	}
@@ -285,27 +285,45 @@ class UsersController extends AppController
 	/*Author  :Ranjit,
 	/*Comment : User Logout page
 ****/	
-	private function loginIsoUser(string $username, string $password): bool
+	/**
+	 * @return true|string True when the ISO session is started, otherwise the message to show.
+	 */
+	private function loginIsoUser(string $username, string $password): true|string
 	{
 		$username = trim($username);
 		if ($username === '' || $password === '') {
-			return false;
+			return 'Wrong username/password';
 		}
-		$user = $this->fetchTable('HrUsers')->find()
-			->where(['username' => $username, 'is_active' => 1])
-			->first();
-		$role = (string)($user->iso_role ?? '');
-		if ($user === null || $role === '' || !isset(\App\Utility\IsoAccess::ROLES[$role])) {
-			return false;
+		$conn = $this->fetchTable('HrUsers')->getConnection();
+		try {
+			$row = $conn->execute(
+				'SELECT id, employee_id, username, password, is_active, iso_role FROM hr_users WHERE username = :username LIMIT 1',
+				['username' => $username]
+			)->fetch('assoc');
+		} catch (\Throwable) {
+			$row = $conn->execute(
+				'SELECT id, employee_id, username, password, is_active FROM hr_users WHERE username = :username LIMIT 1',
+				['username' => $username]
+			)->fetch('assoc');
+			if (is_array($row)) {
+				$row['iso_role'] = null;
+			}
 		}
-		if (!hash_equals((string)$user->password, hash('sha256', $password))) {
-			return false;
+		if (!is_array($row) || !hash_equals((string)$row['password'], hash('sha256', $password))) {
+			return 'Wrong username/password';
+		}
+		if ((int)$row['is_active'] !== 1) {
+			return 'This login is turned off. Ask the administrator to activate the employee.';
+		}
+		$role = (string)($row['iso_role'] ?? '');
+		if ($role === '' || !isset(\App\Utility\IsoAccess::ROLES[$role])) {
+			return 'Password is correct, but this account has no ISO role. Open the employee, choose an ISO role, save, and sign in again.';
 		}
 		$this->Session->write('is_iso_user', 1);
 		$this->Session->write('iso_role', $role);
-		$this->Session->write('iso_user_id', (int)$user->id);
-		$this->Session->write('iso_employee_id', (int)$user->employee_id);
-		$this->Session->write('User', ['username' => $user->username]);
+		$this->Session->write('iso_user_id', (int)$row['id']);
+		$this->Session->write('iso_employee_id', (int)$row['employee_id']);
+		$this->Session->write('User', ['username' => $row['username']]);
 
 		return true;
 	}
