@@ -44,14 +44,14 @@
 						</a>
 						<b class="arrow"></b>
 						<ul class="submenu">
-							<li class="<?php echo $peopleHere && $peopleAction === 'employees' ? 'active' : ''; ?>">
-								<a href="<?php echo SITEURL; ?>admin/people/employees"><i class="menu-icon fa fa-user"></i> Employees</a>
-							</li>
 							<li class="<?php echo $peopleHere && str_starts_with($peopleAction, 'department') ? 'active' : ''; ?>">
 								<a href="<?php echo SITEURL; ?>admin/people/departments"><i class="menu-icon fa fa-building"></i> Departments</a>
 							</li>
 							<li class="<?php echo $peopleHere && str_starts_with($peopleAction, 'designation') ? 'active' : ''; ?>">
 								<a href="<?php echo SITEURL; ?>admin/people/designations"><i class="menu-icon fa fa-id-badge"></i> Designations</a>
+							</li>
+							<li class="<?php echo $peopleHere && ($peopleAction === 'employees' || str_starts_with($peopleAction, 'employee')) ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/people/employees"><i class="menu-icon fa fa-user"></i> Employees</a>
 							</li>
 						</ul>
 					</li>
