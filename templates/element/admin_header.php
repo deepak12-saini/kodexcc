@@ -143,6 +143,14 @@
 									</a>
 								</li>
 								<?php endif; ?>
+								<?php if ($this->request->getSession()->read('is_iso_user')): ?>
+								<li>
+									<a href="<?php echo SITEURL; ?>admin/users/iso-password">
+										<i class="ace-icon fa fa-key"></i>
+										Change password
+									</a>
+								</li>
+								<?php endif; ?>
 
 								<li class="divider"></li>
 

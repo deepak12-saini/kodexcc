@@ -537,6 +537,54 @@ class UsersController extends AppController
 	{
 		$this->change_password();
 	}
+
+	/**
+	 * Signed-in ISO staff change their own hr_users password.
+	 */
+	public function isoPassword(): ?\Cake\Http\Response
+	{
+		$this->viewBuilder()->setLayout('admin_layout');
+		$this->viewBuilder()->addHelper('Form');
+		$this->set('title_for_layout', SITENAME . ' Change Password');
+		if (!$this->Session->read('is_iso_user')) {
+			$this->Flash->error('You need to be logged in to access this area.');
+
+			return $this->redirect('/admin');
+		}
+		$userId = (int)$this->Session->read('iso_user_id');
+		if ($this->request->is('post')) {
+			$current = (string)$this->request->getData('current_password');
+			$new = (string)$this->request->getData('new_password');
+			$confirm = (string)$this->request->getData('confirm_password');
+			$conn = $this->fetchTable('HrUsers')->getConnection();
+			$row = $conn->execute(
+				'SELECT id, password FROM hr_users WHERE id = :id AND is_active = 1 LIMIT 1',
+				['id' => $userId]
+			)->fetch('assoc');
+			if (!is_array($row) || !hash_equals((string)$row['password'], hash('sha256', $current))) {
+				$this->Flash->error('Current password is not correct.');
+			} elseif (strlen($new) < 6) {
+				$this->Flash->error('Use at least 6 characters for the new password.');
+			} elseif (!hash_equals($new, $confirm)) {
+				$this->Flash->error('New password and confirm password do not match.');
+			} else {
+				$conn->execute(
+					'UPDATE hr_users SET password = :password, modified = :modified WHERE id = :id',
+					[
+						'password' => hash('sha256', $new),
+						'modified' => date('Y-m-d H:i:s'),
+						'id' => $userId,
+					]
+				);
+				$this->Flash->success('Your password has been changed.');
+
+				return $this->redirect(['action' => 'isoPassword']);
+			}
+		}
+		$this->set('username', (string)$this->Session->read('User.username'));
+
+		return null;
+	}
 	
 	/***
 	/*Author  :Ranjit,
