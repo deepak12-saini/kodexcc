@@ -313,19 +313,29 @@ class UsersController extends AppController
 	function logout()
 	{
 		$this->autoRender = false;
-			
-		$userId = $this->Session->read('User.id');
-		$LoginHistoryArr = $this->LoginHistory->find('first',array('conditions'=>array('LoginHistory.user_id'=>$userId,'LoginHistory.logouttime IS'=>null),'order'=>array('LoginHistory.id'=>'DESC')));
-		if(!empty($LoginHistoryArr)){			
-			$insert['LoginHistory']['id'] = $LoginHistoryArr['LoginHistory']['id'];
-			$insert['LoginHistory']['user_id'] = $userId;
-			$insert['LoginHistory']['logouttime'] = date('Y-m-d H:i:s');
-			$this->LoginHistory->save($insert);
-		}
-		
-		$this->Session->destroy();
-		$this->redirect('/admin');
 
+		// ISO staff sessions store a username only. They have no admin User.id,
+		// and the login-history query rejects a null id.
+		$userId = $this->Session->read('User.id');
+		if (!empty($userId)) {
+			$LoginHistoryArr = $this->LoginHistory->find('first', [
+				'conditions' => [
+					'LoginHistory.user_id' => $userId,
+					'LoginHistory.logouttime IS' => null,
+				],
+				'order' => ['LoginHistory.id' => 'DESC'],
+			]);
+			if (!empty($LoginHistoryArr)) {
+				$insert['LoginHistory']['id'] = $LoginHistoryArr['LoginHistory']['id'];
+				$insert['LoginHistory']['user_id'] = $userId;
+				$insert['LoginHistory']['logouttime'] = date('Y-m-d H:i:s');
+				$this->LoginHistory->save($insert);
+			}
+		}
+
+		$this->Session->destroy();
+
+		return $this->redirect('/admin');
 	}
 	
 	/***
