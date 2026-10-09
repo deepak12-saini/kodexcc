@@ -24,9 +24,11 @@ class PeopleController extends AppController
     public function employees(): void
     {
         $q = trim((string)$this->request->getQuery('q'));
+        $removed = $this->request->getQuery('removed') === '1';
         $query = $this->fetchTable('HrEmployees')->find()
             ->contain(['HrDepartments', 'HrDesignations', 'HrUsers'])
             ->orderBy(['HrEmployees.id' => 'DESC']);
+        $query->where($removed ? ['HrEmployees.status' => 'deleted'] : ['HrEmployees.status !=' => 'deleted']);
         if ($q !== '') {
             $query->where([
                 'OR' => [
@@ -39,7 +41,52 @@ class PeopleController extends AppController
         $this->paginate = ['limit' => 20, 'maxLimit' => 100];
         $this->set('items', $this->paginate($query));
         $this->set('q', $q);
+        $this->set('removed', $removed);
         $this->set('pageTitle', 'Employees');
+    }
+
+    public function employeeRemove($id = null): ?\Cake\Http\Response
+    {
+        $this->request->allowMethod(['post']);
+        $table = $this->fetchTable('HrEmployees');
+        $entity = $table->get((int)$id);
+        $entity->status = 'deleted';
+        $entity->modified = date('Y-m-d H:i:s');
+        if ($table->save($entity)) {
+            $this->setLoginActive((int)$entity->id, 0);
+            $this->Flash->success('Employee removed. You can recover them from Removed employees.');
+        } else {
+            $this->Flash->error('Could not remove this employee.');
+        }
+
+        return $this->redirect(['action' => 'employees']);
+    }
+
+    public function employeeRecover($id = null): ?\Cake\Http\Response
+    {
+        $this->request->allowMethod(['post']);
+        $table = $this->fetchTable('HrEmployees');
+        $entity = $table->get((int)$id);
+        $entity->status = 'active';
+        $entity->modified = date('Y-m-d H:i:s');
+        if ($table->save($entity)) {
+            $this->setLoginActive((int)$entity->id, 1);
+            $this->Flash->success('Employee recovered.');
+        } else {
+            $this->Flash->error('Could not recover this employee.');
+        }
+
+        return $this->redirect(['action' => 'employees', '?' => ['removed' => '1']]);
+    }
+
+    public function departmentRemove($id = null): ?\Cake\Http\Response
+    {
+        return $this->removeSimple('HrDepartments', 'departments', 'department_id', (int)$id, 'Department');
+    }
+
+    public function designationRemove($id = null): ?\Cake\Http\Response
+    {
+        return $this->removeSimple('HrDesignations', 'designations', 'designation_id', (int)$id, 'Designation');
     }
 
     public function employeeForm($id = null): ?\Cake\Http\Response
@@ -200,5 +247,39 @@ class PeopleController extends AppController
             $data['created'] = date('Y-m-d H:i:s');
         }
         $users->save($users->patchEntity($user, $data));
+    }
+
+    private function setLoginActive(int $employeeId, int $active): void
+    {
+        $users = $this->fetchTable('HrUsers');
+        $user = $users->find()->where(['employee_id' => $employeeId])->first();
+        if (!$user) {
+            return;
+        }
+        $user->is_active = $active;
+        $user->modified = date('Y-m-d H:i:s');
+        $users->save($user);
+    }
+
+    private function removeSimple(string $alias, string $listAction, string $employeeField, int $id, string $label): ?\Cake\Http\Response
+    {
+        $this->request->allowMethod(['post']);
+        $used = $this->fetchTable('HrEmployees')->find()
+            ->where([$employeeField => $id, 'status !=' => 'deleted'])
+            ->count();
+        if ($used > 0) {
+            $this->Flash->error('This ' . strtolower($label) . ' is still used by an employee, so it was not deleted.');
+
+            return $this->redirect(['action' => $listAction]);
+        }
+        $table = $this->fetchTable($alias);
+        $entity = $table->find()->where(['id' => $id])->first();
+        if ($entity && $table->delete($entity)) {
+            $this->Flash->success($label . ' deleted.');
+        } else {
+            $this->Flash->error('Could not delete this ' . strtolower($label) . '.');
+        }
+
+        return $this->redirect(['action' => $listAction]);
     }
 }

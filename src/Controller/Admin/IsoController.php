@@ -538,6 +538,20 @@ class IsoController extends AppController
 
     private function renderList(string $title, string $file, string $alias, array $header, array $filter, callable $map, string $addAction, string $selfAction): ?Response
     {
+        if ($this->request->is('post') && $this->request->getData('delete_id')) {
+            $rowId = (int)$this->request->getData('delete_id');
+            $row = $this->fetchTable($alias)->find()->where(['id' => $rowId])->first();
+            if ($row && $alias === 'IsoDocuments') {
+                $this->fetchTable('IsoDocumentRevisions')->deleteAll(['document_id' => $rowId]);
+            }
+            if ($row && $this->fetchTable($alias)->delete($row)) {
+                $this->Flash->success($title . ' deleted.');
+            } else {
+                $this->Flash->error('Could not delete this record.');
+            }
+
+            return $this->redirect(['action' => $selfAction]);
+        }
         $query = $this->fetchTable($alias)->find()->orderBy([$alias . '.id' => 'DESC']);
         $values = [];
         foreach ($filter['selects'] ?? [] as $key => $options) {

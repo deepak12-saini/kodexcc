@@ -1,5 +1,5 @@
 <style>
-.admin-pager { margin-top: 4px; }
+.admin-pager { margin-top: 8px; clear: both; overflow: hidden; }
 .admin-pager .dataTables_info { padding-top: 10px; color: #707070; }
 .admin-pager .pagination { margin: 4px 0 0; float: right; }
 .admin-pager .pagination > li > a,
