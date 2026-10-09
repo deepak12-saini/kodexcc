@@ -128,6 +128,7 @@
 							</a>
 
 							<ul class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+								<?php if ($this->request->getSession()->read('is_admin')): ?>
 								<li>
 									<a href="<?php echo SITEURL;?>admin/users/change_password">
 										<i class="ace-icon fa fa-cog"></i>
@@ -141,6 +142,7 @@
 										Profile
 									</a>
 								</li>
+								<?php endif; ?>
 
 								<li class="divider"></li>
 

@@ -66,59 +66,20 @@
 		
 	</div>
 	 <div class="row">
-            <!-- ./col -->
+			<?php foreach ($dashCards as $card): ?>
             <div class="col-lg-3 col-xs-6">
-              <!-- small box -->
-              <div class="small-box bg-yellow" style="background-color: #F79263 !important;color:#fff;">
+              <div class="small-box" style="background-color: <?php echo h($card['color']); ?> !important;color:#fff;">
                 <div class="inner" style="padding:10px;">
-                  <h3>#<?php echo $totalcate; ?></h3>
-                  <p>Category</p>
+                  <h3>#<?php echo (int)$card['count']; ?></h3>
+                  <p><?php echo h($card['label']); ?></p>
                 </div>
                 <div class="icon">
-                  <i class="fa fa-user"></i>
+                  <i class="fa <?php echo h($card['icon']); ?>"></i>
                 </div>
-                <a href="<?php echo SITEURL.'admin/categories' ?>" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-              </div>
-            </div><!-- ./col -->
-            <div class="col-lg-3 col-xs-6">
-              
-              <div class="small-box bg-red" style="background-color: #CC5D5E !important;color:#fff;">
-                <div class="inner" style="padding:10px;">
-                  <h3>#<?php echo $totalpro; ?></h3>
-                  <p>Products</p>
-                </div>
-                <div class="icon">
-                  <i class="fa fa-briefcase "></i>
-                </div>
-                <a href="<?php echo SITEURL.'admin/products' ?>" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-              </div>
-            </div><!-- ./col -->
-			<div class="col-lg-3 col-xs-6">
-              <!-- small box -->
-              <div class="small-box bg-aqua" style="background-color: #AEC95B !important;color:#fff;">
-                <div class="inner" style="padding:10px;">
-                  <h3>#<?php echo $totalStaff; ?></h3>
-                  <p>Total Staff Member</p>
-                </div>
-                <div class="icon">
-                  <i class="fa fa-user"></i>
-                </div>
-                <a href="<?php echo SITEURL.'admin/users/staff' ?>" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-              </div>
-            </div><!-- ./col -->
-            <div class="col-lg-3 col-xs-6">
-             
-              <div class="small-box bg-green" style="background-color: #8BC1E4 !important;color:#fff;">
-                <div class="inner" style="padding:10px;">
-                  <h3>#<?php echo $totalCustomer; ?></h3>
-                  <p>Total Customer</p>
-                </div>
-                <div class="icon">
-                  <i class="fa fa-user"></i>
-                </div>
-                <a href="<?php echo SITEURL.'admin/users/customer' ?>" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                <a href="<?php echo SITEURL . h($card['url']); ?>" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
               </div>
             </div>
+			<?php endforeach; ?>
           </div><!-- /.row -->
 
 	</div>

@@ -79,6 +79,55 @@
     font-style: italic;
     padding-left: 10px;
 }
+.main-content-inner > .message {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: 16px 18px 0;
+	padding: 12px 14px;
+	border-radius: 10px;
+	border: 1px solid transparent;
+	font-family: "Segoe UI", system-ui, sans-serif;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.4;
+	cursor: pointer;
+}
+.main-content-inner > .message::before {
+	content: "";
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	flex: none;
+	background: #667085;
+}
+.main-content-inner > .message::after {
+	content: "\00d7";
+	margin-left: auto;
+	font-size: 20px;
+	font-weight: 400;
+	line-height: 1;
+	opacity: 0.65;
+}
+.main-content-inner > .message.success {
+	background: #ecfdf3;
+	color: #067647;
+	border-color: #abefc6;
+}
+.main-content-inner > .message.success::before { background: #12b76a; }
+.main-content-inner > .message.error {
+	background: #fef3f2;
+	color: #b42318;
+	border-color: #fecdca;
+}
+.main-content-inner > .message.error::before { background: #f04438; }
+.main-content-inner > .message.warning {
+	background: #fffaeb;
+	color: #b54708;
+	border-color: #fedf89;
+}
+.main-content-inner > .message.warning::before { background: #f79009; }
+.main-content-inner > .message.hidden { display: none; }
 </style>
 </head>
 <body class="no-skin">
@@ -90,6 +139,11 @@
 	<div class="main-content">
 		<div class="main-content-inner">
 			<?php echo $this->Flash->render(); ?>
+			<script>
+			document.querySelectorAll('.main-content-inner > .message.success').forEach(function (note) {
+				setTimeout(function () { note.classList.add('hidden'); }, 4500);
+			});
+			</script>
 			<?php echo $this->fetch('content'); ?>
 		</div>
 	</div>

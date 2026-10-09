@@ -11,6 +11,7 @@
 				
 
 				<ul class="nav nav-list">
+					<?php if ($this->request->getSession()->read('is_admin')): ?>
 					<li class="<?php if ($this->params['controller']=='users' && $this->params['action']=='admin_dashboard') {echo 'active';}?>">
 						<a href="<?php echo SITEURL?>admin/users/dashboard">
 							<i class="menu-icon fa fa-tachometer"></i>
@@ -19,6 +20,97 @@
 
 						<b class="arrow"></b>
 					</li>
+					<?php endif; ?>
+					<?php
+					$isoController = strtolower((string)$this->request->getParam('controller'));
+					$isoAction = (string)$this->request->getParam('action');
+					$isoOpen = $isoController === 'iso';
+					?>
+					<?php
+					$isoRole = $this->request->getSession()->read('is_admin') ? 'super_admin' : (string)$this->request->getSession()->read('iso_role');
+					$isoCan = function (string $section) use ($isoRole): bool {
+						return $isoRole !== '' && \App\Utility\IsoAccess::canView($isoRole, $section);
+					};
+					$showPeople = (bool)$this->request->getSession()->read('is_admin');
+					$peopleHere = $isoController === 'people';
+					$peopleAction = $isoAction;
+					?>
+					<?php if ($showPeople): ?>
+					<li class="<?php echo $peopleHere ? 'active open' : ''; ?>">
+						<a href="#" class="dropdown-toggle">
+							<i class="menu-icon fa fa-users"></i>
+							<span class="menu-text"> People </span>
+							<b class="arrow fa fa-angle-down"></b>
+						</a>
+						<b class="arrow"></b>
+						<ul class="submenu">
+							<li class="<?php echo $peopleHere && $peopleAction === 'employees' ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/people/employees"><i class="menu-icon fa fa-user"></i> Employees</a>
+							</li>
+							<li class="<?php echo $peopleHere && str_starts_with($peopleAction, 'department') ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/people/departments"><i class="menu-icon fa fa-building"></i> Departments</a>
+							</li>
+							<li class="<?php echo $peopleHere && str_starts_with($peopleAction, 'designation') ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/people/designations"><i class="menu-icon fa fa-id-badge"></i> Designations</a>
+							</li>
+						</ul>
+					</li>
+					<?php endif; ?>
+					<?php if ($isoCan('overview')): ?>
+					<li class="<?php echo $isoOpen ? 'active open' : ''; ?>">
+						<a href="#" class="dropdown-toggle">
+							<i class="menu-icon fa fa-certificate"></i>
+							<span class="menu-text"> ISO 9001 </span>
+							<b class="arrow fa fa-angle-down"></b>
+						</a>
+						<b class="arrow"></b>
+						<ul class="submenu">
+							<?php if ($isoCan('overview')): ?><li class="<?php echo $isoOpen && $isoAction === 'index' ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/iso"><i class="menu-icon fa fa-tachometer"></i> Overview</a>
+							</li><?php endif; ?>
+							<?php if ($isoCan('documents')): ?><li class="<?php echo $isoOpen && str_starts_with($isoAction, 'document') ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/iso/documents"><i class="menu-icon fa fa-file"></i> Documents</a>
+							</li><?php endif; ?>
+							<?php if ($isoCan('training')): ?><li class="<?php echo $isoOpen && str_starts_with($isoAction, 'training') ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/iso/training"><i class="menu-icon fa fa-users"></i> Training</a>
+							</li><?php endif; ?>
+							<?php if ($isoCan('suppliers')): ?><li class="<?php echo $isoOpen && str_starts_with($isoAction, 'supplier') ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/iso/suppliers"><i class="menu-icon fa fa-truck"></i> Suppliers</a>
+							</li><?php endif; ?>
+							<?php if ($isoCan('materials')): ?><li class="<?php echo $isoOpen && str_starts_with($isoAction, 'material') ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/iso/materials"><i class="menu-icon fa fa-cubes"></i> Materials</a>
+							</li><?php endif; ?>
+							<?php if ($isoCan('receipts')): ?><li class="<?php echo $isoOpen && str_starts_with($isoAction, 'receipt') ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/iso/receipts"><i class="menu-icon fa fa-inbox"></i> Incoming material</a>
+							</li><?php endif; ?>
+							<?php if ($isoCan('batches')): ?><li class="<?php echo $isoOpen && str_starts_with($isoAction, 'batch') ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/iso/batches"><i class="menu-icon fa fa-industry"></i> Production</a>
+							</li><?php endif; ?>
+							<?php if ($isoCan('inspections')): ?><li class="<?php echo $isoOpen && str_starts_with($isoAction, 'inspection') ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/iso/inspections"><i class="menu-icon fa fa-search"></i> QC inspections</a>
+							</li><?php endif; ?>
+							<?php if ($isoCan('ncr')): ?><li class="<?php echo $isoOpen && str_starts_with($isoAction, 'ncr') ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/iso/nonconformances"><i class="menu-icon fa fa-exclamation-triangle"></i> Non-conformance</a>
+							</li><?php endif; ?>
+							<?php if ($isoCan('corrective')): ?><li class="<?php echo $isoOpen && str_starts_with($isoAction, 'corrective') ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/iso/corrective"><i class="menu-icon fa fa-wrench"></i> Corrective action</a>
+							</li><?php endif; ?>
+							<?php if ($isoCan('maintenance')): ?><li class="<?php echo $isoOpen && str_starts_with($isoAction, 'maintenance') ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/iso/maintenance"><i class="menu-icon fa fa-cogs"></i> Maintenance</a>
+							</li><?php endif; ?>
+							<?php if ($isoCan('audits')): ?><li class="<?php echo $isoOpen && str_starts_with($isoAction, 'audit') ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/iso/audits"><i class="menu-icon fa fa-check-square"></i> Internal audit</a>
+							</li><?php endif; ?>
+							<?php if ($isoCan('complaints')): ?><li class="<?php echo $isoOpen && str_starts_with($isoAction, 'complaint') ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/iso/complaints"><i class="menu-icon fa fa-comment"></i> Complaints</a>
+							</li><?php endif; ?>
+							<?php if ($isoCan('reviews')): ?><li class="<?php echo $isoOpen && str_starts_with($isoAction, 'review') ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/iso/reviews"><i class="menu-icon fa fa-calendar"></i> Management review</a>
+							</li><?php endif; ?>
+						</ul>
+					</li>
+					<?php endif; ?>
+					<?php /* Unused admin menus kept for later. Uncomment this block to restore them.
 						<li class="<?php if ($this->params['controller']=='users' && $this->params['action']=='admin_salemeet') {echo 'active';}?>">
 						<a href="<?php echo SITEURL?>admin/users/salemeet">
 							<i class="menu-icon fa fa-tachometer"></i>
@@ -677,6 +769,7 @@
 					</li>
 					
 							
+					*/ ?>
 				</ul><!-- /.nav-list -->
 
 				<!-- #section:basics/sidebar.layout.minimize -->

@@ -232,15 +232,16 @@ class UsersController extends AppController
 		$this->set('title_for_layout',SITENAME.' Admin Dashboard Page');
 		$this->checkAdminSession(); 
 		
-		$totalcate = $this->Category->find('count');
-		$totalpro = $this->Product->find('count');
-		$totalStaff = $this->Staff->find('count');
-		$totalCustomer = $this->NappUser->find('count');
-		
-		$this->set('totalCustomer',$totalCustomer);
-		$this->set('totalStaff',$totalStaff);
-		$this->set('totalcate',$totalcate);
-		$this->set('totalpro',$totalpro);
+		$this->set('dashCards', [
+			['count' => $this->fetchTable('HrEmployees')->find()->where(['status' => 'active'])->count(), 'label' => 'Employees', 'url' => 'admin/people/employees', 'color' => '#AEC95B', 'icon' => 'fa-users'],
+			['count' => $this->fetchTable('HrDepartments')->find()->where(['status' => 1])->count(), 'label' => 'Departments', 'url' => 'admin/people/departments', 'color' => '#8BC1E4', 'icon' => 'fa-building'],
+			['count' => $this->fetchTable('HrDesignations')->find()->where(['status' => 1])->count(), 'label' => 'Designations', 'url' => 'admin/people/designations', 'color' => '#F79263', 'icon' => 'fa-id-badge'],
+			['count' => $this->fetchTable('IsoDocuments')->find()->where(['status' => 'in_review'])->count(), 'label' => 'Documents to approve', 'url' => 'admin/iso/documents?status=in_review', 'color' => '#438eb9', 'icon' => 'fa-file'],
+			['count' => $this->fetchTable('IsoReceipts')->find()->where(['inspection_result' => 'pending'])->count(), 'label' => 'Incoming awaiting QA', 'url' => 'admin/iso/receipts?inspection_result=pending', 'color' => '#F79263', 'icon' => 'fa-inbox'],
+			['count' => $this->fetchTable('IsoNonconformances')->find()->where(['status' => 'open'])->count(), 'label' => 'Open non-conformances', 'url' => 'admin/iso/nonconformances?status=open', 'color' => '#CC5D5E', 'icon' => 'fa-exclamation-triangle'],
+			['count' => $this->fetchTable('IsoActions')->find()->where(['status' => 'open'])->count(), 'label' => 'Open corrective actions', 'url' => 'admin/iso/corrective?status=open', 'color' => '#6f6e6e', 'icon' => 'fa-wrench'],
+			['count' => $this->fetchTable('IsoSuppliers')->find()->where(['status' => 'approved'])->count(), 'label' => 'Approved suppliers', 'url' => 'admin/iso/suppliers?status=approved', 'color' => '#AEC95B', 'icon' => 'fa-truck'],
+		]);
 	}
 	
 /***
@@ -254,7 +255,11 @@ class UsersController extends AppController
 		$admin_id=$this->Session->read('User.id');
 		if(!empty($admin_id)){
 			$this->redirect(['action' => 'dashboard']);
-		}		
+		}
+		if ($this->Session->read('is_iso_user')) {
+			$this->redirect('/admin/iso');
+			return;
+		}
 		if(!empty($this->requestData())){		
 			$admin_arr = $this->User->find('first',array('conditions'=>array('username'=>$this->requestData()['User']['username'],'password'=>$this->requestData()['User']['password'])));
 			if(!empty($admin_arr)){				
@@ -264,8 +269,11 @@ class UsersController extends AppController
 				$this->LoginHistory->save($insert);
 				
 				$this->Session->write('User', $admin_arr['User']);
-				$this->Session->write('is_admin', 1);					
+				$this->Session->write('is_admin', 1);
+				$this->Session->write('iso_role', 'super_admin');
 				$this->redirect(['action' => 'dashboard']);
+			}else if ($this->loginIsoUser((string)($this->requestData()['User']['username'] ?? ''), (string)($this->requestData()['User']['password'] ?? ''))) {
+				$this->redirect('/admin/iso');
 			}else{
 				//$this->Session->setFlash(__('Wrong username/password', true));
 				$this->Session->setFlash('Wrong username/password','default',array('class' => 'alert alert-danger'));
@@ -277,6 +285,31 @@ class UsersController extends AppController
 	/*Author  :Ranjit,
 	/*Comment : User Logout page
 ****/	
+	private function loginIsoUser(string $username, string $password): bool
+	{
+		$username = trim($username);
+		if ($username === '' || $password === '') {
+			return false;
+		}
+		$user = $this->fetchTable('HrUsers')->find()
+			->where(['username' => $username, 'is_active' => 1])
+			->first();
+		$role = (string)($user->iso_role ?? '');
+		if ($user === null || $role === '' || !isset(\App\Utility\IsoAccess::ROLES[$role])) {
+			return false;
+		}
+		if (!hash_equals((string)$user->password, hash('sha256', $password))) {
+			return false;
+		}
+		$this->Session->write('is_iso_user', 1);
+		$this->Session->write('iso_role', $role);
+		$this->Session->write('iso_user_id', (int)$user->id);
+		$this->Session->write('iso_employee_id', (int)$user->employee_id);
+		$this->Session->write('User', ['username' => $user->username]);
+
+		return true;
+	}
+
 	function logout()
 	{
 		$this->autoRender = false;

@@ -494,6 +494,14 @@ a.hrms-card:hover {
   flex-wrap: wrap;
   gap: 0.3rem;
   align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.hrms-pager-links li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 .hrms-pager-links a,
 .hrms-pager-links span,
@@ -517,6 +525,7 @@ a.hrms-card:hover {
   color: #0f766e;
 }
 .hrms-pager-links .is-current,
+.hrms-pager-links li.active a,
 .hrms-pager-links span.current {
   background: var(--hrms-accent-soft);
   border-color: rgba(13, 148, 136, 0.35);
