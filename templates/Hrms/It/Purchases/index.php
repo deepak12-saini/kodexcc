@@ -12,7 +12,7 @@
 </div>
 <div class="hrms-panel">
 	<table class="hrms-table">
-		<thead><tr><th>Request</th><th>Item</th><th>Qty</th><th>Requester</th><th>Stage</th><th>Estimated</th></tr></thead>
+		<thead><tr><th>Request</th><th>Item</th><th>Qty</th><th>Requester</th><th>Stage</th><th>Estimated</th><th></th></tr></thead>
 		<tbody>
 		<?php foreach ($items as $item): ?>
 			<tr>
@@ -22,9 +22,10 @@
 				<td><?php echo h($item->requester->full_name ?? '—'); ?></td>
 				<td><?php echo $this->It->badge($item->approval_status); ?></td>
 				<td><?php echo $this->It->money($item->estimated_cost); ?></td>
+				<td><a href="<?php echo $itBase; ?>purchases/edit/<?php echo (int)$item->id; ?>">Edit</a></td>
 			</tr>
 		<?php endforeach; ?>
-		<?php if (!count($items)): ?><tr><td colspan="6">No purchase requests yet.</td></tr><?php endif; ?>
+		<?php if (!count($items)): ?><tr><td colspan="7">No purchase requests yet.</td></tr><?php endif; ?>
 		</tbody>
 	</table>
 	<?php echo $this->element('hrms_pagination'); ?>

@@ -52,6 +52,39 @@ class PurchasesController extends ItController
         $this->render('form');
     }
 
+    public function edit($id = null)
+    {
+        $entity = $this->fetchTable('ItPurchaseRequests')->get($id);
+        $this->set('pageTitle', 'Edit ' . $entity->request_no);
+        if ($this->request->is(['post', 'put', 'patch'])) {
+            $data = $this->clean($this->request->getData(), [], ['estimated_cost']);
+            if (trim((string)($data['item_name'] ?? '')) === '') {
+                $this->Flash->error('Item name is required.');
+            } else {
+                $entity = $this->fetchTable('ItPurchaseRequests')->patchEntity($entity, [
+                    'requested_by' => $data['requested_by'] ?? null,
+                    'department_id' => $data['department_id'] ?? null,
+                    'item_name' => trim((string)$data['item_name']),
+                    'quantity' => max(1, (int)($data['quantity'] ?? 1)),
+                    'estimated_cost' => $data['estimated_cost'] ?? null,
+                    'vendor_id' => $data['vendor_id'] ?? null,
+                    'purpose' => $data['purpose'] ?? null,
+                    'specifications' => $data['specifications'] ?? null,
+                    'modified' => $this->now(),
+                ]);
+                if ($this->fetchTable('ItPurchaseRequests')->save($entity)) {
+                    $this->auditLog('it_purchase_update', 'it_purchase', 'Updated ' . $entity->request_no, (int)$entity->id, $entity->requested_by ? (int)$entity->requested_by : null);
+                    $this->Flash->success('Request ' . $entity->request_no . ' updated.');
+
+                    return $this->redirect(['action' => 'view', $entity->id]);
+                }
+                $this->Flash->error('Could not save the request.');
+            }
+        }
+        $this->setLookups($entity);
+        $this->render('form');
+    }
+
     public function view($id = null)
     {
         $purchase = $this->fetchTable('ItPurchaseRequests')->get($id, contain: [

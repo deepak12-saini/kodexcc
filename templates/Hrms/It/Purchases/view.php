@@ -1,5 +1,6 @@
 <div class="hrms-actions">
 	<a class="hrms-btn hrms-btn-ghost" href="<?php echo $itBase; ?>purchases">All requests</a>
+	<a class="hrms-btn hrms-btn-primary" href="<?php echo $itBase; ?>purchases/edit/<?php echo (int)$purchase->id; ?>">Edit request</a>
 	<?php if (in_array($purchase->approval_status, ['received', 'asset_created'], true)): ?>
 		<a class="hrms-btn hrms-btn-primary" href="<?php echo $itBase; ?>purchases/create-asset/<?php echo (int)$purchase->id; ?>">Create asset</a>
 	<?php endif; ?>
