@@ -59,8 +59,17 @@ class ShiftsController extends HrmsController
     {
         $this->request->allowMethod(['post', 'delete']);
         $this->requireHrRole(['admin', 'hr']);
+        $id = (int)$id;
+        $used = $this->fetchTable('HrEmployees')->find()
+            ->where(['shift_id' => $id, 'status !=' => 'deleted'])
+            ->count();
+        if ($used > 0) {
+            $this->Flash->error('This shift is still assigned to an employee.');
+
+            return $this->redirect(['action' => 'index']);
+        }
         $this->fetchTable('HrShifts')->delete($this->fetchTable('HrShifts')->get($id));
-        $this->Flash->success('Deleted.');
+        $this->Flash->success('Shift deleted.');
         return $this->redirect(['action' => 'index']);
     }
 }

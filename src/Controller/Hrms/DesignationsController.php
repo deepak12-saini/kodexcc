@@ -61,9 +61,18 @@ class DesignationsController extends HrmsController
     {
         $this->request->allowMethod(['post', 'delete']);
         $this->requireHrRole(['admin', 'hr']);
+        $id = (int)$id;
+        $used = $this->fetchTable('HrEmployees')->find()
+            ->where(['designation_id' => $id, 'status !=' => 'deleted'])
+            ->count();
+        if ($used > 0) {
+            $this->Flash->error('This designation is still assigned to an employee.');
+
+            return $this->redirect(['action' => 'index']);
+        }
         $table = $this->fetchTable('HrDesignations');
         if ($table->delete($table->get($id))) {
-            $this->Flash->success('Deleted.');
+            $this->Flash->success('Designation deleted.');
         }
         return $this->redirect(['action' => 'index']);
     }

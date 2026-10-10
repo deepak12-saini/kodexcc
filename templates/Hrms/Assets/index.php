@@ -32,6 +32,7 @@
 				<td><span class="badge badge-muted"><?php echo h($item->status); ?></span></td>
 				<td>
 					<a href="<?php echo SITEURL; ?>hrms/assets/edit/<?php echo (int)$item->id; ?>">Edit</a>
+					<?php echo $this->element('hrms_delete', ['id' => (int)$item->id, 'confirm' => 'Delete this asset?']); ?>
 					<?php if ($item->status === 'available'): ?>
 						| <a href="<?php echo SITEURL; ?>hrms/assets/assign/<?php echo (int)$item->id; ?>">Assign</a>
 					<?php elseif ($activeAssign): ?>

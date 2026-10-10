@@ -35,6 +35,7 @@
 					<?php if (!empty($item->file_path)): ?>
 						<a href="<?php echo SITEURL . h($item->file_path); ?>" target="_blank" rel="noopener">Open</a>
 					<?php endif; ?>
+					<?php echo $this->element('hrms_delete', ['id' => (int)$item->id, 'confirm' => 'Delete this document?']); ?>
 				</td>
 			</tr>
 		<?php endforeach; ?>

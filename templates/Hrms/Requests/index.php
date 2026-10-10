@@ -32,7 +32,10 @@
 				<td><?php echo h($item->hr_request_type->name ?? ''); ?></td>
 				<td><?php echo h($item->title); ?></td>
 				<td><span class="badge badge-muted"><?php echo h($item->status); ?></span></td>
-				<td><a href="<?php echo SITEURL; ?>hrms/requests/view/<?php echo (int)$item->id; ?>">Review</a></td>
+				<td>
+					<a href="<?php echo SITEURL; ?>hrms/requests/view/<?php echo (int)$item->id; ?>">Review</a>
+					<?php echo $this->element('hrms_delete', ['id' => (int)$item->id, 'confirm' => 'Delete this request?']); ?>
+				</td>
 			</tr>
 		<?php endforeach; ?>
 		<?php if (!count($items)): ?>

@@ -122,4 +122,25 @@ class AssetsController extends HrmsController
         $this->Flash->success('Asset returned.');
         return $this->redirect(['action' => 'index']);
     }
+
+    public function delete($id = null)
+    {
+        $this->request->allowMethod(['post', 'delete']);
+        $this->requireHrRole(['admin', 'hr']);
+        $table = $this->fetchTable('HrAssets');
+        $asset = $table->get($id);
+        if ($asset->status === 'assigned') {
+            $this->Flash->error('Return this asset before deleting it.');
+
+            return $this->redirect(['action' => 'index']);
+        }
+        $this->fetchTable('HrAssetAssignments')->deleteAll(['asset_id' => (int)$asset->id]);
+        if ($table->delete($asset)) {
+            $this->Flash->success('Asset deleted.');
+        } else {
+            $this->Flash->error('Could not delete this asset.');
+        }
+
+        return $this->redirect(['action' => 'index']);
+    }
 }

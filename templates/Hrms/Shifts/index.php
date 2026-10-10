@@ -11,7 +11,10 @@
 				<td><?php echo h(is_object($item->start_time) ? $item->start_time->format('H:i') : $item->start_time); ?></td>
 				<td><?php echo h(is_object($item->end_time) ? $item->end_time->format('H:i') : $item->end_time); ?></td>
 				<td><?php echo (int)$item->grace_minutes; ?></td>
-				<td><a href="<?php echo SITEURL; ?>hrms/shifts/edit/<?php echo (int)$item->id; ?>">Edit</a></td>
+				<td>
+					<a href="<?php echo SITEURL; ?>hrms/shifts/edit/<?php echo (int)$item->id; ?>">Edit</a>
+					<?php echo $this->element('hrms_delete', ['id' => (int)$item->id, 'confirm' => 'Delete this shift?']); ?>
+				</td>
 			</tr>
 		<?php endforeach; ?>
 		</tbody>

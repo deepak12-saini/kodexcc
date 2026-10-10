@@ -105,4 +105,18 @@ class RequestsController extends HrmsController
 
         $this->set(compact('item', 'availableAssets'));
     }
+
+    public function delete($id = null)
+    {
+        $this->request->allowMethod(['post', 'delete']);
+        $this->requireHrRole(['admin', 'hr']);
+        $table = $this->fetchTable('HrRequests');
+        if ($table->delete($table->get($id))) {
+            $this->Flash->success('Request deleted.');
+        } else {
+            $this->Flash->error('Could not delete this request.');
+        }
+
+        return $this->redirect(['action' => 'index']);
+    }
 }

@@ -59,6 +59,21 @@ class HolidaysController extends HrmsController
         $this->render('form');
     }
 
+    public function delete($id = null)
+    {
+        $this->request->allowMethod(['post', 'delete']);
+        $this->requireHrRole(['admin', 'hr']);
+        $table = $this->fetchTable('HrHolidays');
+        $entity = $table->get($id);
+        if ($table->delete($entity)) {
+            $this->Flash->success('Holiday deleted.');
+        } else {
+            $this->Flash->error('Could not delete this holiday.');
+        }
+
+        return $this->redirect(['action' => 'index']);
+    }
+
     public function calendar()
     {
         $this->checkHrSession();

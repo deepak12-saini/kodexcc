@@ -8,7 +8,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link rel="icon" href="<?php echo SITEURL; ?>favicon.png" type="image/png">
 	<link rel="shortcut icon" href="<?php echo SITEURL; ?>favicon.png" type="image/png">
-	<link rel="stylesheet" href="<?php echo SITEURL; ?>css/hrms.css?v=9">
+	<link rel="stylesheet" href="<?php echo SITEURL; ?>css/hrms.css?v=10">
 	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body class="hrms-body">

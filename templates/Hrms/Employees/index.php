@@ -32,6 +32,7 @@
 					<a href="<?php echo SITEURL; ?>hrms/employees/view/<?php echo (int)$item->id; ?>">Profile</a>
 					<?php if (in_array($hrRole, ['admin', 'hr'], true)): ?>
 						· <a href="<?php echo SITEURL; ?>hrms/employees/edit/<?php echo (int)$item->id; ?>">Edit</a>
+						· <?php echo $this->element('hrms_delete', ['id' => (int)$item->id, 'confirm' => 'Remove this employee?']); ?>
 					<?php endif; ?>
 				</td>
 			</tr>

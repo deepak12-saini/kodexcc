@@ -14,7 +14,8 @@ class EmployeesController extends HrmsController
 
         // order already on query
         $query = $this->fetchTable('HrEmployees')->find()
-            ->contain(['HrDepartments', 'HrDesignations', 'HrShifts']);
+            ->contain(['HrDepartments', 'HrDesignations', 'HrShifts'])
+            ->where(['HrEmployees.status !=' => 'deleted']);
 
         if ($role === 'manager') {
             $mgrId = (int)$this->Session->read('hr_employee_id');
@@ -157,6 +158,29 @@ class EmployeesController extends HrmsController
             ->all();
 
         $this->set(compact('employee', 'tab', 'attendances', 'leaveRequests', 'balances', 'documents', 'assets'));
+    }
+
+    public function delete($id = null)
+    {
+        $this->request->allowMethod(['post', 'delete']);
+        $this->requireHrRole(['admin', 'hr']);
+        $table = $this->fetchTable('HrEmployees');
+        $entity = $table->get($id);
+        $entity->status = 'deleted';
+        $entity->modified = date('Y-m-d H:i:s');
+        if ($table->save($entity)) {
+            $user = $this->fetchTable('HrUsers')->find()->where(['employee_id' => (int)$entity->id])->first();
+            if ($user) {
+                $user->is_active = 0;
+                $user->modified = date('Y-m-d H:i:s');
+                $this->fetchTable('HrUsers')->save($user);
+            }
+            $this->Flash->success('Employee removed.');
+        } else {
+            $this->Flash->error('Could not remove this employee.');
+        }
+
+        return $this->redirect(['action' => 'index']);
     }
 
     private function loadFormLists(): void

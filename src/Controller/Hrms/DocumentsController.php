@@ -68,4 +68,18 @@ class DocumentsController extends HrmsController
         }
         $this->set(compact('employees'));
     }
+
+    public function delete($id = null)
+    {
+        $this->request->allowMethod(['post', 'delete']);
+        $this->requireHrRole(['admin', 'hr']);
+        $table = $this->fetchTable('HrDocuments');
+        if ($table->delete($table->get($id))) {
+            $this->Flash->success('Document deleted.');
+        } else {
+            $this->Flash->error('Could not delete this document.');
+        }
+
+        return $this->redirect(['action' => 'index']);
+    }
 }

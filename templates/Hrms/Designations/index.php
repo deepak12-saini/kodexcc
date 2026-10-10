@@ -10,7 +10,10 @@
 				<td><?php echo h($item->name); ?></td>
 				<td><?php echo h($item->hr_department->name ?? '—'); ?></td>
 				<td><?php echo $item->status ? 'Active' : 'Inactive'; ?></td>
-				<td><a href="<?php echo SITEURL; ?>hrms/designations/edit/<?php echo (int)$item->id; ?>">Edit</a></td>
+				<td>
+					<a href="<?php echo SITEURL; ?>hrms/designations/edit/<?php echo (int)$item->id; ?>">Edit</a>
+					<?php echo $this->element('hrms_delete', ['id' => (int)$item->id, 'confirm' => 'Delete this designation?']); ?>
+				</td>
 			</tr>
 		<?php endforeach; ?>
 		</tbody>

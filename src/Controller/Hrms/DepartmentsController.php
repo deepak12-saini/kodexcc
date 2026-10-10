@@ -60,10 +60,22 @@ class DepartmentsController extends HrmsController
     {
         $this->request->allowMethod(['post', 'delete']);
         $this->requireHrRole(['admin', 'hr']);
+        $id = (int)$id;
+        $usedByPeople = $this->fetchTable('HrEmployees')->find()
+            ->where(['department_id' => $id, 'status !=' => 'deleted'])
+            ->count();
+        $usedByRoles = $this->fetchTable('HrDesignations')->find()
+            ->where(['department_id' => $id])
+            ->count();
+        if ($usedByPeople > 0 || $usedByRoles > 0) {
+            $this->Flash->error('This department is still used by a designation or an employee.');
+
+            return $this->redirect(['action' => 'index']);
+        }
         $table = $this->fetchTable('HrDepartments');
         $entity = $table->get($id);
         if ($table->delete($entity)) {
-            $this->Flash->success('Deleted.');
+            $this->Flash->success('Department deleted.');
         } else {
             $this->Flash->error('Delete failed.');
         }

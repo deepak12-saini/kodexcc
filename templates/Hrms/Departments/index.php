@@ -12,6 +12,7 @@
 				<td><?php echo $item->status ? 'Active' : 'Inactive'; ?></td>
 				<td>
 					<a href="<?php echo SITEURL; ?>hrms/departments/edit/<?php echo (int)$item->id; ?>">Edit</a>
+					<?php echo $this->element('hrms_delete', ['id' => (int)$item->id, 'confirm' => 'Delete this department?']); ?>
 				</td>
 			</tr>
 		<?php endforeach; ?>
