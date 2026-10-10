@@ -89,7 +89,8 @@ class EmployeesController extends HrmsController
             }
             $this->Flash->error('Could not save employee.');
         }
-        $this->set(compact('entity'));
+        $loginUser = null;
+        $this->set(compact('entity', 'loginUser'));
         $this->render('form');
     }
 
@@ -100,16 +101,26 @@ class EmployeesController extends HrmsController
         $table = $this->fetchTable('HrEmployees');
         $entity = $table->get($id);
         $this->loadFormLists();
+        $loginUser = $this->fetchTable('HrUsers')->find()->where(['employee_id' => (int)$id])->first();
         if ($this->request->is(['post', 'put', 'patch'])) {
-            $entity = $table->patchEntity($entity, $this->request->getData() + ['modified' => date('Y-m-d H:i:s')]);
+            $data = $this->request->getData();
+            $username = trim((string)($data['username'] ?? ''));
+            $password = (string)($data['password'] ?? '');
+            $loginRole = (string)($data['login_role'] ?? '');
+            unset($data['username'], $data['password'], $data['login_role']);
+            $entity = $table->patchEntity($entity, $data + ['modified' => date('Y-m-d H:i:s')]);
             if ($table->save($entity)) {
+                $loginError = $this->saveEmployeeLogin((int)$entity->id, $username, $password, $loginRole, $loginUser);
+                if ($loginError !== null) {
+                    $this->Flash->error($loginError);
+                }
                 $this->auditLog('employee_update', 'employee', 'Updated employee ' . $entity->employee_code, (int)$entity->id, (int)$entity->id);
                 $this->Flash->success('Employee updated.');
                 return $this->redirect(['action' => 'view', $id]);
             }
             $this->Flash->error('Could not update.');
         }
-        $this->set(compact('entity'));
+        $this->set(compact('entity', 'loginUser'));
         $this->render('form');
     }
 
@@ -181,6 +192,56 @@ class EmployeesController extends HrmsController
         }
 
         return $this->redirect(['action' => 'index']);
+    }
+
+    private function saveEmployeeLogin(int $employeeId, string $username, string $password, string $loginRole, $existing): ?string
+    {
+        $allowed = ['employee', 'manager', 'hr', 'admin', 'it'];
+        if (!in_array($loginRole, $allowed, true)) {
+            $loginRole = (string)($existing->role ?? 'employee');
+        }
+        $users = $this->fetchTable('HrUsers');
+        if ($existing === null && $username === '') {
+            return null;
+        }
+        if ($username !== '') {
+            $taken = $users->find()->where(['username' => $username]);
+            if ($existing !== null) {
+                $taken->where(['id !=' => $existing->id]);
+            }
+            if ($taken->count() > 0) {
+                return 'That username is already used.';
+            }
+        }
+        if ($existing === null) {
+            if ($password === '') {
+                return null;
+            }
+            $user = $users->newEntity([
+                'employee_id' => $employeeId,
+                'username' => $username,
+                'password' => $this->hashPassword($password),
+                'role' => $loginRole,
+                'is_active' => 1,
+                'created' => date('Y-m-d H:i:s'),
+                'modified' => date('Y-m-d H:i:s'),
+            ]);
+            $users->save($user);
+
+            return null;
+        }
+        if ($username !== '') {
+            $existing->username = $username;
+        }
+        if ($password !== '') {
+            $existing->password = $this->hashPassword($password);
+        }
+        $existing->role = $loginRole;
+        $existing->is_active = 1;
+        $existing->modified = date('Y-m-d H:i:s');
+        $users->save($existing);
+
+        return null;
     }
 
     private function loadFormLists(): void

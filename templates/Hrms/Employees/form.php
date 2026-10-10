@@ -105,26 +105,23 @@
 			</select>
 		</div>
 
-		<?php if (empty($entity->id)): ?>
 		<div class="full"><h3 style="margin:0;">Login Access</h3></div>
 		<div>
 			<label>Username</label>
-			<input type="text" name="username" placeholder="optional">
+			<input type="text" name="username" value="<?php echo h($loginUser->username ?? ''); ?>" autocomplete="off" placeholder="Sign-in name">
 		</div>
 		<div>
-			<label>Temp Password</label>
-			<input type="text" name="password" value="welcome123">
+			<label>Password</label>
+			<input type="password" name="password" value="" autocomplete="new-password" placeholder="<?php echo empty($loginUser) ? 'Set a password to create the login' : 'Leave blank to keep the current password'; ?>">
 		</div>
 		<div>
 			<label>Role</label>
 			<select name="login_role">
-				<option value="employee">Employee</option>
-				<option value="manager">Manager</option>
-				<option value="hr">HR</option>
-				<option value="admin">Admin</option>
+				<?php foreach (['employee' => 'Employee', 'manager' => 'Manager', 'hr' => 'HR', 'it' => 'IT', 'admin' => 'Admin'] as $roleKey => $roleLabel): ?>
+					<option value="<?php echo h($roleKey); ?>" <?php echo ($loginUser->role ?? 'employee') === $roleKey ? 'selected' : ''; ?>><?php echo h($roleLabel); ?></option>
+				<?php endforeach; ?>
 			</select>
 		</div>
-		<?php endif; ?>
 
 		<div class="full">
 			<button type="submit" class="hrms-btn hrms-btn-primary">Save Employee</button>

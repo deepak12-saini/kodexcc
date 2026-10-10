@@ -1,6 +1,5 @@
 <div class="hrms-login-form">
 	<h1>Sign in</h1>
-	<p>Confidential employee &amp; attendance portal</p>
 	<?php echo $this->Form->create(null, [
 		'url' => ['prefix' => 'Hrms', 'controller' => 'Users', 'action' => 'login'],
 	]); ?>

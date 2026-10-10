@@ -1,271 +1,157 @@
-	<div class="row">
-					<div class="col-sm-10 col-sm-offset-1">
-						<div class="login-container">
-							<div class="center">
-								<h1>
-									<a href="<?php echo SITEURL; ?>"><img src="<?php echo SITEURL; ?>customdurotech/images/durotech_logo.png"/></a>
-								</h1>
-								<h4 class="blue" id="id-company-text">Admin Panel</h4>
-							</div>
-
-							<div class="space-6"></div>
-
-							<div class="position-relative">
-								<div id="login-box" class="login-box visible widget-box no-border">
-									<div class="widget-body">
-										<div class="widget-main">
-											<h4 class="header blue lighter bigger">
-												<i class="ace-icon fa fa-coffee green"></i>
-												Please Enter Your Information
-											</h4>
-
-											<div class="space-6"></div>
-
-											<?php echo $this->Form->create(null, [
-												'url' => ['prefix' => 'Admin', 'controller' => 'Users', 'action' => 'login'],
-												'name' => 'loginForm',
-												'id' => 'loginForm',
-											]); ?>
-											<?php echo $this->Flash->render(); ?>
-												<fieldset>
-													<label class="block clearfix">
-														<span class="block input-icon input-icon-right">
-															
-															<?php echo $this->Form->text('username', [
-																'name' => 'User[username]',
-																'label' => false,
-																'class' => 'form-control',
-																'placeholder' => 'Username',
-																'id' => 'username',
-															]); ?>
-															<i class="ace-icon fa fa-user"></i>
-														</span>
-													</label>
-
-													<label class="block clearfix">
-														<span class="block input-icon input-icon-right">
-															<?php echo $this->Form->password('password', [
-																'name' => 'User[password]',
-																'label' => false,
-																'class' => 'form-control',
-																'placeholder' => 'Password',
-																'id' => 'password',
-															]); ?>
-															<i class="ace-icon fa fa-lock"></i>
-														</span>
-													</label>
-
-													<div class="space"></div>
-
-													<div class="clearfix">
-														<!--label class="inline">
-															<input type="checkbox" class="ace" />
-															<span class="lbl"> Remember Me</span>
-														</label-->
-<?php echo $this->Form->submit('Login', ['class' => 'width-35 pull-right btn btn-sm btn-primary']); ?>
-														<!--button type="button" class="width-35 pull-right btn btn-sm btn-primary">
-															<i class="ace-icon fa fa-key"></i>
-															<span class="bigger-110">Login</span>
-														</button-->
-													</div>
-
-													<div class="space-4"></div>
-												</fieldset>
-											<?php echo $this->Form->end();?>
-
-											<!--div class="social-or-login center">
-												<span class="bigger-110">Or Login Using</span>
-											</div>
-
-											<div class="space-6"></div>
-
-											<div class="social-login center">
-												<a class="btn btn-primary">
-													<i class="ace-icon fa fa-facebook"></i>
-												</a>
-
-												<a class="btn btn-info">
-													<i class="ace-icon fa fa-twitter"></i>
-												</a>
-
-												<a class="btn btn-danger">
-													<i class="ace-icon fa fa-google-plus"></i>
-												</a>
-											</div-->
-										</div><!-- /.widget-main -->
-
-										<!--div class="toolbar clearfix">
-											<div>
-												<a href="#" data-target="#forgot-box" class="forgot-password-link">
-													<i class="ace-icon fa fa-arrow-left"></i>
-													I forgot my password
-												</a>
-											</div>
-
-											<div>
-												<a href="#" data-target="#signup-box" class="user-signup-link">
-													I want to register
-													<i class="ace-icon fa fa-arrow-right"></i>
-												</a>
-											</div>
-										</div-->
-									</div><!-- /.widget-body -->
-								</div><!-- /.login-box -->
-
-								<div id="forgot-box" class="forgot-box widget-box no-border">
-									<div class="widget-body">
-										<div class="widget-main">
-											<h4 class="header red lighter bigger">
-												<i class="ace-icon fa fa-key"></i>
-												Retrieve Password
-											</h4>
-
-											<div class="space-6"></div>
-											<p>
-												Enter your email and to receive instructions
-											</p>
-
-											<?php echo $this->Form->create(null, [
-												'url' => ['prefix' => 'Admin', 'controller' => 'Users', 'action' => 'forgot_password'],
-												'name' => 'forgotPasswordForm',
-												'id' => 'forgotPasswordForm',
-											]); ?>
-											<?php echo $this->Flash->render(); ?>
-												<fieldset>
-													<label class="block clearfix">
-														<span class="block input-icon input-icon-right">
-															<?php echo $this->Form->text('email', [
-																'name' => 'User[email]',
-																'label' => false,
-																'class' => 'form-control',
-																'placeholder' => 'Email',
-																'id' => 'email',
-															]); ?>
-															<i class="ace-icon fa fa-envelope"></i>
-														</span>
-													</label>
-
-													<div class="clearfix">
-													<?php echo $this->Form->submit('Send Me', ['class' => 'width-35 pull-right btn btn-xs btn-danger']); ?>
-														<!--button type="button" class="width-35 pull-right btn btn-sm btn-danger">
-															<i class="ace-icon fa fa-lightbulb-o"></i>
-															<span class="bigger-110">Send Me!</span>
-														</button-->
-													</div>
-												</fieldset>
-											<?php echo $this->Form->end(); ?>
-										</div><!-- /.widget-main -->
-
-										<div class="toolbar center">
-											<a href="#" data-target="#login-box" class="back-to-login-link">
-												Back to login
-												<i class="ace-icon fa fa-arrow-right"></i>
-											</a>
-										</div>
-									</div><!-- /.widget-body -->
-								</div><!-- /.forgot-box -->
-
-								<div id="signup-box" class="signup-box widget-box no-border">
-									<div class="widget-body">
-										<div class="widget-main">
-											<h4 class="header green lighter bigger">
-												<i class="ace-icon fa fa-users blue"></i>
-												New User Registration
-											</h4>
-
-											<div class="space-6"></div>
-											<p> Enter your details to begin: </p>
-
-											<form>
-												<fieldset>
-													<label class="block clearfix">
-														<span class="block input-icon input-icon-right">
-															<input type="email" class="form-control" placeholder="Email" />
-															<i class="ace-icon fa fa-envelope"></i>
-														</span>
-													</label>
-
-													<label class="block clearfix">
-														<span class="block input-icon input-icon-right">
-															<input type="text" class="form-control" placeholder="Username" />
-															<i class="ace-icon fa fa-user"></i>
-														</span>
-													</label>
-
-													<label class="block clearfix">
-														<span class="block input-icon input-icon-right">
-															<input type="password" class="form-control" placeholder="Password" />
-															<i class="ace-icon fa fa-lock"></i>
-														</span>
-													</label>
-
-													<label class="block clearfix">
-														<span class="block input-icon input-icon-right">
-															<input type="password" class="form-control" placeholder="Repeat password" />
-															<i class="ace-icon fa fa-retweet"></i>
-														</span>
-													</label>
-
-													<label class="block">
-														<input type="checkbox" class="ace" />
-														<span class="lbl">
-															I accept the
-															<a href="#">User Agreement</a>
-														</span>
-													</label>
-
-													<div class="space-24"></div>
-
-													<div class="clearfix">
-														<button type="reset" class="width-30 pull-left btn btn-sm">
-															<i class="ace-icon fa fa-refresh"></i>
-															<span class="bigger-110">Reset</span>
-														</button>
-
-														<button type="button" class="width-65 pull-right btn btn-sm btn-success">
-															<span class="bigger-110">Register</span>
-
-															<i class="ace-icon fa fa-arrow-right icon-on-right"></i>
-														</button>
-													</div>
-												</fieldset>
-											</form>
-										</div>
-
-										<div class="toolbar center">
-											<a href="#" data-target="#login-box" class="back-to-login-link">
-												<i class="ace-icon fa fa-arrow-left"></i>
-												Back to login
-											</a>
-										</div>
-									</div><!-- /.widget-body -->
-								</div><!-- /.signup-box -->
-							</div><!-- /.position-relative -->
-
-						
-						</div>
-					</div><!-- /.col -->
-				</div><!-- /.row -->
-		<script type="text/javascript">
-				jQuery(function(){ //short for $(document).ready(function(){
-	
-
-				$("#username").validate({
-                     expression: "if (VAL) return true; else return false;",
-                    message: "Please enter username"
-                }); 
-				$("#password").validate({
-                     expression: "if (VAL) return true; else return false;",
-                    message: "Please enter password"
-                }); 
-				$("#email").validate({
-                     expression: "if (VAL) return true; else return false;",
-                    message: "Please enter email"
-                });
-					jQuery("#email").validate({
-					expression: "if (VAL.match(\/^([a-zA-Z0-9_\\.\\-])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+$\/) && VAL) return true; else return false;",
-                    message: "Please enter valid email"
-                });
-			});
-			
-			</script>
+<style>
+body.login-layout {
+	background:
+		radial-gradient(ellipse 70% 50% at 85% 10%, rgba(13, 148, 136, 0.28), transparent 55%),
+		radial-gradient(ellipse 50% 40% at 10% 90%, rgba(26, 95, 122, 0.22), transparent 50%),
+		linear-gradient(160deg, #0b1824, #122636 55%, #0e1f2c) !important;
+	min-height: 100vh;
+}
+body.login-layout .main-container,
+body.login-layout .main-content {
+	background: transparent !important;
+	min-height: 100vh;
+}
+.kx-admin-login {
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1.5rem;
+	font-family: "Segoe UI", system-ui, sans-serif;
+}
+.kx-admin-card {
+	width: min(420px, 100%);
+	background: #fff;
+	border-radius: 14px;
+	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+	overflow: hidden;
+}
+.kx-admin-brand {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 1.15rem 1.25rem;
+	background: #07111f;
+}
+.kx-admin-brand img {
+	display: block;
+	height: 4.25rem;
+	width: auto;
+	max-width: 16rem;
+	object-fit: contain;
+}
+.kx-admin-body {
+	padding: 1.6rem 1.7rem 1.7rem;
+}
+.kx-admin-body h1 {
+	margin: 0;
+	font-size: 1.7rem;
+	font-weight: 700;
+	color: #111827;
+}
+.kx-admin-lead {
+	margin: 0.2rem 0 1.1rem;
+	color: #6b7280;
+	font-size: 0.95rem;
+}
+.kx-admin-body label {
+	display: block;
+	margin: 0 0 0.5rem;
+	font-size: 1.35rem !important;
+	line-height: 1.3;
+	color: #111827 !important;
+	font-weight: 700 !important;
+}
+.kx-admin-body input[type="text"],
+.kx-admin-body input[type="password"] {
+	width: 100%;
+	height: 52px;
+	margin: 0 0 1.1rem;
+	padding: 0 0.95rem;
+	border: 1px solid #d1d5db;
+	border-radius: 8px;
+	box-shadow: none;
+	font-size: 1.1rem;
+}
+.kx-admin-body input:focus {
+	border-color: #0f766e;
+	outline: none;
+}
+.kx-admin-body .ValidationErrors {
+	display: block;
+	margin: -0.7rem 0 0.8rem;
+	padding: 0;
+	color: #b42318;
+	font-size: 0.82rem;
+	font-style: normal;
+}
+.kx-admin-body button,
+.kx-admin-body input[type="submit"] {
+	width: 100%;
+	height: 46px;
+	margin-top: 0.25rem;
+	border: 0;
+	border-radius: 8px;
+	background: #0f766e;
+	color: #fff;
+	font-size: 1rem;
+	font-weight: 600;
+}
+.kx-admin-body button:hover,
+.kx-admin-body input[type="submit"]:hover {
+	background: #0d655e;
+}
+.kx-admin-body .message,
+.kx-admin-body .alert {
+	margin-bottom: 1rem;
+}
+</style>
+<div class="kx-admin-login">
+	<div class="kx-admin-card">
+		<div class="kx-admin-brand">
+			<img src="<?php echo SITEURL; ?>img/kodex-logo.png" alt="Kodex">
+		</div>
+		<div class="kx-admin-body">
+			<h1>Admin Panel</h1>
+			<p class="kx-admin-lead">Sign in</p>
+			<?php echo $this->Form->create(null, [
+				'url' => ['prefix' => 'Admin', 'controller' => 'Users', 'action' => 'login'],
+				'name' => 'loginForm',
+				'id' => 'loginForm',
+			]); ?>
+			<?php echo $this->Flash->render(); ?>
+			<label for="username">Username</label>
+			<?php echo $this->Form->text('username', [
+				'name' => 'User[username]',
+				'label' => false,
+				'placeholder' => 'Username',
+				'id' => 'username',
+				'required' => true,
+				'autocomplete' => 'username',
+			]); ?>
+			<label for="password">Password</label>
+			<?php echo $this->Form->password('password', [
+				'name' => 'User[password]',
+				'label' => false,
+				'placeholder' => 'Password',
+				'id' => 'password',
+				'required' => true,
+				'autocomplete' => 'current-password',
+			]); ?>
+			<?php echo $this->Form->submit('Login'); ?>
+			<?php echo $this->Form->end(); ?>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+jQuery(function () {
+	$("#username").validate({
+		expression: "if (VAL) return true; else return false;",
+		message: "Please enter username"
+	});
+	$("#password").validate({
+		expression: "if (VAL) return true; else return false;",
+		message: "Please enter password"
+	});
+});
+</script>

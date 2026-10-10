@@ -440,7 +440,22 @@ a.hrms-card:hover {
   padding: 1.85rem;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
 }
-.hrms-login-brand { display: flex; gap: 0.8rem; align-items: center; margin-bottom: 1.35rem; }
+.hrms-login-brand {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: -1.85rem -1.85rem 1.35rem;
+	padding: 1rem 1.25rem;
+	background: #07111f;
+	border-radius: 14px 14px 0 0;
+}
+.hrms-login-logo {
+	display: block;
+	height: 4.25rem;
+	width: auto;
+	max-width: 16rem;
+	object-fit: contain;
+}
 .hrms-login-brand strong {
   font-family: var(--hrms-display);
   font-size: 1.05rem;
@@ -455,17 +470,18 @@ a.hrms-card:hover {
 .hrms-login-form p { margin: 0 0 1rem; color: var(--hrms-muted); }
 .hrms-login-form label {
   display: block;
-  margin: 0.75rem 0 0.3rem;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--hrms-muted);
+  margin: 0.85rem 0 0.4rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #111827;
 }
 .hrms-login-form input {
   width: 100%;
-  padding: 0.75rem 0.85rem;
+  padding: 0.9rem 0.95rem;
   border: 1px solid var(--hrms-border);
   border-radius: 8px;
   font-family: var(--hrms-font);
+  font-size: 1.1rem;
 }
 .hrms-login-form input:focus {
   outline: none;
