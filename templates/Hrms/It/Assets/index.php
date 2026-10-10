@@ -45,6 +45,7 @@
 				<td><?php echo h($holder->hr_employee->full_name ?? '—'); ?></td>
 				<td>
 					<a href="<?php echo $itBase; ?>assets/edit/<?php echo (int)$item->id; ?>">Edit</a>
+					· <?php echo $this->element('hrms_delete', ['id' => (int)$item->id, 'confirm' => 'Delete ' . $item->asset_code . '? Its assignments, tickets, and repairs will be removed too.']); ?>
 					<?php if ($item->status === 'available' || $item->status === 'reserved'): ?>
 						· <a href="<?php echo $itBase; ?>assignments/assign/<?php echo (int)$item->id; ?>">Assign</a>
 					<?php endif; ?>

@@ -1,6 +1,7 @@
 <div class="hrms-actions">
 	<a class="hrms-btn hrms-btn-ghost" href="<?php echo $itBase; ?>assets">All assets</a>
 	<a class="hrms-btn hrms-btn-ghost" href="<?php echo $itBase; ?>assets/edit/<?php echo (int)$asset->id; ?>">Edit</a>
+	<?php echo $this->element('hrms_delete', ['id' => (int)$asset->id, 'confirm' => 'Delete ' . $asset->asset_code . '? Its assignments, tickets, and repairs will be removed too.']); ?>
 	<?php if (in_array($asset->status, ['available', 'reserved', 'faulty'], true)): ?>
 		<a class="hrms-btn hrms-btn-primary" href="<?php echo $itBase; ?>assignments/assign/<?php echo (int)$asset->id; ?>">Assign</a>
 	<?php endif; ?>

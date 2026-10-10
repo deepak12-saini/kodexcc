@@ -269,7 +269,8 @@ a.hrms-card:hover {
 }
 .hrms-table a:hover { color: var(--hrms-accent); }
 .hrms-table a.hrms-delete,
-.hrms-table .hrms-delete { color: #b42318; margin-left: .35rem; }
+.hrms-table .hrms-delete,
+.hrms-actions .hrms-delete { color: #b42318; margin-left: .35rem; }
 
 /* —— Buttons —— */
 .hrms-btn {

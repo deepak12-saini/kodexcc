@@ -129,6 +129,51 @@ class AssetsController extends ItController
         $this->set(compact('asset', 'events', 'assignments'));
     }
 
+    public function delete($id = null)
+    {
+        $this->request->allowMethod(['post', 'delete']);
+        $table = $this->fetchTable('ItAssets');
+        $asset = $table->get($id);
+        $code = (string)$asset->asset_code;
+        $type = (string)$asset->asset_type;
+        $assetId = (int)$asset->id;
+        $ticketIds = $this->fetchTable('ItTickets')->find()
+            ->select(['id'])
+            ->where(['asset_id' => $assetId])
+            ->all()
+            ->extract('id')
+            ->toList();
+        $repairIds = $this->fetchTable('ItRepairs')->find()
+            ->select(['id'])
+            ->where(['asset_id' => $assetId])
+            ->all()
+            ->extract('id')
+            ->toList();
+        if ($repairIds) {
+            $this->fetchTable('ItRepairFiles')->deleteAll(['repair_id IN' => $repairIds]);
+        }
+        $this->fetchTable('ItRepairs')->deleteAll(['asset_id' => $assetId]);
+        if ($ticketIds) {
+            $this->fetchTable('ItTicketUpdates')->deleteAll(['ticket_id IN' => $ticketIds]);
+            $this->fetchTable('ItTickets')->deleteAll(['id IN' => $ticketIds]);
+        }
+        $this->fetchTable('ItMaintenance')->deleteAll(['asset_id' => $assetId]);
+        $this->fetchTable('ItAssetEvents')->deleteAll(['asset_id' => $assetId]);
+        $this->fetchTable('ItAssetAssignments')->deleteAll(['asset_id' => $assetId]);
+        $this->fetchTable('ItPurchaseRequests')->updateAll(
+            ['asset_id' => null],
+            ['asset_id' => $assetId]
+        );
+        if ($table->delete($asset)) {
+            $this->auditLog('it_asset_delete', 'it_asset', 'Deleted ' . $code, $assetId);
+            $this->Flash->success($code . ' deleted.');
+        } else {
+            $this->Flash->error('Could not delete this asset.');
+        }
+
+        return $this->redirect(['action' => 'index', '?' => ['type' => $type]]);
+    }
+
     private function setForm($entity): void
     {
         $vendors = $this->vendorOptions();
