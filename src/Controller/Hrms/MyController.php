@@ -283,11 +283,15 @@ class MyController extends HrmsController
             return $this->redirectDenied();
         }
         $this->set('pageTitle', 'My Assets');
+        $this->set('assetTypes', \App\Controller\Hrms\It\ItController::ASSET_TYPES);
         $this->hrPaginate(
-            $this->fetchTable('HrAssetAssignments')->find()
-                ->contain(['HrAssets'])
-                ->where(['employee_id' => $empId]),
-            ['order' => ['HrAssetAssignments.id' => 'DESC'], 'sortableFields' => ['HrAssetAssignments.id', 'HrAssetAssignments.issue_date']]
+            $this->fetchTable('ItAssetAssignments')->find()
+                ->contain(['ItAssets'])
+                ->where(['ItAssetAssignments.employee_id' => $empId]),
+            [
+                'order' => ['ItAssetAssignments.id' => 'DESC'],
+                'sortableFields' => ['ItAssetAssignments.id', 'ItAssetAssignments.assigned_date', 'ItAssetAssignments.status'],
+            ]
         );
     }
 
