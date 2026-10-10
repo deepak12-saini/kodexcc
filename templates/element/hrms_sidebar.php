@@ -61,7 +61,7 @@ $itLink = function (string $href, string $label, bool $active, bool $child = fal
 	echo '<a class="hrms-nav-link' . ($child ? ' is-child' : '') . ($active ? ' is-active' : '') . '" href="' . $base . 'it/' . $href . '">';
 	echo '<span>' . h($label) . '</span></a>';
 };
-$renderItMenu = function (bool $withDashboard = true) use ($itLink, $itActive): void {
+$renderItMenu = function (bool $withDashboard = true) use ($itLink, $itActive, $role): void {
 	$assetType = (string)$this->request->getQuery('type');
 	echo '<div class="hrms-nav-label">Admin & IT</div>';
 	if ($withDashboard) {
@@ -80,6 +80,9 @@ $renderItMenu = function (bool $withDashboard = true) use ($itLink, $itActive): 
 	$itLink('vendors', 'Vendors', $itActive('vendors'));
 	$itLink('maintenance', 'Maintenance', $itActive('maintenance'));
 	$itLink('reports', 'Reports', $itActive('reports'));
+	if ($role === 'admin') {
+		$itLink('notices', 'Notify employees', $itActive('notices'));
+	}
 };
 ?>
 <div class="hrms-brand">
