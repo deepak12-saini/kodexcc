@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Hrms\It;
 
+use App\Utility\SmtpMail;
 use Cake\Event\EventInterface;
 use Cake\Mailer\Mailer;
 
@@ -75,8 +76,6 @@ TXT;
             try {
                 $mailer = new Mailer();
                 $mailer
-                    ->setTransport('default')
-                    ->setFrom(['info@kodexcc.com' => 'KodexCC'])
                     ->setTo($person['email'])
                     ->setSubject($subject)
                     ->setEmailFormat('html')
@@ -91,13 +90,14 @@ TXT;
                 $mailer->viewBuilder()
                     ->setTemplate('hardware_portal')
                     ->setLayout('hardware_portal');
-                $mailer->deliver();
+                $mailer->render();
+                SmtpMail::send($person['email'], $subject, $mailer->getMessage()->getBodyHtml());
                 if ($plain !== '') {
                     $this->storePassword((int)$person['user_id'], $plain);
                 }
                 $sent++;
             } catch (\Throwable $e) {
-                $failed[] = $person['name'] . ' (' . $person['email'] . ')';
+                $failed[] = $person['name'] . ' (' . $person['email'] . '): ' . $e->getMessage();
             }
         }
         $this->auditLog(
