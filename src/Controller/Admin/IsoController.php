@@ -1024,11 +1024,12 @@ class IsoController extends AppController
     }
 
     /**
-     * Super Admin sees every department. Any other login only sees the department on their employee record.
+     * Admin, ISO manager, and auditor see every department.
+     * Any other login only sees the department on their employee record.
      */
     private function ncrScope(): ?string
     {
-        if ($this->isoRole() === 'super_admin') {
+        if (in_array($this->isoRole(), ['super_admin', 'iso_manager', 'auditor'], true)) {
             return null;
         }
         $employeeId = (int)$this->Session->read('iso_employee_id');

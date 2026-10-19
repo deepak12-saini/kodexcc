@@ -41,14 +41,14 @@ class IsoAccess
     private const VIEW = [
         'super_admin' => ['*'],
         'iso_manager' => ['overview', 'documents', 'training', 'inspections', 'audits', 'ncr', 'corrective'],
-        'document_controller' => ['overview', 'documents', 'training'],
-        'approver' => ['overview', 'documents', 'corrective', 'reviews'],
-        'qa_inspector' => ['overview', 'inspections', 'receipts'],
-        'production_supervisor' => ['overview', 'batches', 'inspections'],
-        'purchase_manager' => ['overview', 'suppliers', 'materials', 'receipts'],
-        'sales_executive' => ['overview'],
-        'accounts_manager' => ['overview'],
-        'maintenance_manager' => ['overview', 'maintenance'],
+        'document_controller' => ['overview', 'documents', 'training', 'ncr'],
+        'approver' => ['overview', 'documents', 'corrective', 'reviews', 'ncr'],
+        'qa_inspector' => ['overview', 'inspections', 'receipts', 'ncr'],
+        'production_supervisor' => ['overview', 'batches', 'inspections', 'ncr'],
+        'purchase_manager' => ['overview', 'suppliers', 'materials', 'receipts', 'ncr'],
+        'sales_executive' => ['overview', 'ncr'],
+        'accounts_manager' => ['overview', 'ncr'],
+        'maintenance_manager' => ['overview', 'maintenance', 'ncr'],
         'auditor' => ['*'],
     ];
 
