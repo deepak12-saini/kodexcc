@@ -159,14 +159,12 @@ class AppController extends Controller
         //$this->loadComponent('FormProtection');
     }
 
-    //Function 'checkAdminSession' for admin check in controller
+    //Function 'checkAdminSession' for admin check in controller.
+	// Throw so Cake sends the Location header. exit() after redirect() left a blank page when the session expired.
 	function checkAdminSession() {
-		// if the admin session hasn't been set
 		if(!$this->Session->read('is_admin')){
-			// set flash message and redirect
 			$this->Session->setFlash('You need to be logged in to access this area.','default',array('class' => 'alert alert-danger'));
-			$this->redirect('/admin');
-			exit();
+			throw new RedirectException(Router::url('/admin'));
 		}
 	}
 

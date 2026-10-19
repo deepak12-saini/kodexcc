@@ -91,7 +91,7 @@ class IsoController extends AppController
         $cards = [
             ['label' => 'Documents waiting approval', 'count' => $this->countWhere('IsoDocuments', ['status' => 'in_review']), 'url' => 'documents?status=in_review', 'icon' => 'fa-file', 'tone' => 'blue', 'section' => 'documents'],
             ['label' => 'Incoming awaiting QA', 'count' => $this->countWhere('IsoReceipts', ['inspection_result' => 'pending']), 'url' => 'receipts?inspection_result=pending', 'icon' => 'fa-inbox', 'tone' => 'orange', 'section' => 'receipts'],
-            ['label' => 'Open non-conformances', 'count' => $this->countWhere('IsoNonconformances', ['status' => 'open']), 'url' => 'nonconformances?status=open', 'icon' => 'fa-exclamation-triangle', 'tone' => 'red', 'section' => 'ncr'],
+            ['label' => 'Open non-conformances', 'count' => $this->countWhere('IsoNonconformances', $this->ncrWhere(['status' => 'open'])), 'url' => 'nonconformances?status=open', 'icon' => 'fa-exclamation-triangle', 'tone' => 'red', 'section' => 'ncr'],
             ['label' => 'Overdue corrective actions', 'count' => $this->overdueActions(), 'url' => 'corrective?status=open', 'icon' => 'fa-wrench', 'tone' => 'green', 'section' => 'corrective'],
         ];
         $cards = array_values(array_filter($cards, function (array $card) use ($role): bool {
@@ -391,7 +391,7 @@ class IsoController extends AppController
             'selects' => [
                 'status' => ['open' => 'Open', 'under_action' => 'Under action', 'closed' => 'Closed'],
                 'source' => ['incoming' => 'Incoming', 'in_process' => 'In process', 'final' => 'Final', 'other' => 'Other'],
-                'department' => $this->departmentOptions(),
+                'department' => $this->ncrDepartmentOptions(),
             ],
             'search' => ['ncr_no', 'description'],
         ], function ($row) {
@@ -401,15 +401,28 @@ class IsoController extends AppController
 
     public function ncrForm($id = null): ?Response
     {
+        if ($id && !$this->ncrVisible((int)$id)) {
+            $this->Flash->error('That non-conformance belongs to another department.');
+
+            return $this->redirect(['action' => 'nonconformances']);
+        }
+
         return $this->renderForm('Non-conformance', 'IsoNonconformances', 'nonconformances', $id, [
             'ncr_no' => ['label' => 'NCR no', 'default' => $id ? null : $this->nextNo('IsoNonconformances', 'ncr_no', 'ISO-NCR'), 'placeholder' => 'Filled automatically, change only if needed'],
             'source' => ['label' => 'Source', 'type' => 'select', 'options' => ['incoming' => 'Incoming', 'in_process' => 'In process', 'final' => 'Final', 'other' => 'Other'], 'placeholder' => 'Where the failure was found'],
-            'department' => ['label' => 'Department', 'type' => 'select', 'options' => $this->departmentOptions(), 'placeholder' => 'Select the department'],
+            'department' => ['label' => 'Department', 'type' => 'select', 'options' => $this->ncrDepartmentOptions(), 'placeholder' => 'Select the department'],
             'receipt_id' => ['label' => 'Incoming receipt', 'type' => 'select', 'options' => $this->optionList('IsoReceipts', 'receipt_no', 'material'), 'placeholder' => 'Link the failed receipt, if any'],
             'batch_id' => ['label' => 'Production batch', 'type' => 'select', 'options' => $this->optionList('IsoBatches', 'batch_no', 'product'), 'placeholder' => 'Link the failed batch, if any'],
             'description' => ['label' => 'What failed', 'type' => 'textarea', 'required' => true, 'placeholder' => 'Describe the failure in plain words'],
             'status' => ['label' => 'Status', 'type' => 'select', 'options' => ['open' => 'Open', 'under_action' => 'Under action', 'closed' => 'Closed'], 'placeholder' => 'Open until the corrective action is finished'],
-        ]);
+        ], function ($table, array $data, $existing) {
+            $dept = $this->ncrScope();
+            if ($dept !== null) {
+                $data['department'] = $dept;
+            }
+
+            return $data;
+        });
     }
 
     public function corrective(): ?Response
@@ -560,6 +573,11 @@ class IsoController extends AppController
     {
         if ($this->request->is('post') && $this->request->getData('delete_id')) {
             $rowId = (int)$this->request->getData('delete_id');
+            if ($alias === 'IsoNonconformances' && !$this->ncrVisible($rowId)) {
+                $this->Flash->error('That non-conformance belongs to another department.');
+
+                return $this->redirect(['action' => $selfAction]);
+            }
             $row = $this->fetchTable($alias)->find()->where(['id' => $rowId])->first();
             if ($row && $alias === 'IsoDocuments') {
                 $this->fetchTable('IsoDocumentRevisions')->deleteAll(['document_id' => $rowId]);
@@ -573,6 +591,12 @@ class IsoController extends AppController
             return $this->redirect(['action' => $selfAction]);
         }
         $query = $this->fetchTable($alias)->find()->orderBy([$alias . '.id' => 'DESC']);
+        if ($alias === 'IsoNonconformances') {
+            $dept = $this->ncrScope();
+            if ($dept !== null) {
+                $query->where([$alias . '.department' => $dept]);
+            }
+        }
         $values = [];
         foreach ($filter['selects'] ?? [] as $key => $options) {
             $value = trim((string)$this->request->getQuery($key));
@@ -747,7 +771,14 @@ class IsoController extends AppController
     private function optionList(string $alias, string $left, ?string $right = null): array
     {
         $out = [];
-        foreach ($this->fetchTable($alias)->find()->orderBy(['id' => 'DESC'])->limit(300) as $row) {
+        $query = $this->fetchTable($alias)->find()->orderBy(['id' => 'DESC'])->limit(300);
+        if ($alias === 'IsoNonconformances') {
+            $dept = $this->ncrScope();
+            if ($dept !== null) {
+                $query->where(['department' => $dept]);
+            }
+        }
+        foreach ($query as $row) {
             $label = (string)$row->{$left};
             if ($right && !empty($row->{$right})) {
                 $label .= ' — ' . $row->{$right};
@@ -877,6 +908,61 @@ class IsoController extends AppController
             'name' => $name,
             'created' => date('Y-m-d H:i:s'),
         ]));
+    }
+
+    /**
+     * Super Admin sees every department. Any other login only sees the department on their employee record.
+     */
+    private function ncrScope(): ?string
+    {
+        if ($this->isoRole() === 'super_admin') {
+            return null;
+        }
+        $employeeId = (int)$this->Session->read('iso_employee_id');
+        if ($employeeId < 1) {
+            return '';
+        }
+        $employee = $this->fetchTable('HrEmployees')->find()
+            ->contain(['HrDepartments'])
+            ->where(['HrEmployees.id' => $employeeId])
+            ->first();
+
+        return trim((string)($employee->hr_department->name ?? ''));
+    }
+
+    private function ncrWhere(array $where): array
+    {
+        $dept = $this->ncrScope();
+        if ($dept !== null) {
+            $where['department'] = $dept;
+        }
+
+        return $where;
+    }
+
+    private function ncrVisible(int $id): bool
+    {
+        $dept = $this->ncrScope();
+        if ($dept === null) {
+            return true;
+        }
+        if ($id < 1 || $dept === '') {
+            return false;
+        }
+
+        return (bool)$this->fetchTable('IsoNonconformances')->find()
+            ->where(['id' => $id, 'department' => $dept])
+            ->count();
+    }
+
+    private function ncrDepartmentOptions(): array
+    {
+        $dept = $this->ncrScope();
+        if ($dept === null) {
+            return $this->departmentOptions();
+        }
+
+        return $dept === '' ? [] : [$dept => $dept];
     }
 
     private function isoRole(): ?string
