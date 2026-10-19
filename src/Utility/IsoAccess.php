@@ -14,8 +14,10 @@ class IsoAccess
         'document_controller' => 'Document Controller',
         'approver' => 'Approver / Management',
         'qa_inspector' => 'QA Inspector',
-        'production_supervisor' => 'Production Supervisor',
-        'purchase_manager' => 'Purchase / Supplier Manager',
+        'production_supervisor' => 'Production',
+        'purchase_manager' => 'Purchase',
+        'sales_executive' => 'Sales',
+        'accounts_manager' => 'Accounts',
         'maintenance_manager' => 'Maintenance Manager',
         'auditor' => 'Auditor / Read-only',
     ];
@@ -29,6 +31,8 @@ class IsoAccess
         'qa_inspector' => ['inspections', 'receipts'],
         'production_supervisor' => ['batches', 'inspections'],
         'purchase_manager' => ['suppliers', 'materials', 'receipts'],
+        'sales_executive' => [],
+        'accounts_manager' => [],
         'maintenance_manager' => ['maintenance'],
         'auditor' => [],
     ];
@@ -42,6 +46,8 @@ class IsoAccess
         'qa_inspector' => ['overview', 'inspections', 'receipts'],
         'production_supervisor' => ['overview', 'batches', 'inspections'],
         'purchase_manager' => ['overview', 'suppliers', 'materials', 'receipts'],
+        'sales_executive' => ['overview'],
+        'accounts_manager' => ['overview'],
         'maintenance_manager' => ['overview', 'maintenance'],
         'auditor' => ['*'],
     ];

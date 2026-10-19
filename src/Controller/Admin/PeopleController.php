@@ -16,6 +16,7 @@ class PeopleController extends AppController
         $this->viewBuilder()->setLayout('admin_layout');
         $this->viewBuilder()->addHelper('Paginator');
         $this->viewBuilder()->addHelper('Form');
+        $this->viewBuilder()->addHelper('Time');
         $this->checkAdminSession();
         $this->set('title_for_layout', 'People');
         $this->set('isoRoles', IsoAccess::ROLES);
@@ -87,6 +88,23 @@ class PeopleController extends AppController
     public function designationRemove($id = null): ?\Cake\Http\Response
     {
         return $this->removeSimple('HrDesignations', 'designations', 'designation_id', (int)$id, 'Designation');
+    }
+
+    public function employeeView($id = null): ?\Cake\Http\Response
+    {
+        $entity = $this->fetchTable('HrEmployees')->find()
+            ->contain(['HrDepartments', 'HrDesignations', 'HrUsers'])
+            ->where(['HrEmployees.id' => (int)$id])
+            ->first();
+        if (!$entity) {
+            $this->Flash->error('Employee not found.');
+
+            return $this->redirect(['action' => 'employees']);
+        }
+        $this->set(compact('entity'));
+        $this->set('pageTitle', 'Staff KPI');
+
+        return null;
     }
 
     public function employeeForm($id = null): ?\Cake\Http\Response

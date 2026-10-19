@@ -302,6 +302,10 @@ class IsoController extends AppController
             'remarks' => ['label' => 'Remarks', 'type' => 'textarea', 'placeholder' => 'What QA found, e.g. viscosity out of spec'],
         ], null, null, function ($entity) {
             $this->linkFailure($entity, 'IsoReceipts', 'inspection_result', 'incoming', (string)$entity->remarks, null, null);
+            try {
+                \App\Utility\ErpStock::syncInspection($entity);
+            } catch (\Throwable) {
+            }
         });
     }
 

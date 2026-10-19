@@ -13,7 +13,7 @@
 		<?php endif; ?>
 	</form>
 	<table class="table table-striped table-bordered table-hover">
-		<thead><tr><th style="width:70px;">S.No</th><th>Code</th><th>Name</th><th>Department</th><th>Designation</th><th>ISO role</th><th>Status</th><th></th></tr></thead>
+		<thead><tr><th style="width:70px;">S.No</th><th>Code</th><th>Name</th><th>Department</th><th>Designation</th><th>ISO role</th><th>KPI</th><th>Status</th><th>Added</th><th>Updated</th><th></th></tr></thead>
 		<tbody>
 		<?php $sno = ((max(1, (int)$this->request->getQuery('page', 1)) - 1) * (int)($this->Paginator->param('perPage') ?: 20)) + 1; ?>
 		<?php foreach ($items as $item): ?>
@@ -24,8 +24,15 @@
 				<td><?php echo h($item->hr_department->name ?? ''); ?></td>
 				<td><?php echo h($item->hr_designation->name ?? ''); ?></td>
 				<td><?php echo h($isoRoles[$item->hr_user->iso_role ?? ''] ?? ''); ?></td>
+				<td title="<?php echo h($item->kpi ?? ''); ?>"><?php
+					$kpi = trim((string)($item->kpi ?? ''));
+					echo $kpi === '' ? '' : h(mb_strlen($kpi) > 60 ? mb_substr($kpi, 0, 60) . '…' : $kpi);
+				?></td>
 				<td><?php echo h($item->status); ?></td>
+				<td style="white-space:nowrap;"><?php echo h($this->Time->format($item->created, 'dd MMM yyyy hh:mm a')); ?></td>
+				<td style="white-space:nowrap;"><?php echo h($this->Time->format($item->modified, 'dd MMM yyyy hh:mm a')); ?></td>
 				<td style="white-space:nowrap;">
+					<a class="btn btn-mini" href="<?php echo SITEURL; ?>admin/people/employee-view/<?php echo (int)$item->id; ?>" title="View KPI"><i class="fa fa-eye"></i></a>
 					<?php if (empty($removed)): ?>
 						<a class="btn btn-mini btn-info" href="<?php echo SITEURL; ?>admin/people/employee-form/<?php echo (int)$item->id; ?>">Edit</a>
 						<?php echo $this->Form->create(null, ['url' => ['action' => 'employeeRemove', $item->id], 'style' => 'display:inline;']); ?>
@@ -39,7 +46,7 @@
 				</td>
 			</tr>
 		<?php endforeach; ?>
-		<?php if (!count($items)): ?><tr><td colspan="8"><?php echo !empty($removed) ? 'No removed employees.' : 'No employees yet.'; ?></td></tr><?php endif; ?>
+		<?php if (!count($items)): ?><tr><td colspan="11"><?php echo !empty($removed) ? 'No removed employees.' : 'No employees yet.'; ?></td></tr><?php endif; ?>
 		</tbody>
 	</table>
 	<?php echo $this->element('admin_pagination'); ?>

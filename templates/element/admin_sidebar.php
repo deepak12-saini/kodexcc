@@ -110,6 +110,60 @@
 						</ul>
 					</li>
 					<?php endif; ?>
+					<?php /* ERP menu hidden until it is in use. Remove this comment wrapper to restore.
+					$erpOpen = $isoController === 'erp';
+					$erpCan = function (string $section) use ($isoRole): bool {
+						return $isoRole !== '' && \App\Utility\ErpAccess::canView($isoRole, $section);
+					};
+					?>
+					<?php if ($erpCan('overview')): ?>
+					<li class="<?php echo $erpOpen ? 'active open' : ''; ?>">
+						<a href="#" class="dropdown-toggle">
+							<i class="menu-icon fa fa-briefcase"></i>
+							<span class="menu-text"> ERP </span>
+							<b class="arrow fa fa-angle-down"></b>
+						</a>
+						<b class="arrow"></b>
+						<ul class="submenu">
+							<li class="<?php echo $erpOpen && $isoAction === 'index' ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/erp"><i class="menu-icon fa fa-tachometer"></i> Dashboard</a>
+							</li>
+							<?php if ($erpCan('partners')): ?><li class="<?php echo $erpOpen && str_starts_with($isoAction, 'partner') ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/erp/partners"><i class="menu-icon fa fa-address-book"></i> Business partners</a>
+							</li><?php endif; ?>
+							<?php if ($erpCan('purchase')): ?><li class="<?php echo $erpOpen && in_array($isoAction, ['purchasing', 'requests', 'requestForm', 'quotations', 'quotationForm', 'orders', 'orderForm', 'goodsReceipts', 'goodsReceiptForm', 'bills', 'billForm'], true) ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/erp/purchasing"><i class="menu-icon fa fa-shopping-cart"></i> Purchasing</a>
+							</li><?php endif; ?>
+							<?php if ($erpCan('inventory')): ?><li class="<?php echo $erpOpen && in_array($isoAction, ['inventory', 'items', 'itemForm', 'transfer', 'adjustment'], true) ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/erp/inventory"><i class="menu-icon fa fa-cubes"></i> Inventory</a>
+							</li><?php endif; ?>
+							<?php if ($erpCan('production')): ?><li class="<?php echo $erpOpen && in_array($isoAction, ['production', 'bomForm', 'productionForm'], true) ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/erp/production"><i class="menu-icon fa fa-industry"></i> Production</a>
+							</li><?php endif; ?>
+							<?php if ($erpCan('sales')): ?><li class="<?php echo $erpOpen && in_array($isoAction, ['sales', 'salesQuotations', 'salesQuotationForm', 'salesOrders', 'salesOrderForm', 'deliveries', 'deliveryForm', 'salesInvoices', 'salesInvoiceForm', 'outstanding'], true) ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/erp/sales"><i class="menu-icon fa fa-line-chart"></i> Sales</a>
+							</li><?php endif; ?>
+							<?php if ($erpCan('banking')): ?><li class="<?php echo $erpOpen && in_array($isoAction, ['banking', 'payments', 'paymentForm', 'reconcile'], true) ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/erp/banking"><i class="menu-icon fa fa-bank"></i> Banking</a>
+							</li><?php endif; ?>
+							<?php if ($erpCan('financials')): ?><li class="<?php echo $erpOpen && in_array($isoAction, ['financials', 'trialBalance', 'profitLoss', 'balanceSheet', 'gstSummary', 'openingForm'], true) ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/erp/financials"><i class="menu-icon fa fa-book"></i> Financials</a>
+							</li><?php endif; ?>
+							<?php if ($erpCan('admin')): ?><li class="<?php echo $erpOpen && str_starts_with($isoAction, 'unit') ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/erp/units"><i class="menu-icon fa fa-balance-scale"></i> Units</a>
+							</li>
+							<li class="<?php echo $erpOpen && str_starts_with($isoAction, 'godown') ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/erp/godowns"><i class="menu-icon fa fa-building"></i> Godowns</a>
+							</li>
+							<li class="<?php echo $erpOpen && $isoAction === 'settings' ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/erp/settings"><i class="menu-icon fa fa-cog"></i> Company settings</a>
+							</li>
+							<li class="<?php echo $erpOpen && $isoAction === 'auditLog' ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/erp/audit-log"><i class="menu-icon fa fa-history"></i> Change log</a>
+							</li><?php endif; ?>
+						</ul>
+					</li>
+					<?php endif; */ ?>
 					<?php /* Unused admin menus kept for later. Uncomment this block to restore them.
 						<li class="<?php if ($this->params['controller']=='users' && $this->params['action']=='admin_salemeet') {echo 'active';}?>">
 						<a href="<?php echo SITEURL?>admin/users/salemeet">

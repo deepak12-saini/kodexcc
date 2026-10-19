@@ -1,4 +1,5 @@
 <?php
+$basePath = $basePath ?? 'admin/iso/';
 $dashed = function (string $action): string {
 	return strtolower((string)preg_replace('/([a-z])([A-Z])/', '$1-$2', $action));
 };
@@ -80,7 +81,7 @@ $dashed = function (string $action): string {
 				</div>
 				<div class="kx-actions">
 					<?php if (!empty($canEdit)): ?><button class="kx-btn kx-btn-primary" type="submit">Save</button><?php endif; ?>
-					<a class="kx-btn kx-btn-ghost" href="<?php echo SITEURL . 'admin/iso/' . h($dashed($listAction)); ?>">Back</a>
+					<a class="kx-btn kx-btn-ghost" href="<?php echo SITEURL . $basePath . h($dashed($listAction)); ?>">Back</a>
 				</div>
 			</div>
 		<?php echo $this->Form->end(); ?>

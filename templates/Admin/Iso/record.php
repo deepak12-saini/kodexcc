@@ -1,4 +1,5 @@
 <?php
+$basePath = $basePath ?? 'admin/iso/';
 $values = $values ?? [];
 $csv = $this->request->getQueryParams();
 unset($csv['page']);
@@ -11,8 +12,14 @@ $dashed = function (string $action): string {
 	<div class="page-header">
 		<h1>
 			<?php echo h($title); ?>
-			<?php if (!empty($canEdit)): ?>
-				<a class="btn btn-primary btn-sm pull-right" href="<?php echo SITEURL . 'admin/iso/' . h($dashed($addAction)); ?>">Add</a>
+			<?php if (!empty($canEdit) && $addAction !== ''): ?>
+				<a class="btn btn-primary btn-sm pull-right" href="<?php echo SITEURL . $basePath . h($dashed($addAction)); ?>">Add</a>
+			<?php endif; ?>
+			<?php if (!empty($canEdit) && !empty($importCount)): ?>
+				<?php echo $this->Form->create(null, ['url' => ['action' => $listAction], 'class' => 'pull-right', 'style' => 'margin-right:8px;']); ?>
+					<input type="hidden" name="import_iso" value="1">
+					<button class="btn btn-success btn-sm" type="submit">Import <?php echo (int)$importCount; ?> ISO supplier(s)</button>
+				<?php echo $this->Form->end(); ?>
 			<?php endif; ?>
 		</h1>
 	</div>
@@ -31,7 +38,7 @@ $dashed = function (string $action): string {
 			<input type="date" name="to" value="<?php echo h($values['to'] ?? ''); ?>" class="form-control" style="margin-right:6px;">
 		<?php endif; ?>
 		<button class="btn btn-sm" type="submit">Filter</button>
-		<a class="btn btn-sm" href="<?php echo SITEURL . 'admin/iso/' . h($dashed($listAction)); ?>">Clear</a>
+		<a class="btn btn-sm" href="<?php echo SITEURL . $basePath . h($dashed($listAction)); ?>">Clear</a>
 		<a class="btn btn-sm btn-success" href="?<?php echo h(http_build_query($csv)); ?>">Download CSV</a>
 	</form>
 	<div class="table-responsive">
@@ -52,8 +59,10 @@ $dashed = function (string $action): string {
 							<td><?php echo h((string)$cell); ?></td>
 						<?php endforeach; ?>
 						<td style="white-space:nowrap;">
-							<?php if (!empty($canEdit)): ?>
-								<a class="btn btn-mini btn-info" href="<?php echo SITEURL . 'admin/iso/' . h($dashed($addAction)) . '/' . (int)$item->id; ?>">Edit</a>
+							<?php if ($addAction !== ''): ?>
+								<a class="btn btn-mini btn-info" href="<?php echo SITEURL . $basePath . h($dashed($addAction)) . '/' . (int)$item->id; ?>"><?php echo !empty($canEdit) ? 'Edit' : 'Open'; ?></a>
+							<?php endif; ?>
+							<?php if (!empty($canEdit) && ($allowDelete ?? true)): ?>
 								<?php echo $this->Form->create(null, ['url' => ['action' => $listAction], 'style' => 'display:inline;']); ?>
 									<input type="hidden" name="delete_id" value="<?php echo (int)$item->id; ?>">
 									<button class="btn btn-mini btn-danger" type="submit" onclick="return confirm('Delete this record? This cannot be undone.');">Delete</button>

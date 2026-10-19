@@ -31,10 +31,14 @@
 							<?php endforeach; ?>
 						</select>
 					</label>
+					<label class="kx-field kx-span"><span>KPI</span>
+						<textarea name="kpi" rows="4" placeholder="Targets this person is measured on"><?php echo h($entity->kpi ?? ''); ?></textarea>
+						<p class="kx-hint">Shown on the employee list. Open the eye icon to read the full KPI.</p>
+					</label>
 				</div>
 			</div>
 			<div class="kx-card">
-				<p class="kx-section">Login and ISO access</p>
+				<p class="kx-section">Login and department access</p>
 				<div class="kx-grid">
 					<label class="kx-field"><span>Username</span><input name="username" value="<?php echo h($entity->hr_user->username ?? ''); ?>"></label>
 					<label class="kx-field"><span>Password</span><input name="password" type="password" autocomplete="new-password" value="" placeholder="<?php echo empty($entity->hr_user) ? 'Set a password to create the login' : 'Leave blank to keep the current password'; ?>"></label>
@@ -46,7 +50,7 @@
 								<option value="<?php echo h($key); ?>" <?php echo ($entity->hr_user->iso_role ?? '') === $key ? 'selected' : ''; ?>><?php echo h($label); ?></option>
 							<?php endforeach; ?>
 						</select>
-						<p class="kx-hint">Super Admin is the existing admin login. This role controls which ISO screens the employee can open.</p>
+						<p class="kx-hint">Super Admin is the main admin login. Everyone else signs in with their own username. The role is their department: Purchase buys and receives, QA sees stock, Production runs orders, Sales quotes and delivers, Accounts takes payments and reports, Management approves. Two people with the same role see the same menus.</p>
 					</label>
 				</div>
 				<div class="kx-actions">
