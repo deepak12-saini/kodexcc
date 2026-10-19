@@ -28,8 +28,12 @@
 					?>
 					<?php
 					$isoRole = $this->request->getSession()->read('is_admin') ? 'super_admin' : (string)$this->request->getSession()->read('iso_role');
-					$isoCan = function (string $section) use ($isoRole): bool {
-						return $isoRole !== '' && \App\Utility\IsoAccess::canView($isoRole, $section);
+					$isoAssigned = $this->request->getSession()->read('iso_sections');
+					if ($this->request->getSession()->read('is_admin') || !is_array($isoAssigned)) {
+						$isoAssigned = null;
+					}
+					$isoCan = function (string $section) use ($isoRole, $isoAssigned): bool {
+						return $isoRole !== '' && \App\Utility\IsoAccess::canView($isoRole, $section, $isoAssigned);
 					};
 					$showPeople = (bool)$this->request->getSession()->read('is_admin');
 					$peopleHere = $isoController === 'people';

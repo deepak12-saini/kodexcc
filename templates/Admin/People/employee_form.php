@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="<?php echo SITEURL; ?>css/admin-forms.css?v=1">
+<link rel="stylesheet" href="<?php echo SITEURL; ?>css/admin-forms.css?v=4">
 <div class="page-content">
 	<div class="kx-sheet">
 		<?php echo $this->Form->create(null, ['class' => 'kx-form']); ?>
@@ -50,8 +50,19 @@
 								<option value="<?php echo h($key); ?>" <?php echo ($entity->hr_user->iso_role ?? '') === $key ? 'selected' : ''; ?>><?php echo h($label); ?></option>
 							<?php endforeach; ?>
 						</select>
-						<p class="kx-hint">Super Admin is the main admin login. Everyone else signs in with their own username. The role is their department: Purchase buys and receives, QA sees stock, Production runs orders, Sales quotes and delivers, Accounts takes payments and reports, Management approves. Two people with the same role see the same menus.</p>
+						<p class="kx-hint">The role fills the usual menus. Tick any extra menu this person may open. Non-conformance still shows only the reports for their department.</p>
 					</label>
+					<div class="kx-field kx-span">
+						<span>Menus they may open</span>
+						<div class="kx-ticks" id="iso-menus">
+							<?php foreach ($isoMenus as $key => $label): ?>
+								<label class="kx-tick">
+									<input type="checkbox" name="iso_menus[]" value="<?php echo h($key); ?>" <?php echo in_array($key, $checkedMenus, true) ? 'checked' : ''; ?>>
+									<?php echo h($label); ?>
+								</label>
+							<?php endforeach; ?>
+						</div>
+					</div>
 				</div>
 				<div class="kx-actions">
 					<button class="kx-btn kx-btn-primary" type="submit">Save</button>
@@ -61,3 +72,15 @@
 		<?php echo $this->Form->end(); ?>
 	</div>
 </div>
+<script>
+var isoRoleMenus = <?php echo json_encode($roleMenuMap, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+var roleSelect = document.querySelector('select[name="iso_role"]');
+if (roleSelect) {
+	roleSelect.addEventListener('change', function () {
+		var allowed = isoRoleMenus[roleSelect.value] || [];
+		document.querySelectorAll('#iso-menus input').forEach(function (box) {
+			box.checked = allowed.indexOf(box.value) !== -1;
+		});
+	});
+}
+</script>

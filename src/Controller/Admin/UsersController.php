@@ -297,16 +297,16 @@ class UsersController extends AppController
 		$conn = $this->fetchTable('HrUsers')->getConnection();
 		try {
 			$row = $conn->execute(
-				'SELECT id, employee_id, username, password, is_active, iso_role FROM hr_users WHERE username = :username LIMIT 1',
+				'SELECT id, employee_id, username, password, is_active, iso_role, iso_sections FROM hr_users WHERE username = :username LIMIT 1',
 				['username' => $username]
 			)->fetch('assoc');
 		} catch (\Throwable) {
 			$row = $conn->execute(
-				'SELECT id, employee_id, username, password, is_active FROM hr_users WHERE username = :username LIMIT 1',
+				'SELECT id, employee_id, username, password, is_active, iso_role FROM hr_users WHERE username = :username LIMIT 1',
 				['username' => $username]
 			)->fetch('assoc');
 			if (is_array($row)) {
-				$row['iso_role'] = null;
+				$row['iso_sections'] = null;
 			}
 		}
 		if (!is_array($row) || !hash_equals((string)$row['password'], hash('sha256', $password))) {
@@ -323,6 +323,12 @@ class UsersController extends AppController
 		$this->Session->write('iso_role', $role);
 		$this->Session->write('iso_user_id', (int)$row['id']);
 		$this->Session->write('iso_employee_id', (int)$row['employee_id']);
+		$sections = null;
+		if (array_key_exists('iso_sections', $row) && $row['iso_sections'] !== null && $row['iso_sections'] !== '') {
+			$decoded = json_decode((string)$row['iso_sections'], true);
+			$sections = is_array($decoded) ? \App\Utility\IsoAccess::cleanMenus($decoded) : [];
+		}
+		$this->Session->write('iso_sections', $sections);
 		$this->Session->write('User', ['username' => $row['username']]);
 
 		return true;

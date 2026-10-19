@@ -118,7 +118,8 @@ class PeopleController extends AppController
             $username = trim((string)($data['username'] ?? ''));
             $password = (string)($data['password'] ?? '');
             $isoRole = (string)($data['iso_role'] ?? '');
-            unset($data['username'], $data['password'], $data['iso_role']);
+            $isoMenus = \App\Utility\IsoAccess::cleanMenus($data['iso_menus'] ?? []);
+            unset($data['username'], $data['password'], $data['iso_role'], $data['iso_menus']);
             if (empty($data['employee_code'])) {
                 $data['employee_code'] = 'KDX-EMP-' . str_pad((string)((int)$table->find()->count() + 1), 3, '0', STR_PAD_LEFT);
             }
@@ -134,14 +135,26 @@ class PeopleController extends AppController
             }
             $entity = $table->patchEntity($entity, $data);
             if ($table->save($entity)) {
-                $this->saveLogin((int)$entity->id, $username, $password, $isoRole, $entity->hr_user ?? null);
+                $this->saveLogin((int)$entity->id, $username, $password, $isoRole, $isoMenus, $entity->hr_user ?? null);
                 $this->Flash->success('Employee saved.');
 
                 return $this->redirect(['action' => 'employees']);
             }
             $this->Flash->error('Could not save this employee.');
         }
+        $storedMenus = $entity->hr_user->iso_sections ?? null;
+        $roleForMenus = (string)($entity->hr_user->iso_role ?? '');
+        $checkedMenus = ($storedMenus === null || $storedMenus === '')
+            ? IsoAccess::menusForRole($roleForMenus)
+            : IsoAccess::cleanMenus(json_decode((string)$storedMenus, true));
+        $roleMenuMap = [];
+        foreach (array_keys(IsoAccess::ROLES) as $roleKey) {
+            $roleMenuMap[$roleKey] = IsoAccess::menusForRole($roleKey);
+        }
         $this->set(compact('entity', 'departments', 'designations'));
+        $this->set('isoMenus', IsoAccess::MENUS);
+        $this->set('checkedMenus', $checkedMenus);
+        $this->set('roleMenuMap', $roleMenuMap);
         $this->set('pageTitle', $id ? 'Edit employee' : 'Add employee');
 
         return null;
@@ -226,7 +239,7 @@ class PeopleController extends AppController
         return null;
     }
 
-    private function saveLogin(int $employeeId, string $username, string $password, string $isoRole, $existing): void
+    private function saveLogin(int $employeeId, string $username, string $password, string $isoRole, array $isoMenus, $existing): void
     {
         if (!isset(IsoAccess::ROLES[$isoRole])) {
             $isoRole = '';
@@ -239,6 +252,7 @@ class PeopleController extends AppController
         $data = [
             'employee_id' => $employeeId,
             'iso_role' => $isoRole !== '' ? $isoRole : null,
+            'iso_sections' => json_encode(IsoAccess::cleanMenus($isoMenus)),
             'is_active' => 1,
             'modified' => date('Y-m-d H:i:s'),
         ];

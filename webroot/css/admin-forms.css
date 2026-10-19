@@ -456,6 +456,26 @@
 	padding: 0;
 	cursor: pointer;
 }
+.kx-ticks {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px 16px;
+	margin-top: 4px;
+}
+.kx-tick {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 0;
+	font-size: 14px;
+	font-weight: 550;
+	color: #1f2937;
+}
+.kx-tick input {
+	width: 16px;
+	height: 16px;
+	margin: 0;
+}
 .kx-module-go {
 	margin-left: auto;
 	color: #9ca3af;

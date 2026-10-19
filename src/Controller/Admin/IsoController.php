@@ -63,10 +63,15 @@ class IsoController extends AppController
             return $this->redirect('/admin');
         }
         $section = $this->sectionFor((string)$this->request->getParam('action'));
-        if (!IsoAccess::canView($role, $section)) {
-            $this->Flash->error('Your role cannot open that ISO screen.');
+        $assigned = $this->Session->read('iso_sections');
+        $assigned = $role !== 'super_admin' && is_array($assigned) ? $assigned : null;
+        if (!IsoAccess::canView($role, $section, $assigned)) {
+            $this->Flash->error('Your login cannot open that ISO screen.');
+            if ($section !== 'overview' && IsoAccess::canView($role, 'overview', $assigned)) {
+                return $this->redirect(['action' => 'index']);
+            }
 
-            return $this->redirect(['action' => 'index']);
+            return $this->redirect('/admin');
         }
         if ($this->request->is(['post', 'put']) && !IsoAccess::canWrite($role, $section)) {
             $this->Flash->error('Your role can view this screen but cannot change it.');

@@ -22,6 +22,23 @@ class IsoAccess
         'auditor' => 'Auditor / Read-only',
     ];
 
+    /** Menus an admin can tick on the employee form. */
+    public const MENUS = [
+        'documents' => 'Documents',
+        'training' => 'Training',
+        'suppliers' => 'Suppliers',
+        'materials' => 'Materials',
+        'receipts' => 'Incoming material',
+        'batches' => 'Production',
+        'inspections' => 'QC inspections',
+        'ncr' => 'Non-conformance',
+        'corrective' => 'Corrective action',
+        'maintenance' => 'Maintenance',
+        'audits' => 'Internal audit',
+        'complaints' => 'Complaints',
+        'reviews' => 'Management review',
+    ];
+
     /** @var array<string, list<string>> */
     private const WRITE = [
         'super_admin' => ['*'],
@@ -52,9 +69,53 @@ class IsoAccess
         'auditor' => ['*'],
     ];
 
-    public static function canView(string $role, string $section): bool
+    public static function canView(string $role, string $section, ?array $assigned = null): bool
     {
+        if ($assigned !== null && $role !== 'super_admin') {
+            if ($section === 'overview') {
+                return $assigned !== [];
+            }
+
+            return in_array($section, $assigned, true);
+        }
+
         return self::allows(self::VIEW, $role, $section);
+    }
+
+    /**
+     * Menus the role opens when the admin has not ticked a custom list yet.
+     *
+     * @return list<string>
+     */
+    public static function menusForRole(string $role): array
+    {
+        $menus = [];
+        foreach (self::MENUS as $key => $label) {
+            if (self::allows(self::VIEW, $role, $key)) {
+                $menus[] = $key;
+            }
+        }
+
+        return $menus;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function cleanMenus(mixed $posted): array
+    {
+        if (!is_array($posted)) {
+            return [];
+        }
+        $menus = [];
+        foreach ($posted as $key) {
+            $key = (string)$key;
+            if (isset(self::MENUS[$key])) {
+                $menus[] = $key;
+            }
+        }
+
+        return array_values(array_unique($menus));
     }
 
     public static function canWrite(string $role, string $section): bool
