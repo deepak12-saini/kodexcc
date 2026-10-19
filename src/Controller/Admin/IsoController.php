@@ -452,7 +452,7 @@ class IsoController extends AppController
     public function correctiveForm($id = null): ?Response
     {
         return $this->renderForm('Corrective action', 'IsoActions', 'corrective', $id, [
-            'action_no' => ['label' => 'Action no', 'default' => $id ? null : $this->nextNo('IsoActions', 'action_no', 'ISO-CAP'), 'placeholder' => 'Filled automatically, change only if needed'],
+            'action_no' => ['label' => 'Action no', 'default' => $id ? null : $this->nextNo('IsoActions', 'action_no', 'KGCC-CAP', 2), 'placeholder' => 'Filled automatically, for example KGCC-CAP-2026-01'],
             'nonconformance_id' => ['label' => 'Non-conformance', 'type' => 'select', 'options' => $this->optionList('IsoNonconformances', 'ncr_no'), 'placeholder' => 'Select the NCR this action fixes'],
             'cause' => ['label' => 'Cause', 'type' => 'textarea', 'placeholder' => 'Why it happened'],
             'action_text' => ['label' => 'Action', 'type' => 'textarea', 'required' => true, 'placeholder' => 'What will be done to stop it happening again'],
@@ -934,7 +934,7 @@ class IsoController extends AppController
         ])->count();
     }
 
-    private function nextNo(string $alias, string $field, string $prefix): string
+    private function nextNo(string $alias, string $field, string $prefix, int $width = 4): string
     {
         $like = $prefix . '-' . date('Y') . '-%';
         $last = $this->fetchTable($alias)->find()
@@ -947,7 +947,7 @@ class IsoController extends AppController
             $n = (int)$m[1] + 1;
         }
 
-        return sprintf('%s-%s-%04d', $prefix, date('Y'), $n);
+        return sprintf('%s-%s-%0' . $width . 'd', $prefix, date('Y'), $n);
     }
 
     private function machineOptions(): array
