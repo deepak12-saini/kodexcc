@@ -241,9 +241,6 @@ class UsersController extends AppController
 			['count' => $this->fetchTable('IsoNonconformances')->find()->where(['status' => 'open'])->count(), 'label' => 'Open non-conformances', 'url' => 'admin/iso/nonconformances?status=open', 'color' => '#CC5D5E', 'icon' => 'fa-exclamation-triangle'],
 			['count' => $this->fetchTable('IsoActions')->find()->where(['status' => 'open'])->count(), 'label' => 'Open corrective actions', 'url' => 'admin/iso/corrective?status=open', 'color' => '#6f6e6e', 'icon' => 'fa-wrench'],
 			['count' => $this->fetchTable('IsoSuppliers')->find()->where(['status' => 'approved'])->count(), 'label' => 'Approved suppliers', 'url' => 'admin/iso/suppliers?status=approved', 'color' => '#AEC95B', 'icon' => 'fa-truck'],
-			['count' => $this->fetchTable('ErpPartners')->find()->where(['partner_type' => 'customer', 'status' => 'active'])->count(), 'label' => 'ERP customers', 'url' => 'admin/erp/partners?partner_type=customer&status=active', 'color' => '#8BC1E4', 'icon' => 'fa-address-book'],
-			['count' => $this->fetchTable('ErpPurchaseOrders')->find()->where(['status IN' => ['approved', 'partial', 'draft']])->count(), 'label' => 'Open purchase orders', 'url' => 'admin/erp/purchasing', 'color' => '#438eb9', 'icon' => 'fa-shopping-cart'],
-			['count' => $this->fetchTable('ErpArInvoices')->find()->where(['status' => 'open'])->count(), 'label' => 'Sales invoices', 'url' => 'admin/erp/outstanding', 'color' => '#AEC95B', 'icon' => 'fa-line-chart'],
 		]);
 	}
 	
