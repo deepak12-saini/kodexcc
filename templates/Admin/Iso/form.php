@@ -4,7 +4,7 @@ $dashed = function (string $action): string {
 	return strtolower((string)preg_replace('/([a-z])([A-Z])/', '$1-$2', $action));
 };
 ?>
-<link rel="stylesheet" href="<?php echo SITEURL; ?>css/admin-forms.css?v=3">
+<link rel="stylesheet" href="<?php echo SITEURL; ?>css/admin-forms.css?v=4">
 <div class="page-content">
 	<div class="kx-sheet">
 		<?php echo $this->Form->create(null, ['class' => 'kx-form', 'enctype' => 'multipart/form-data']); ?>
@@ -15,7 +15,7 @@ $dashed = function (string $action): string {
 					<?php foreach ($fields as $key => $field): ?>
 						<?php
 						$type = $field['type'] ?? 'text';
-						$wide = in_array($type, ['textarea', 'file', 'select_other'], true);
+						$wide = in_array($type, ['textarea', 'file', 'select_other', 'evidence'], true);
 						$current = $entity->{$key} ?? null;
 						if (is_object($current) && method_exists($current, 'format')) {
 							$current = $current->format('Y-m-d');
@@ -30,6 +30,60 @@ $dashed = function (string $action): string {
 							<span><?php echo h($field['label']); ?><?php if (!empty($field['required'])): ?><span class="kx-req">*</span><?php endif; ?></span>
 							<?php if ($type === 'textarea'): ?>
 								<textarea name="<?php echo h($key); ?>" rows="4" placeholder="<?php echo h($placeholder); ?>"><?php echo h((string)$current); ?></textarea>
+							<?php elseif ($type === 'evidence'): ?>
+								<?php
+								$savedFiles = json_decode((string)($entity->evidence_files ?? ''), true);
+								$savedFiles = is_array($savedFiles) ? $savedFiles : [];
+								$evidenceKind = function (string $path): string {
+									$ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+									if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true)) {
+										return 'image';
+									}
+									if (in_array($ext, ['mp4', 'webm', 'mov'], true)) {
+										return 'video';
+									}
+
+									return 'doc';
+								};
+								?>
+								<div class="kx-evidence">
+									<textarea name="<?php echo h($key); ?>" rows="4" placeholder="<?php echo h($placeholder); ?>"><?php echo h((string)$current); ?></textarea>
+									<?php if (!empty($canEdit)): ?>
+										<label class="kx-drop">
+											<input type="file" name="<?php echo h($key); ?>_files[]" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,video/mp4,video/webm,video/quicktime">
+											<span class="kx-drop-title">Add a photo, document, or video</span>
+											<span class="kx-drop-hint">JPG, PNG, PDF, Word, Excel, or MP4. Up to 25 MB each. You can choose more than one.</span>
+										</label>
+										<div class="kx-evidence-list" data-pending></div>
+									<?php endif; ?>
+									<?php if ($savedFiles): ?>
+										<div class="kx-evidence-list">
+											<?php foreach ($savedFiles as $path): ?>
+												<?php
+												$path = (string)$path;
+												$kind = $evidenceKind($path);
+												$name = basename($path);
+												?>
+												<div class="kx-evidence-card">
+													<?php if ($kind === 'image'): ?>
+														<a href="<?php echo SITEURL . h($path); ?>" target="_blank"><img src="<?php echo SITEURL . h($path); ?>" alt=""></a>
+													<?php elseif ($kind === 'video'): ?>
+														<video controls preload="metadata" src="<?php echo SITEURL . h($path); ?>"></video>
+													<?php else: ?>
+														<a class="kx-evidence-doc" href="<?php echo SITEURL . h($path); ?>" target="_blank"><i class="fa fa-file-text-o"></i></a>
+													<?php endif; ?>
+													<div class="kx-evidence-meta">
+														<a href="<?php echo SITEURL . h($path); ?>" target="_blank"><?php echo h($name); ?></a>
+														<?php if (!empty($canEdit)): ?>
+															<input type="hidden" name="<?php echo h($key); ?>_keep[]" value="<?php echo h($path); ?>">
+															<button type="button" class="kx-evidence-remove">Remove</button>
+														<?php endif; ?>
+													</div>
+												</div>
+											<?php endforeach; ?>
+										</div>
+									<?php endif; ?>
+								</div>
 							<?php elseif ($type === 'select' || $type === 'select_other' || $type === 'person'): ?>
 								<?php
 								$options = $type === 'person'
@@ -161,5 +215,48 @@ document.addEventListener('click', function (event) {
 			pick.querySelector('.kx-pick-menu').setAttribute('hidden', '');
 		});
 	}
+});
+document.querySelectorAll('.kx-evidence').forEach(function (box) {
+	var input = box.querySelector('input[type="file"]');
+	var pending = box.querySelector('[data-pending]');
+	if (!input || !pending) {
+		return;
+	}
+	input.addEventListener('change', function () {
+		pending.innerHTML = '';
+		Array.prototype.forEach.call(input.files || [], function (file) {
+			var card = document.createElement('div');
+			card.className = 'kx-evidence-card';
+			if (file.type.indexOf('image/') === 0) {
+				var img = document.createElement('img');
+				img.alt = '';
+				img.src = URL.createObjectURL(file);
+				card.appendChild(img);
+			} else if (file.type.indexOf('video/') === 0) {
+				var video = document.createElement('video');
+				video.controls = true;
+				video.src = URL.createObjectURL(file);
+				card.appendChild(video);
+			} else {
+				var doc = document.createElement('div');
+				doc.className = 'kx-evidence-doc';
+				doc.textContent = 'DOC';
+				card.appendChild(doc);
+			}
+			var meta = document.createElement('div');
+			meta.className = 'kx-evidence-meta';
+			meta.textContent = file.name;
+			card.appendChild(meta);
+			pending.appendChild(card);
+		});
+	});
+});
+document.querySelectorAll('.kx-evidence-remove').forEach(function (button) {
+	button.addEventListener('click', function () {
+		var card = button.closest('.kx-evidence-card');
+		if (card) {
+			card.remove();
+		}
+	});
 });
 </script>

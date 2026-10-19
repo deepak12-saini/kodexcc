@@ -454,7 +454,7 @@ class IsoController extends AppController
             'action_text' => ['label' => 'Action', 'type' => 'textarea', 'required' => true, 'placeholder' => 'What will be done to stop it happening again'],
             'owner_name' => ['label' => 'Owner', 'type' => 'person', 'placeholder' => 'Select who is responsible'],
             'due_date' => ['label' => 'Due date', 'type' => 'date'],
-            'evidence' => ['label' => 'Evidence', 'type' => 'textarea', 'placeholder' => 'How you will show the action is done'],
+            'evidence' => ['label' => 'Evidence', 'type' => 'evidence', 'placeholder' => 'Write what was checked or done. You can also attach a photo, document, or video.'],
             'status' => ['label' => 'Status', 'type' => 'select', 'options' => ['open' => 'Open', 'done' => 'Done', 'closed' => 'Closed'], 'placeholder' => 'Open, done, or closed'],
             'closed_by' => ['label' => 'Closed by', 'type' => 'person', 'placeholder' => 'Select who closed it'],
             'closed_on' => ['label' => 'Closed on', 'type' => 'date'],
@@ -650,6 +650,7 @@ class IsoController extends AppController
     {
         $table = $this->fetchTable($alias);
         $entity = $id ? $table->get($id) : $table->newEmptyEntity();
+        $uploadFailed = false;
         if ($this->request->is(['post', 'put'])) {
             $data = [];
             foreach ($fields as $key => $field) {
@@ -659,6 +660,22 @@ class IsoController extends AppController
                     if ($stored !== null) {
                         $data[$key] = $stored;
                     }
+                    continue;
+                }
+                if ($type === 'evidence') {
+                    $note = trim((string)$this->request->getData($key));
+                    $data[$key] = $note === '' ? null : $note;
+                    $uploaded = $this->storeEvidenceFiles($key . '_files');
+                    if ($uploaded === false) {
+                        $uploadFailed = true;
+                        continue;
+                    }
+                    $kept = $this->request->getData($key . '_keep');
+                    $kept = is_array($kept) ? $this->evidencePaths($kept) : [];
+                    $previous = $this->evidencePaths($entity->evidence_files ?? '');
+                    $kept = array_values(array_intersect($kept, $previous));
+                    $paths = array_values(array_unique(array_merge($kept, $uploaded)));
+                    $data[$key . '_files'] = $paths === [] ? null : json_encode($paths);
                     continue;
                 }
                 if ($type === 'select_other') {
@@ -686,6 +703,9 @@ class IsoController extends AppController
                 $data[$key] = $value;
             }
             foreach ($fields as $key => $field) {
+                if ($uploadFailed) {
+                    break;
+                }
                 if (!empty($field['required']) && ($data[$key] ?? '') === '') {
                     $this->Flash->error($field['label'] . ' is required.');
                     $entity = $table->patchEntity($entity, $data);
@@ -698,6 +718,17 @@ class IsoController extends AppController
 
                     return null;
                 }
+            }
+            if ($uploadFailed) {
+                $entity = $table->patchEntity($entity, $data);
+                $this->set(compact('title', 'fields', 'entity', 'listAction'));
+                $this->set('pageTitle', $title);
+                if ($extra) {
+                    $extra($id);
+                }
+                $this->render('form');
+
+                return null;
             }
             if ($mutate) {
                 $data = $mutate($table, $data, $id ? $entity : null);
@@ -766,6 +797,88 @@ class IsoController extends AppController
         $file->moveTo($dir . DIRECTORY_SEPARATOR . $name);
 
         return 'files/iso/' . $name;
+    }
+
+    /**
+     * @return list<string>|false
+     */
+    private function storeEvidenceFiles(string $field): array|false
+    {
+        $files = $this->request->getData($field);
+        if ($files === null || $files === '') {
+            $files = $this->request->getUploadedFiles()[$field] ?? null;
+        }
+        if ($files === null || $files === '') {
+            return [];
+        }
+        if (!is_array($files)) {
+            $files = [$files];
+        }
+        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'mp4', 'webm', 'mov'];
+        $ready = [];
+        foreach ($files as $file) {
+            if (!is_object($file) || !method_exists($file, 'getError')) {
+                continue;
+            }
+            $error = $file->getError();
+            if ($error === UPLOAD_ERR_NO_FILE) {
+                continue;
+            }
+            if ($error !== UPLOAD_ERR_OK) {
+                $this->Flash->error('One evidence file did not upload. Each file must be 25 MB or smaller.');
+
+                return false;
+            }
+            $ext = strtolower(pathinfo((string)$file->getClientFilename(), PATHINFO_EXTENSION));
+            if (!in_array($ext, $allowed, true)) {
+                $this->Flash->error('Evidence can be a photo, a document (PDF, Word, Excel), or a video (MP4, WEBM, MOV).');
+
+                return false;
+            }
+            if ((int)$file->getSize() > 25 * 1024 * 1024) {
+                $this->Flash->error('Each evidence file must be 25 MB or smaller.');
+
+                return false;
+            }
+            $ready[] = [$file, $ext];
+        }
+        $stored = [];
+        $dir = WWW_ROOT . 'files' . DIRECTORY_SEPARATOR . 'iso';
+        if ($ready !== [] && !is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+        foreach ($ready as [$file, $ext]) {
+            $safe = preg_replace('/[^A-Za-z0-9._-]/', '', (string)$file->getClientFilename()) ?: ('file.' . $ext);
+            $name = date('YmdHis') . '_' . bin2hex(random_bytes(3)) . '_' . $safe;
+            $file->moveTo($dir . DIRECTORY_SEPARATOR . $name);
+            $stored[] = 'files/iso/' . $name;
+        }
+
+        return $stored;
+    }
+
+    /**
+     * @param mixed $raw
+     * @return list<string>
+     */
+    private function evidencePaths(mixed $raw): array
+    {
+        if (is_string($raw)) {
+            $decoded = json_decode($raw, true);
+            $raw = is_array($decoded) ? $decoded : [];
+        }
+        if (!is_array($raw)) {
+            return [];
+        }
+        $out = [];
+        foreach ($raw as $path) {
+            $path = str_replace('\\', '/', (string)$path);
+            if (preg_match('#^files/iso/[A-Za-z0-9._-]+$#', $path) === 1) {
+                $out[] = $path;
+            }
+        }
+
+        return array_values(array_unique($out));
     }
 
     private function optionList(string $alias, string $left, ?string $right = null): array
