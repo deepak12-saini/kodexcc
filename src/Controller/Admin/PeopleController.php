@@ -135,7 +135,9 @@ class PeopleController extends AppController
             }
             $entity = $table->patchEntity($entity, $data);
             if ($table->save($entity)) {
-                $this->saveLogin((int)$entity->id, $username, $password, $isoRole, $isoMenus, $entity->hr_user ?? null);
+                if (!$this->saveLogin((int)$entity->id, $username, $password, $isoRole, $isoMenus, $entity->hr_user ?? null)) {
+                    return $this->redirect(['action' => 'employeeForm', $entity->id]);
+                }
                 $this->Flash->success('Employee saved.');
 
                 return $this->redirect(['action' => 'employees']);
@@ -239,20 +241,21 @@ class PeopleController extends AppController
         return null;
     }
 
-    private function saveLogin(int $employeeId, string $username, string $password, string $isoRole, array $isoMenus, $existing): void
+    private function saveLogin(int $employeeId, string $username, string $password, string $isoRole, array $isoMenus, $existing): bool
     {
         if (!isset(IsoAccess::ROLES[$isoRole])) {
             $isoRole = '';
         }
         $users = $this->fetchTable('HrUsers');
         if ($username === '' && $existing === null) {
-            return;
+            return true;
         }
         $user = $existing ?: $users->find()->where(['employee_id' => $employeeId])->first() ?: $users->newEmptyEntity();
+        $menus = json_encode(IsoAccess::cleanMenus($isoMenus));
         $data = [
             'employee_id' => $employeeId,
             'iso_role' => $isoRole !== '' ? $isoRole : null,
-            'iso_sections' => json_encode(IsoAccess::cleanMenus($isoMenus)),
+            'iso_sections' => $menus,
             'is_active' => 1,
             'modified' => date('Y-m-d H:i:s'),
         ];
@@ -264,7 +267,7 @@ class PeopleController extends AppController
             if ($taken->count() > 0) {
                 $this->Flash->error('That username is already used.');
 
-                return;
+                return false;
             }
             $data['username'] = $username;
         }
@@ -273,12 +276,33 @@ class PeopleController extends AppController
         }
         if ($user->isNew()) {
             if ($username === '' || $password === '') {
-                return;
+                return true;
             }
             $data['role'] = 'employee';
             $data['created'] = date('Y-m-d H:i:s');
         }
-        $users->save($users->patchEntity($user, $data));
+        try {
+            $saved = $users->save($users->patchEntity($user, $data));
+        } catch (\Throwable) {
+            $saved = false;
+        }
+        if (!$saved) {
+            $this->Flash->error('Could not save the menu permissions.');
+
+            return false;
+        }
+        try {
+            $fresh = $users->find()->select(['id', 'iso_sections'])->where(['id' => $user->id])->enableHydration(false)->first();
+        } catch (\Throwable) {
+            $fresh = null;
+        }
+        if (!is_array($fresh) || (string)($fresh['iso_sections'] ?? '') !== $menus) {
+            $this->Flash->error('Menu permissions were not stored. Run the iso sections database update, then save again.');
+
+            return false;
+        }
+
+        return true;
     }
 
     private function setLoginActive(int $employeeId, int $active): void

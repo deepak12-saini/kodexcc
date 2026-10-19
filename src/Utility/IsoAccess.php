@@ -118,8 +118,12 @@ class IsoAccess
         return array_values(array_unique($menus));
     }
 
-    public static function canWrite(string $role, string $section): bool
+    public static function canWrite(string $role, string $section, ?array $assigned = null): bool
     {
+        if ($assigned !== null && $role !== 'super_admin') {
+            return in_array($section, $assigned, true);
+        }
+
         return self::allows(self::WRITE, $role, $section);
     }
 

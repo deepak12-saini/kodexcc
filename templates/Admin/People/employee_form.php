@@ -79,7 +79,9 @@ if (roleSelect) {
 	roleSelect.addEventListener('change', function () {
 		var allowed = isoRoleMenus[roleSelect.value] || [];
 		document.querySelectorAll('#iso-menus input').forEach(function (box) {
-			box.checked = allowed.indexOf(box.value) !== -1;
+			if (allowed.indexOf(box.value) !== -1) {
+				box.checked = true;
+			}
 		});
 	});
 }

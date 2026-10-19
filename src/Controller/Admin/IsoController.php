@@ -63,8 +63,7 @@ class IsoController extends AppController
             return $this->redirect('/admin');
         }
         $section = $this->sectionFor((string)$this->request->getParam('action'));
-        $assigned = $this->Session->read('iso_sections');
-        $assigned = $role !== 'super_admin' && is_array($assigned) ? $assigned : null;
+        $assigned = $this->menuAssigned();
         if (!IsoAccess::canView($role, $section, $assigned)) {
             $this->Flash->error('Your login cannot open that ISO screen.');
             if ($section !== 'overview' && IsoAccess::canView($role, 'overview', $assigned)) {
@@ -73,15 +72,15 @@ class IsoController extends AppController
 
             return $this->redirect('/admin');
         }
-        if ($this->request->is(['post', 'put']) && !IsoAccess::canWrite($role, $section)) {
-            $this->Flash->error('Your role can view this screen but cannot change it.');
+        if ($this->request->is(['post', 'put']) && !IsoAccess::canWrite($role, $section, $assigned)) {
+            $this->Flash->error('Your login can view this screen but cannot change it.');
 
             return $this->redirect(['action' => $this->request->getParam('action')]);
         }
         $this->set('title_for_layout', 'ISO 9001');
         $this->set('isoRole', $role);
         $this->set('isoRoleLabel', IsoAccess::ROLES[$role] ?? $role);
-        $this->set('canEdit', IsoAccess::canWrite($role, $section));
+        $this->set('canEdit', IsoAccess::canWrite($role, $section, $assigned));
         $names = [];
         foreach ($this->fetchTable('HrEmployees')->find()->where(['status' => 'active'])->orderBy(['full_name' => 'ASC'])->limit(200) as $person) {
             $names[] = (string)$person->full_name;
@@ -100,7 +99,7 @@ class IsoController extends AppController
             ['label' => 'Overdue corrective actions', 'count' => $this->overdueActions(), 'url' => 'corrective?status=open', 'icon' => 'fa-wrench', 'tone' => 'green', 'section' => 'corrective'],
         ];
         $cards = array_values(array_filter($cards, function (array $card) use ($role): bool {
-            return IsoAccess::canView($role, $card['section']);
+            return IsoAccess::canView($role, $card['section'], $this->menuAssigned());
         }));
         $modules = [
             ['section' => 'documents', 'label' => 'Documents', 'hint' => 'Controlled procedures and forms', 'icon' => 'fa-file', 'url' => 'documents'],
@@ -118,7 +117,7 @@ class IsoController extends AppController
             ['section' => 'reviews', 'label' => 'Management review', 'hint' => 'Review meetings', 'icon' => 'fa-calendar', 'url' => 'reviews'],
         ];
         $modules = array_values(array_filter($modules, function (array $module) use ($role): bool {
-            return IsoAccess::canView($role, $module['section']);
+            return IsoAccess::canView($role, $module['section'], $this->menuAssigned());
         }));
         $this->set('cards', $cards);
         $this->set('modules', $modules);
@@ -1082,6 +1081,16 @@ class IsoController extends AppController
         }
 
         return $dept === '' ? [] : [$dept => $dept];
+    }
+
+    private function menuAssigned(): ?array
+    {
+        if ($this->isoRole() === 'super_admin') {
+            return null;
+        }
+        $assigned = $this->Session->read('iso_sections');
+
+        return is_array($assigned) ? $assigned : null;
     }
 
     private function isoRole(): ?string
