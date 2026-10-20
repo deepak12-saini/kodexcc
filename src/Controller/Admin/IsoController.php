@@ -390,7 +390,7 @@ class IsoController extends AppController
     public function nonconformances(): ?Response
     {
         return $this->renderList('Non-conformance', 'iso-nonconformances.csv', 'IsoNonconformances', [
-            'NCR', 'Source', 'Department', 'Description', 'Status',
+            'NCR', 'Source', 'Department', 'Description', 'Date', 'Time', 'Timer', 'Open / closed',
         ], [
             'selects' => [
                 'status' => ['open' => 'Open', 'under_action' => 'Under action', 'closed' => 'Closed'],
@@ -399,7 +399,18 @@ class IsoController extends AppController
             ],
             'search' => ['ncr_no', 'description'],
         ], function ($row) {
-            return [$row->ncr_no, str_replace('_', ' ', (string)$row->source), $row->department, $row->description, $row->status];
+            $raised = $this->stamp($row->created);
+
+            return [
+                $row->ncr_no,
+                str_replace('_', ' ', (string)$row->source),
+                $row->department,
+                $row->description,
+                $raised ? date('d M Y', $raised) : '',
+                $raised ? date('h:i A', $raised) : '',
+                $this->openTimer($raised, (string)$row->status, $this->stamp($row->modified)),
+                (string)$row->status === 'closed' ? 'Closed' : 'Open',
+            ];
         }, 'ncrForm', 'nonconformances');
     }
 
@@ -932,6 +943,39 @@ class IsoController extends AppController
             'due_date <' => date('Y-m-d'),
             'due_date IS NOT' => null,
         ])->count();
+    }
+
+    private function stamp(mixed $value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (is_object($value) && method_exists($value, 'getTimestamp')) {
+            return $value->getTimestamp();
+        }
+        $ts = strtotime((string)$value);
+
+        return $ts ?: null;
+    }
+
+    private function openTimer(?int $raised, string $status, ?int $modified): string
+    {
+        if ($raised === null) {
+            return '';
+        }
+        $end = $status === 'closed' ? ($modified ?? $raised) : time();
+        $seconds = max(0, $end - $raised);
+        $days = intdiv($seconds, 86400);
+        $hours = intdiv($seconds % 86400, 3600);
+        $mins = intdiv($seconds % 3600, 60);
+        if ($days > 0) {
+            return $days . ' day' . ($days === 1 ? '' : 's') . ($hours > 0 ? ' ' . $hours . ' hr' : '');
+        }
+        if ($hours > 0) {
+            return $hours . ' hr' . ($mins > 0 ? ' ' . $mins . ' min' : '');
+        }
+
+        return max(1, $mins) . ' min';
     }
 
     private function nextNo(string $alias, string $field, string $prefix, int $width = 4): string
