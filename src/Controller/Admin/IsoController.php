@@ -588,6 +588,11 @@ class IsoController extends AppController
     {
         if ($this->request->is('post') && $this->request->getData('delete_id')) {
             $rowId = (int)$this->request->getData('delete_id');
+            if ($alias === 'IsoActions' && $this->isoRole() !== 'super_admin') {
+                $this->Flash->error('Only the admin can delete a corrective action.');
+
+                return $this->redirect(['action' => $selfAction]);
+            }
             if ($alias === 'IsoNonconformances' && !$this->ncrVisible($rowId)) {
                 $this->Flash->error('That non-conformance belongs to another department.');
 
@@ -656,6 +661,7 @@ class IsoController extends AppController
         $this->set(compact('title', 'header', 'items', 'map', 'filter', 'values', 'addAction'));
         $this->set('showDates', !empty($dateCol));
         $this->set('listAction', $selfAction);
+        $this->set('allowDelete', !($alias === 'IsoActions' && $this->isoRole() !== 'super_admin'));
         $this->render('record');
 
         return null;

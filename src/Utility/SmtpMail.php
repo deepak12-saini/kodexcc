@@ -51,7 +51,7 @@ class SmtpMail
             self::command($fp, 'DATA', '354');
             $payload = self::message($from, $to, $subject, $html);
             fwrite($fp, $payload . "\r\n.\r\n");
-            self::expect($fp, '250');
+            self::expect($fp, '250', 'sent');
             self::command($fp, 'QUIT', '221');
         } finally {
             fclose($fp);

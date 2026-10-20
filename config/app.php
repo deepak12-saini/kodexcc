@@ -262,6 +262,14 @@ return [
     ],
 
     /*
+     * Morning non-conformance email.
+     * Change dailyReportTo here when the director address changes.
+     */
+    'Iso' => [
+        'dailyReportTo' => 'deepak@kodexcc.com',
+    ],
+
+    /*
      * Connection information used by the ORM to connect
      * to your application's datastores.
      *
