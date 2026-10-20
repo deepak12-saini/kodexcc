@@ -105,6 +105,27 @@ body.login-layout .main-content {
 .kx-admin-body .alert {
 	margin-bottom: 1rem;
 }
+.kx-admin-reset {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 46px;
+	margin-top: 0.75rem;
+	border: 2px solid #0f766e;
+	border-radius: 8px;
+	background: #fff;
+	color: #0f766e !important;
+	font-size: 1.05rem !important;
+	font-weight: 700 !important;
+	line-height: 1;
+	text-align: center;
+	text-decoration: none !important;
+}
+.kx-admin-reset:hover {
+	background: #f0fdfa;
+	color: #0d655e !important;
+}
 </style>
 <div class="kx-admin-login">
 	<div class="kx-admin-card">
@@ -140,6 +161,7 @@ body.login-layout .main-content {
 			]); ?>
 			<?php echo $this->Form->submit('Login'); ?>
 			<?php echo $this->Form->end(); ?>
+			<a class="kx-admin-reset" href="<?php echo SITEURL; ?>admin/users/staff-reset">Reset password</a>
 		</div>
 	</div>
 </div>

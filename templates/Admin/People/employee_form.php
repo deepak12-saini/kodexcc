@@ -24,6 +24,14 @@
 						<?php endforeach; ?>
 						</select>
 					</label>
+					<label class="kx-field"><span>Reporting manager</span>
+						<select name="manager_id"><option value="">Select</option>
+						<?php foreach ($managers as $id => $name): ?>
+							<option value="<?php echo (int)$id; ?>" <?php echo (string)($entity->manager_id ?? '') === (string)$id ? 'selected' : ''; ?>><?php echo h($name); ?></option>
+						<?php endforeach; ?>
+						</select>
+						<p class="kx-hint">Who this person reports to. They can also change this from My profile.</p>
+					</label>
 					<label class="kx-field"><span>Status</span>
 						<select name="status">
 							<?php foreach (['active' => 'Active', 'inactive' => 'Inactive'] as $key => $label): ?>

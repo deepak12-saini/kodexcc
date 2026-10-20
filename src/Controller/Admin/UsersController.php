@@ -4,7 +4,10 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Controller\AppController;
+use App\Utility\SmtpMail;
+use App\Utility\StaffPasswordReset;
 use Cake\Event\EventInterface;
+use Cake\Routing\Router;
 
 /**
  * Admin area Users controller (CakePHP 5 prefix: /admin/users/...).
@@ -280,6 +283,105 @@ class UsersController extends AppController
 			$this->Session->setFlash($isoLogin,'default',array('class' => 'alert alert-danger'));
 		}
 		
+	}
+
+	/**
+	 * Staff set their own password from the login page. The link is emailed and lasts one day.
+	 */
+	public function staffReset(): ?\Cake\Http\Response
+	{
+		$this->viewBuilder()->setLayout('admin_login');
+		$this->viewBuilder()->addHelper('Form');
+		$this->set('title_for_layout', SITENAME . ' Reset password');
+		$token = trim((string)$this->request->getQuery('token'));
+		if ($token !== '') {
+			$row = $this->staffForResetToken($token);
+			if ($row === null) {
+				$this->Flash->error('This reset link has expired. Request a new one.');
+
+				return $this->redirect(['action' => 'staffReset']);
+			}
+			if ($this->request->is('post')) {
+				$new = (string)$this->request->getData('new_password');
+				$confirm = (string)$this->request->getData('confirm_password');
+				if (strlen($new) < 6) {
+					$this->Flash->error('Use at least 6 characters.');
+				} elseif (!hash_equals($new, $confirm)) {
+					$this->Flash->error('The two passwords do not match.');
+				} else {
+					$this->fetchTable('HrUsers')->getConnection()->execute(
+						'UPDATE hr_users SET password = :password, modified = :modified WHERE id = :id',
+						[
+							'password' => hash('sha256', $new),
+							'modified' => date('Y-m-d H:i:s'),
+							'id' => (int)$row['id'],
+						]
+					);
+					$this->Flash->success('Your password is saved. Sign in with your username.');
+
+					return $this->redirect('/admin');
+				}
+			}
+			$this->set('setPassword', true);
+			$this->set('token', $token);
+			$this->set('username', (string)$row['username']);
+
+			return null;
+		}
+		if ($this->request->is('post')) {
+			$email = strtolower(trim((string)$this->request->getData('email')));
+			if ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+				$row = $this->fetchTable('HrUsers')->getConnection()->execute(
+					'SELECT u.id, u.username, u.password, e.full_name
+					 FROM hr_users u
+					 INNER JOIN hr_employees e ON e.id = u.employee_id
+					 WHERE LOWER(e.email) = :email AND u.is_active = 1 AND e.status = :status
+					 LIMIT 1',
+					['email' => $email, 'status' => 'active']
+				)->fetch('assoc');
+				if (is_array($row)) {
+					$resetToken = StaffPasswordReset::token((int)$row['id'], (string)$row['password']);
+					$link = Router::url(['action' => 'staffReset', '?' => ['token' => $resetToken]], true);
+					$html = '<p>Hello ' . h((string)$row['full_name']) . ',</p>'
+						. '<p>Use this link to choose your KodexCC staff password. It works for 24 hours.</p>'
+						. '<p><a href="' . h($link) . '">' . h($link) . '</a></p>'
+						. '<p>Your username is <strong>' . h((string)$row['username']) . '</strong>.</p>';
+					try {
+						SmtpMail::send($email, 'Set your KodexCC password', $html);
+					} catch (\Throwable) {
+						$this->Flash->error('The reset email could not be sent. Try again in a few minutes.');
+
+						return $this->redirect(['action' => 'staffReset']);
+					}
+				}
+			}
+			$this->Flash->success('If that email is on an active staff login, a reset link is on its way.');
+
+			return $this->redirect(['action' => 'staffReset']);
+		}
+		$this->set('setPassword', false);
+
+		return null;
+	}
+
+	/**
+	 * @return array{id: int|string, username: string, password: string}|null
+	 */
+	private function staffForResetToken(string $token): ?array
+	{
+		$parsed = StaffPasswordReset::read($token);
+		if ($parsed === null) {
+			return null;
+		}
+		$row = $this->fetchTable('HrUsers')->getConnection()->execute(
+			'SELECT id, username, password FROM hr_users WHERE id = :id AND is_active = 1 LIMIT 1',
+			['id' => $parsed['id']]
+		)->fetch('assoc');
+		if (!is_array($row) || !hash_equals(StaffPasswordReset::stamp((string)$row['password']), $parsed['stamp'])) {
+			return null;
+		}
+
+		return $row;
 	}
 /***
 	/*Author  :Ranjit,

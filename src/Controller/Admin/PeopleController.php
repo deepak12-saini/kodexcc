@@ -17,7 +17,14 @@ class PeopleController extends AppController
         $this->viewBuilder()->addHelper('Paginator');
         $this->viewBuilder()->addHelper('Form');
         $this->viewBuilder()->addHelper('Time');
-        $this->checkAdminSession();
+        if ((string)$this->request->getParam('action') === 'myProfile') {
+            if (!$this->Session->read('is_admin') && !$this->Session->read('is_iso_user')) {
+                $this->Flash->error('You need to be logged in to access this area.');
+                throw new \Cake\Routing\Exception\RedirectException(\Cake\Routing\Router::url('/admin'));
+            }
+        } else {
+            $this->checkAdminSession();
+        }
         $this->set('title_for_layout', 'People');
         $this->set('isoRoles', IsoAccess::ROLES);
     }
@@ -27,7 +34,7 @@ class PeopleController extends AppController
         $q = trim((string)$this->request->getQuery('q'));
         $removed = $this->request->getQuery('removed') === '1';
         $query = $this->fetchTable('HrEmployees')->find()
-            ->contain(['HrDepartments', 'HrDesignations', 'HrUsers'])
+            ->contain(['HrDepartments', 'HrDesignations', 'HrUsers', 'Managers'])
             ->orderBy(['HrEmployees.id' => 'DESC']);
         $query->where($removed ? ['HrEmployees.status' => 'deleted'] : ['HrEmployees.status !=' => 'deleted']);
         if ($q !== '') {
@@ -93,7 +100,7 @@ class PeopleController extends AppController
     public function employeeView($id = null): ?\Cake\Http\Response
     {
         $entity = $this->fetchTable('HrEmployees')->find()
-            ->contain(['HrDepartments', 'HrDesignations', 'HrUsers'])
+            ->contain(['HrDepartments', 'HrDesignations', 'HrUsers', 'Managers'])
             ->where(['HrEmployees.id' => (int)$id])
             ->first();
         if (!$entity) {
@@ -107,12 +114,61 @@ class PeopleController extends AppController
         return null;
     }
 
+    public function myProfile(): ?\Cake\Http\Response
+    {
+        $employeeId = (int)$this->Session->read('iso_employee_id');
+        if ($employeeId <= 0) {
+            $this->Flash->error('Your login is not linked to an employee profile.');
+
+            return $this->redirect('/admin/iso');
+        }
+        $table = $this->fetchTable('HrEmployees');
+        $entity = $table->find()
+            ->contain(['HrDepartments', 'HrDesignations', 'Managers'])
+            ->where(['HrEmployees.id' => $employeeId])
+            ->first();
+        if (!$entity) {
+            $this->Flash->error('Your employee profile was not found.');
+
+            return $this->redirect('/admin/iso');
+        }
+        $managers = $this->managerChoices($employeeId);
+        if ($this->request->is(['post', 'put'])) {
+            $data = $this->request->getData();
+            $managerId = ($data['manager_id'] ?? '') === '' ? null : (int)$data['manager_id'];
+            if ($managerId !== null && !isset($managers[$managerId]) && !isset($managers[(string)$managerId])) {
+                $managerId = $entity->manager_id;
+            }
+            $entity = $table->patchEntity($entity, [
+                'full_name' => trim((string)($data['full_name'] ?? '')),
+                'email' => trim((string)($data['email'] ?? '')),
+                'mobile' => trim((string)($data['mobile'] ?? '')),
+                'kpi' => trim((string)($data['kpi'] ?? '')),
+                'manager_id' => $managerId,
+                'modified' => date('Y-m-d H:i:s'),
+            ], [
+                'fields' => ['full_name', 'email', 'mobile', 'kpi', 'manager_id', 'modified'],
+            ]);
+            if ($entity->getError('full_name') === [] && trim((string)$entity->full_name) !== '' && $table->save($entity)) {
+                $this->Flash->success('Your profile was saved.');
+
+                return $this->redirect(['action' => 'myProfile']);
+            }
+            $this->Flash->error('Could not save your profile.');
+        }
+        $this->set(compact('entity', 'managers'));
+        $this->set('pageTitle', 'My profile');
+
+        return null;
+    }
+
     public function employeeForm($id = null): ?\Cake\Http\Response
     {
         $table = $this->fetchTable('HrEmployees');
         $entity = $id ? $table->get($id, contain: ['HrUsers']) : $table->newEmptyEntity();
         $departments = $this->fetchTable('HrDepartments')->find('list')->where(['status' => 1])->orderBy(['name' => 'ASC'])->toArray();
         $designations = $this->fetchTable('HrDesignations')->find('list')->where(['status' => 1])->orderBy(['name' => 'ASC'])->toArray();
+        $managers = $this->managerChoices($entity->isNew() ? null : (int)$entity->id);
         if ($this->request->is(['post', 'put'])) {
             $data = $this->request->getData();
             $username = trim((string)($data['username'] ?? ''));
@@ -128,10 +184,13 @@ class PeopleController extends AppController
             if ($entity->isNew()) {
                 $data['created'] = date('Y-m-d H:i:s');
             }
-            foreach (['department_id', 'designation_id'] as $key) {
+            foreach (['department_id', 'designation_id', 'manager_id'] as $key) {
                 if (($data[$key] ?? '') === '') {
                     $data[$key] = null;
                 }
+            }
+            if (!$entity->isNew() && (int)($data['manager_id'] ?? 0) === (int)$entity->id) {
+                $data['manager_id'] = null;
             }
             $entity = $table->patchEntity($entity, $data);
             if ($table->save($entity)) {
@@ -153,7 +212,7 @@ class PeopleController extends AppController
         foreach (array_keys(IsoAccess::ROLES) as $roleKey) {
             $roleMenuMap[$roleKey] = IsoAccess::menusForRole($roleKey);
         }
-        $this->set(compact('entity', 'departments', 'designations'));
+        $this->set(compact('entity', 'departments', 'designations', 'managers'));
         $this->set('isoMenus', IsoAccess::MENUS);
         $this->set('checkedMenus', $checkedMenus);
         $this->set('roleMenuMap', $roleMenuMap);
@@ -303,6 +362,23 @@ class PeopleController extends AppController
         }
 
         return true;
+    }
+
+    /**
+     * Active employees who can be chosen as a reporting manager.
+     *
+     * @return array<int, string>
+     */
+    private function managerChoices(?int $exceptId): array
+    {
+        $query = $this->fetchTable('HrEmployees')->find('list')
+            ->where(['status' => 'active'])
+            ->orderBy(['full_name' => 'ASC']);
+        if ($exceptId) {
+            $query->where(['HrEmployees.id !=' => $exceptId]);
+        }
+
+        return $query->toArray();
     }
 
     private function setLoginActive(int $employeeId, int $active): void

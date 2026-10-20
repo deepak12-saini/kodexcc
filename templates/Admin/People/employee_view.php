@@ -7,6 +7,7 @@
 			<div class="kx-grid">
 				<label class="kx-field"><span>Department</span><input readonly value="<?php echo h($entity->hr_department->name ?? ''); ?>"></label>
 				<label class="kx-field"><span>Designation</span><input readonly value="<?php echo h($entity->hr_designation->name ?? ''); ?>"></label>
+				<label class="kx-field"><span>Reporting manager</span><input readonly value="<?php echo h($entity->manager->full_name ?? ''); ?>"></label>
 				<label class="kx-field"><span>Email</span><input readonly value="<?php echo h($entity->email ?? ''); ?>"></label>
 				<label class="kx-field"><span>Mobile</span><input readonly value="<?php echo h($entity->mobile ?? ''); ?>"></label>
 				<label class="kx-field"><span>ISO role</span><input readonly value="<?php echo h($isoRoles[$entity->hr_user->iso_role ?? ''] ?? ''); ?>"></label>

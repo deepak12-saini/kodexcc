@@ -39,6 +39,15 @@
 					$peopleHere = $isoController === 'people';
 					$peopleAction = $isoAction;
 					?>
+					<?php if (!$this->request->getSession()->read('is_admin') && (int)$this->request->getSession()->read('iso_employee_id') > 0): ?>
+					<li class="<?php echo $peopleHere && $peopleAction === 'myProfile' ? 'active' : ''; ?>">
+						<a href="<?php echo SITEURL; ?>admin/people/my-profile">
+							<i class="menu-icon fa fa-user"></i>
+							<span class="menu-text"> My profile </span>
+						</a>
+						<b class="arrow"></b>
+					</li>
+					<?php endif; ?>
 					<?php if ($showPeople): ?>
 					<li class="<?php echo $peopleHere ? 'active open' : ''; ?>">
 						<a href="#" class="dropdown-toggle">
