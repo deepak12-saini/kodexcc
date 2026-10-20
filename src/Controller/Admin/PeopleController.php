@@ -5,7 +5,11 @@ namespace App\Controller\Admin;
 
 use App\Controller\AppController;
 use App\Utility\IsoAccess;
+use App\Utility\SmtpMail;
+use App\Utility\StaffPasswordReset;
 use Cake\Event\EventInterface;
+use Cake\Mailer\Mailer;
+use Cake\Routing\Router;
 
 class PeopleController extends AppController
 {
@@ -160,6 +164,129 @@ class PeopleController extends AppController
         $this->set('pageTitle', 'My profile');
 
         return null;
+    }
+
+    public function notify(): void
+    {
+        [$recipients, $skipped] = $this->noticeAudience();
+        $this->set('recipients', $recipients);
+        $this->set('skipped', $skipped);
+        $this->set('subject', 'Use the KodexCC ISO portal');
+        $this->set('message', "Please use the KodexCC ISO portal for quality records.\n\nSign in at https://kodexcc.com/admin\n\nYour username is in this email. Use Reset password on the sign-in page, or the button in this email, to choose your own password.\n\nOpen Non-conformance for issues in your department, and Corrective action for the work to close them.");
+        $this->set('portalUrl', 'https://kodexcc.com/admin');
+        $this->set('logoUrl', 'https://kodexcc.com/img/kodex-logo.png');
+        $this->set('pageTitle', 'Notify employees');
+    }
+
+    public function notifySend(): ?\Cake\Http\Response
+    {
+        $this->request->allowMethod(['post']);
+        $subject = trim((string)$this->request->getData('subject'));
+        $message = trim((string)$this->request->getData('message'));
+        if ($subject === '' || $message === '') {
+            $this->Flash->error('Subject and message are required.');
+
+            return $this->redirect(['action' => 'notify']);
+        }
+        [$recipients] = $this->noticeAudience(true);
+        $selectedOnly = (string)$this->request->getData('audience') === 'selected';
+        if ($selectedOnly) {
+            $ids = array_map('intval', (array)$this->request->getData('employee_ids'));
+            $recipients = array_values(array_filter(
+                $recipients,
+                static fn (array $person): bool => in_array($person['id'], $ids, true)
+            ));
+            if (!$recipients) {
+                $this->Flash->error('Select at least one employee.');
+
+                return $this->redirect(['action' => 'notify']);
+            }
+        }
+        $sent = 0;
+        $failed = [];
+        foreach ($recipients as $person) {
+            try {
+                $resetUrl = Router::url([
+                    'prefix' => 'Admin',
+                    'controller' => 'Users',
+                    'action' => 'staffReset',
+                    '?' => ['token' => StaffPasswordReset::token((int)$person['user_id'], (string)$person['password'])],
+                ], true);
+                $mailer = new Mailer();
+                $mailer
+                    ->setTo($person['email'])
+                    ->setSubject($subject)
+                    ->setEmailFormat('html')
+                    ->setViewVars([
+                        'employeeName' => $person['name'],
+                        'message' => $message,
+                        'portalUrl' => 'https://kodexcc.com/admin',
+                        'logoUrl' => 'https://kodexcc.com/img/kodex-logo.png',
+                        'username' => $person['username'],
+                        'resetUrl' => $resetUrl,
+                    ]);
+                $mailer->viewBuilder()
+                    ->setTemplate('iso_portal')
+                    ->setLayout('iso_portal');
+                $mailer->render();
+                SmtpMail::send($person['email'], $subject, (string)$mailer->getMessage()->getBodyHtml());
+                $sent++;
+            } catch (\Throwable $e) {
+                $failed[] = $person['name'];
+            }
+        }
+        if ($sent > 0) {
+            $this->Flash->success('Sent to ' . $sent . ' employee' . ($sent === 1 ? '' : 's') . '.');
+        }
+        if ($failed) {
+            $this->Flash->error('Could not send to: ' . implode(', ', $failed));
+        }
+        if ($sent === 0 && !$failed) {
+            $this->Flash->error('No employees with an email and login to notify.');
+        }
+
+        return $this->redirect(['action' => 'notify']);
+    }
+
+    /**
+     * @return array{0: list<array{id: int, user_id: int, name: string, email: string, username: string, password?: string}>, 1: list<string>}
+     */
+    private function noticeAudience(bool $withPassword = false): array
+    {
+        $rows = $this->fetchTable('HrEmployees')->find()
+            ->contain(['HrUsers'])
+            ->where(['HrEmployees.status' => 'active'])
+            ->orderBy(['HrEmployees.full_name' => 'ASC'])
+            ->all();
+        $recipients = [];
+        $skipped = [];
+        foreach ($rows as $row) {
+            $name = trim((string)$row->full_name) ?: 'Employee';
+            $email = trim((string)$row->email);
+            $user = $row->hr_user ?? null;
+            $username = trim((string)($user->username ?? ''));
+            if ($email === '' || filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+                $skipped[] = $name . ' (no email)';
+                continue;
+            }
+            if ($user === null || $username === '' || !(int)$user->is_active) {
+                $skipped[] = $name . ' (no portal login)';
+                continue;
+            }
+            $person = [
+                'id' => (int)$row->id,
+                'user_id' => (int)$user->id,
+                'name' => $name,
+                'email' => $email,
+                'username' => $username,
+            ];
+            if ($withPassword) {
+                $person['password'] = (string)$user->password;
+            }
+            $recipients[] = $person;
+        }
+
+        return [$recipients, $skipped];
     }
 
     public function employeeForm($id = null): ?\Cake\Http\Response

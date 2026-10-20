@@ -66,6 +66,9 @@
 							<li class="<?php echo $peopleHere && ($peopleAction === 'employees' || str_starts_with($peopleAction, 'employee')) ? 'active' : ''; ?>">
 								<a href="<?php echo SITEURL; ?>admin/people/employees"><i class="menu-icon fa fa-user"></i> Employees</a>
 							</li>
+							<li class="<?php echo $peopleHere && str_starts_with($peopleAction, 'notify') ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/people/notify"><i class="menu-icon fa fa-envelope"></i> Notify employees</a>
+							</li>
 						</ul>
 					</li>
 					<?php endif; ?>
