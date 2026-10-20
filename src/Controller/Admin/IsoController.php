@@ -462,6 +462,12 @@ class IsoController extends AppController
 
     public function correctiveForm($id = null): ?Response
     {
+        if ($id && !$this->actionVisible((int)$id)) {
+            $this->Flash->error('That corrective action belongs to another department.');
+
+            return $this->redirect(['action' => 'corrective']);
+        }
+
         return $this->renderForm('Corrective action', 'IsoActions', 'corrective', $id, [
             'action_no' => ['label' => 'Action no', 'default' => $id ? null : $this->nextNo('IsoActions', 'action_no', 'KGCC-CAP', 2), 'placeholder' => 'Filled automatically, for example KGCC-CAP-2026-01'],
             'nonconformance_id' => ['label' => 'Non-conformance', 'type' => 'select', 'options' => $this->optionList('IsoNonconformances', 'ncr_no'), 'placeholder' => 'Select the NCR this action fixes'],
@@ -476,6 +482,10 @@ class IsoController extends AppController
         ], function ($table, array $data, $existing) {
             if (($data['status'] ?? '') === 'closed' && empty($data['closed_on'])) {
                 $data['closed_on'] = date('Y-m-d');
+            }
+            if ($this->ncrScope() !== null && !$this->ncrVisible((int)($data['nonconformance_id'] ?? 0))) {
+                $this->Flash->error('That non-conformance belongs to another department.');
+                throw new \Cake\Routing\Exception\RedirectException(\Cake\Routing\Router::url(['action' => 'corrective']));
             }
 
             return $data;
@@ -616,6 +626,9 @@ class IsoController extends AppController
             if ($dept !== null) {
                 $query->where([$alias . '.department' => $dept]);
             }
+        }
+        if ($alias === 'IsoActions') {
+            $query = $this->scopeActions($query);
         }
         $values = [];
         foreach ($filter['selects'] ?? [] as $key => $options) {
@@ -944,11 +957,39 @@ class IsoController extends AppController
 
     private function overdueActions(): int
     {
-        return $this->fetchTable('IsoActions')->find()->where([
-            'status' => 'open',
-            'due_date <' => date('Y-m-d'),
-            'due_date IS NOT' => null,
-        ])->count();
+        $query = $this->fetchTable('IsoActions')->find()->where([
+            'IsoActions.status' => 'open',
+            'IsoActions.due_date <' => date('Y-m-d'),
+            'IsoActions.due_date IS NOT' => null,
+        ]);
+
+        return $this->scopeActions($query)->count();
+    }
+
+    private function scopeActions(\Cake\ORM\Query\SelectQuery $query): \Cake\ORM\Query\SelectQuery
+    {
+        $dept = $this->ncrScope();
+        if ($dept === null) {
+            return $query;
+        }
+        $ids = $this->fetchTable('IsoNonconformances')->find()
+            ->select(['IsoNonconformances.id'])
+            ->where(['IsoNonconformances.department' => $dept]);
+
+        return $query->where(['IsoActions.nonconformance_id IN' => $ids]);
+    }
+
+    private function actionVisible(int $id): bool
+    {
+        if ($this->ncrScope() === null) {
+            return true;
+        }
+        if ($id < 1) {
+            return false;
+        }
+        $action = $this->fetchTable('IsoActions')->find()->where(['id' => $id])->first();
+
+        return $action ? $this->ncrVisible((int)$action->nonconformance_id) : false;
     }
 
     private function stamp(mixed $value): ?int
@@ -1078,12 +1119,12 @@ class IsoController extends AppController
     }
 
     /**
-     * Admin, ISO manager, and auditor see every department.
-     * Any other login only sees the department on their employee record.
+     * The admin login sees every department.
+     * Every staff login, including ISO manager, only sees the department on their employee record.
      */
     private function ncrScope(): ?string
     {
-        if (in_array($this->isoRole(), ['super_admin', 'iso_manager', 'auditor'], true)) {
+        if ($this->isoRole() === 'super_admin') {
             return null;
         }
         $employeeId = (int)$this->Session->read('iso_employee_id');
