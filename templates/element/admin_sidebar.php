@@ -71,6 +71,13 @@
 							</li>
 						</ul>
 					</li>
+					<li class="<?php echo $isoController === 'containers' ? 'active' : ''; ?>">
+						<a href="<?php echo SITEURL; ?>admin/containers">
+							<i class="menu-icon fa fa-truck"></i>
+							<span class="menu-text"> Containers </span>
+						</a>
+						<b class="arrow"></b>
+					</li>
 					<?php endif; ?>
 					<?php if ($isoCan('overview')): ?>
 					<li class="<?php echo $isoOpen ? 'active open' : ''; ?>">
@@ -86,6 +93,9 @@
 							</li><?php endif; ?>
 							<?php if ($isoCan('documents')): ?><li class="<?php echo $isoOpen && str_starts_with($isoAction, 'document') ? 'active' : ''; ?>">
 								<a href="<?php echo SITEURL; ?>admin/iso/documents"><i class="menu-icon fa fa-file"></i> Documents</a>
+							</li><?php endif; ?>
+							<?php if ($isoCan('documents')): ?><li class="<?php echo $isoOpen && str_starts_with($isoAction, 'sop') ? 'active' : ''; ?>">
+								<a href="<?php echo SITEURL; ?>admin/iso/sops"><i class="menu-icon fa fa-book"></i> SOPs</a>
 							</li><?php endif; ?>
 							<?php if ($isoCan('training')): ?><li class="<?php echo $isoOpen && str_starts_with($isoAction, 'training') ? 'active' : ''; ?>">
 								<a href="<?php echo SITEURL; ?>admin/iso/training"><i class="menu-icon fa fa-users"></i> Training</a>

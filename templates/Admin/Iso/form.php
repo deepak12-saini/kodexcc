@@ -144,19 +144,48 @@ $dashed = function (string $action): string {
 				<h1>Earlier revisions</h1>
 				<div class="kx-table-wrap">
 					<table class="kx-table">
-						<thead><tr><th>Revision</th><th>Title</th><th>Status</th><th>When</th></tr></thead>
+						<thead><tr><th>Revision</th><th>Title</th><th>Status</th><th>File</th><th>When</th></tr></thead>
 						<tbody>
 							<?php foreach ($revisions as $rev): ?>
 								<tr>
 									<td><?php echo h($rev->revision); ?></td>
-									<td><?php echo h($rev->title); ?></td>
-									<td><?php echo h($rev->status); ?></td>
+									<td><?php echo h($rev->title ?? ''); ?></td>
+									<td><?php echo !empty($rev->obsolete) ? 'Obsolete' : h((string)$rev->status); ?></td>
+									<td>
+										<?php if (!empty($rev->file_path)): ?>
+											<a href="<?php echo SITEURL . h((string)$rev->file_path); ?>" target="_blank">Open file</a>
+										<?php endif; ?>
+									</td>
 									<td><?php echo h((string)$rev->created); ?></td>
 								</tr>
 							<?php endforeach; ?>
 						</tbody>
 					</table>
 				</div>
+			</div>
+		<?php endif; ?>
+		<?php if (isset($sopReviewLog)): ?>
+			<div class="kx-card">
+				<h1>Reviews</h1>
+				<?php if (!count($sopReviewLog)): ?>
+					<p class="kx-lead">No reviews yet.</p>
+				<?php else: ?>
+					<div class="kx-table-wrap">
+						<table class="kx-table">
+							<thead><tr><th>Person</th><th>Result</th><th>Reason</th><th>When</th></tr></thead>
+							<tbody>
+								<?php foreach ($sopReviewLog as $review): ?>
+									<tr>
+										<td><?php echo h($review->employee_name); ?></td>
+										<td><?php echo h(\App\Controller\Admin\IsoController::SOP_REVIEW_RESULTS[$review->result] ?? $review->result); ?></td>
+										<td><?php echo h($review->reason); ?></td>
+										<td><?php echo h((string)$review->created); ?></td>
+									</tr>
+								<?php endforeach; ?>
+							</tbody>
+						</table>
+					</div>
+				<?php endif; ?>
 			</div>
 		<?php endif; ?>
 	</div>

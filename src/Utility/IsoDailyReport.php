@@ -50,9 +50,15 @@ class IsoDailyReport
             $openRows[] = $row;
         }
 
+        $containers = TableRegistry::getTableLocator()->get('IsoContainers')->find()
+            ->where(['IsoContainers.status' => 'in_transit'])
+            ->orderBy(['IsoContainers.dispatched_on' => 'ASC', 'IsoContainers.id' => 'ASC'])
+            ->all()
+            ->toList();
+
         $today = date('d M Y');
         $subject = 'KodexCC daily report — ' . $today;
-        $html = self::html($today, $openRows, $closedRows, $actions);
+        $html = self::html($today, $openRows, $closedRows, $actions, $containers);
 
         return [
             'subject' => $subject,
@@ -66,8 +72,9 @@ class IsoDailyReport
      * @param list<object> $openRows
      * @param list<object> $closedRows
      * @param array<int, list<object>> $actions
+     * @param list<object> $containers
      */
-    private static function html(string $today, array $openRows, array $closedRows, array $actions): string
+    private static function html(string $today, array $openRows, array $closedRows, array $actions, array $containers): string
     {
         $body = '<p style="margin:0 0 12px;">Good morning. This is the non-conformance position for <strong>' . self::e($today) . '</strong>.</p>';
         $body .= '<p style="margin:0 0 6px;font-weight:700;">Still open (' . count($openRows) . ')</p>';
@@ -76,8 +83,12 @@ class IsoDailyReport
             : self::table($openRows, $actions, true);
         $body .= '<p style="margin:16px 0 6px;font-weight:700;">Closed yesterday (' . count($closedRows) . ')</p>';
         $body .= $closedRows === []
-            ? '<p style="margin:0;">Nothing was closed yesterday.</p>'
+            ? '<p style="margin:0 0 16px;">Nothing was closed yesterday.</p>'
             : self::table($closedRows, $actions, false);
+        $body .= '<p style="margin:16px 0 6px;font-weight:700;">Containers in transit (' . count($containers) . ')</p>';
+        $body .= $containers === []
+            ? '<p style="margin:0;">No containers are in transit.</p>'
+            : self::containerTable($containers);
 
         return '<!DOCTYPE html><html><body style="margin:0;padding:0;background:#eef2f6;">'
             . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f6;padding:28px 12px;"><tr><td align="center">'
@@ -164,6 +175,28 @@ class IsoDailyReport
         $ts = strtotime((string)$value);
 
         return $ts ?: null;
+    }
+
+    /**
+     * @param list<object> $containers
+     */
+    private static function containerTable(array $containers): string
+    {
+        $html = '<table width="100%" cellpadding="6" cellspacing="0" style="border-collapse:collapse;font-size:13px;">'
+            . '<tr style="background:#f3f4f6;text-align:left;">'
+            . '<th>Container</th><th>Customer</th><th>Destination</th><th>Left factory</th><th>Days so far</th></tr>';
+        foreach ($containers as $row) {
+            $left = ContainerTransit::date($row->dispatched_on);
+            $html .= '<tr style="border-top:1px solid #e5e7eb;vertical-align:top;">'
+                . '<td>' . self::e((string)$row->container_no) . '</td>'
+                . '<td>' . self::e((string)$row->customer) . '</td>'
+                . '<td>' . self::e((string)$row->destination) . '</td>'
+                . '<td>' . self::e($left !== '' ? date('d M Y', strtotime($left)) : '') . '</td>'
+                . '<td>' . self::e(ContainerTransit::label(ContainerTransit::days($left))) . '</td>'
+                . '</tr>';
+        }
+
+        return $html . '</table>';
     }
 
     private static function e(string $value): string

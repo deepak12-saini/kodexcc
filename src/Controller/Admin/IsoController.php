@@ -44,6 +44,17 @@ class IsoController extends AppController
         'obsolete' => 'Obsolete',
     ];
 
+    public const SOP_STATUSES = [
+        'draft' => 'Draft',
+        'in_review' => 'In review',
+        'approved' => 'Approved',
+    ];
+
+    public const SOP_REVIEW_RESULTS = [
+        'reviewed' => 'Reviewed',
+        'needs_change' => 'Needs change',
+    ];
+
     public const MACHINES = [
         'extruder' => 'Main machine & Extruder',
         'sausage_cartridge' => 'Sausage and Cartridge',
@@ -72,7 +83,8 @@ class IsoController extends AppController
 
             return $this->redirect('/admin');
         }
-        if ($this->request->is(['post', 'put']) && !IsoAccess::canWrite($role, $section, $assigned)) {
+        $sopReview = (string)$this->request->getParam('action') === 'sopReview';
+        if ($this->request->is(['post', 'put']) && !$sopReview && !IsoAccess::canWrite($role, $section, $assigned)) {
             $this->Flash->error('Your login can view this screen but cannot change it.');
 
             return $this->redirect(['action' => $this->request->getParam('action')]);
@@ -103,6 +115,7 @@ class IsoController extends AppController
         }));
         $modules = [
             ['section' => 'documents', 'label' => 'Documents', 'hint' => 'Controlled procedures and forms', 'icon' => 'fa-file', 'url' => 'documents'],
+            ['section' => 'documents', 'label' => 'SOPs', 'hint' => 'Department procedures, reviews, and revisions', 'icon' => 'fa-book', 'url' => 'sops'],
             ['section' => 'training', 'label' => 'Training', 'hint' => 'Who was trained, and on what', 'icon' => 'fa-users', 'url' => 'training'],
             ['section' => 'suppliers', 'label' => 'Suppliers', 'hint' => 'Approved supplier list', 'icon' => 'fa-truck', 'url' => 'suppliers'],
             ['section' => 'materials', 'label' => 'Materials', 'hint' => 'Raw materials on the approved list', 'icon' => 'fa-cubes', 'url' => 'materials'],
@@ -194,6 +207,142 @@ class IsoController extends AppController
                 ->orderBy(['id' => 'DESC'])
                 ->all());
         });
+    }
+
+    public function sops(): ?Response
+    {
+        $this->set('canEdit', $this->isoRole() === 'super_admin');
+
+        return $this->renderList('SOPs', 'iso-sops.csv', 'IsoSops', [
+            'SOP no', 'Title', 'Department', 'Revision', 'Status', 'Next review',
+        ], [
+            'selects' => [
+                'status' => self::SOP_STATUSES,
+                'department' => $this->scopedDepartmentOptions($this->departmentScope()),
+            ],
+            'search' => ['sop_no', 'title'],
+        ], function ($row) {
+            return [
+                $row->sop_no,
+                $row->title,
+                $row->department,
+                $row->revision,
+                self::SOP_STATUSES[$row->status] ?? $row->status,
+                $this->plainDate($row->next_review_on),
+            ];
+        }, 'sopForm', 'sops');
+    }
+
+    public function sopForm($id = null): ?Response
+    {
+        if ($this->isoRole() !== 'super_admin') {
+            return $this->showSop($id);
+        }
+        $archived = null;
+
+        return $this->renderForm('SOP', 'IsoSops', 'sops', $id, [
+            'sop_no' => ['label' => 'SOP number', 'required' => true, 'placeholder' => 'e.g. SOP-QA-001'],
+            'title' => ['label' => 'Title', 'required' => true, 'placeholder' => 'Name of this procedure'],
+            'department' => ['label' => 'Department', 'type' => 'select', 'required' => true, 'options' => $this->departmentOptions(), 'placeholder' => 'Select the department that owns it'],
+            'revision' => ['label' => 'Revision', 'default' => '1', 'placeholder' => 'e.g. 1 or 1.1'],
+            'status' => ['label' => 'Status', 'type' => 'select', 'options' => self::SOP_STATUSES, 'placeholder' => 'Select draft, in review, or approved'],
+            'next_review_on' => ['label' => 'Next review date', 'type' => 'date'],
+            'prepared_by' => ['label' => 'Prepared by', 'type' => 'person', 'placeholder' => 'Select who prepared it'],
+            'prepared_on' => ['label' => 'Prepared on', 'type' => 'date'],
+            'reviewed_by' => ['label' => 'Reviewed by', 'type' => 'person', 'placeholder' => 'Select who reviewed it'],
+            'reviewed_on' => ['label' => 'Reviewed on', 'type' => 'date'],
+            'approved_by' => ['label' => 'Approved by', 'type' => 'person', 'placeholder' => 'Select who approved it'],
+            'approved_on' => ['label' => 'Approved on', 'type' => 'date'],
+            'file_path' => ['label' => 'File', 'type' => 'file'],
+            'notes' => ['label' => 'Notes', 'type' => 'textarea', 'placeholder' => 'What this procedure is used for'],
+        ], function ($table, array $data, $existing) use (&$archived) {
+            if ($existing && !empty($data['file_path']) && (string)$existing->file_path !== '') {
+                $archived = [
+                    'sop_id' => $existing->id,
+                    'revision' => $existing->revision,
+                    'title' => $existing->title,
+                    'status' => $existing->status,
+                    'file_path' => $existing->file_path,
+                ];
+            }
+            if ($existing && empty($data['file_path'])) {
+                unset($data['file_path']);
+            }
+            if (($data['revision'] ?? '') === '' || $data['revision'] === null) {
+                $data['revision'] = '1';
+            }
+            if (!isset(self::SOP_STATUSES[(string)($data['status'] ?? '')])) {
+                $data['status'] = 'draft';
+            }
+
+            return $data;
+        }, function ($id) {
+            $this->set('revisions', $id ? $this->sopRevisions((int)$id) : []);
+            $this->set('sopReviewLog', $id ? $this->sopReviews((int)$id) : null);
+        }, function ($entity) use (&$archived) {
+            if (!$archived) {
+                return;
+            }
+            $archived['obsolete'] = 1;
+            $archived['created'] = date('Y-m-d H:i:s');
+            $table = $this->fetchTable('IsoSopRevisions');
+            $table->save($table->newEntity($archived));
+        });
+    }
+
+    public function sopReview($id = null): ?Response
+    {
+        $id = (int)$id;
+        if (!$this->sopVisible($id)) {
+            $this->Flash->error('That SOP belongs to another department.');
+
+            return $this->redirect(['action' => 'sops']);
+        }
+        if (!$this->request->is(['post', 'put'])) {
+            return $this->redirect(['action' => 'sopForm', $id]);
+        }
+        $employeeId = (int)$this->Session->read('iso_employee_id');
+        $employee = $employeeId > 0 ? $this->fetchTable('HrEmployees')->find()->where(['id' => $employeeId])->first() : null;
+        if (!$employee) {
+            $this->Flash->error('Your login is not linked to an employee, so a review cannot be saved.');
+
+            return $this->redirect(['action' => 'sopForm', $id]);
+        }
+        $existing = $this->fetchTable('IsoSopReviews')->find()
+            ->where(['sop_id' => $id, 'employee_id' => $employeeId])
+            ->first();
+        if ($existing) {
+            $this->Flash->error('You have already reviewed this SOP.');
+
+            return $this->redirect(['action' => 'sopForm', $id]);
+        }
+        $result = (string)$this->request->getData('result');
+        $reason = trim((string)$this->request->getData('reason'));
+        if (!isset(self::SOP_REVIEW_RESULTS[$result])) {
+            $this->Flash->error('Choose reviewed or needs change.');
+
+            return $this->redirect(['action' => 'sopForm', $id]);
+        }
+        if ($reason === '') {
+            $this->Flash->error('Reason is required.');
+
+            return $this->redirect(['action' => 'sopForm', $id]);
+        }
+        $review = $this->fetchTable('IsoSopReviews')->newEntity([
+            'sop_id' => $id,
+            'employee_id' => $employeeId,
+            'employee_name' => (string)$employee->full_name,
+            'result' => $result,
+            'reason' => $reason,
+            'created' => date('Y-m-d H:i:s'),
+        ]);
+        if ($this->fetchTable('IsoSopReviews')->save($review)) {
+            $this->Flash->success('Review saved.');
+        } else {
+            $this->Flash->error('Could not save this review.');
+        }
+
+        return $this->redirect(['action' => 'sopForm', $id]);
     }
 
     public function training(): ?Response
@@ -608,9 +757,18 @@ class IsoController extends AppController
 
                 return $this->redirect(['action' => $selfAction]);
             }
+            if ($alias === 'IsoSops' && $this->isoRole() !== 'super_admin') {
+                $this->Flash->error('Only the admin can delete an SOP.');
+
+                return $this->redirect(['action' => $selfAction]);
+            }
             $row = $this->fetchTable($alias)->find()->where(['id' => $rowId])->first();
             if ($row && $alias === 'IsoDocuments') {
                 $this->fetchTable('IsoDocumentRevisions')->deleteAll(['document_id' => $rowId]);
+            }
+            if ($row && $alias === 'IsoSops') {
+                $this->fetchTable('IsoSopRevisions')->deleteAll(['sop_id' => $rowId]);
+                $this->fetchTable('IsoSopReviews')->deleteAll(['sop_id' => $rowId]);
             }
             if ($row && $this->fetchTable($alias)->delete($row)) {
                 $this->Flash->success($title . ' deleted.');
@@ -621,8 +779,8 @@ class IsoController extends AppController
             return $this->redirect(['action' => $selfAction]);
         }
         $query = $this->fetchTable($alias)->find()->orderBy([$alias . '.id' => 'DESC']);
-        if ($alias === 'IsoNonconformances') {
-            $dept = $this->ncrScope();
+        if ($alias === 'IsoNonconformances' || $alias === 'IsoSops') {
+            $dept = $alias === 'IsoSops' ? $this->departmentScope() : $this->ncrScope();
             if ($dept !== null) {
                 $query->where([$alias . '.department' => $dept]);
             }
@@ -674,7 +832,8 @@ class IsoController extends AppController
         $this->set(compact('title', 'header', 'items', 'map', 'filter', 'values', 'addAction'));
         $this->set('showDates', !empty($dateCol));
         $this->set('listAction', $selfAction);
-        $this->set('allowDelete', !($alias === 'IsoActions' && $this->isoRole() !== 'super_admin'));
+        $adminOnlyDelete = ($alias === 'IsoActions' || $alias === 'IsoSops') && $this->isoRole() !== 'super_admin';
+        $this->set('allowDelete', !$adminOnlyDelete);
         $this->render('record');
 
         return null;
@@ -1119,10 +1278,22 @@ class IsoController extends AppController
     }
 
     /**
-     * The admin login sees every department.
-     * Every staff login, including ISO manager, only sees the department on their employee record.
+     * Admin and the ISO manager see non-conformances and corrective actions for every department.
+     * Every other staff login sees only the department on their employee record.
      */
     private function ncrScope(): ?string
+    {
+        if (in_array($this->isoRole(), ['super_admin', 'iso_manager'], true)) {
+            return null;
+        }
+
+        return $this->departmentScope();
+    }
+
+    /**
+     * SOPs stay with the employee's department. Only the admin login sees every department.
+     */
+    private function departmentScope(): ?string
     {
         if ($this->isoRole() === 'super_admin') {
             return null;
@@ -1137,6 +1308,15 @@ class IsoController extends AppController
             ->first();
 
         return trim((string)($employee->hr_department->name ?? ''));
+    }
+
+    private function scopedDepartmentOptions(?string $dept): array
+    {
+        if ($dept === null) {
+            return $this->departmentOptions();
+        }
+
+        return $dept === '' ? [] : [$dept => $dept];
     }
 
     private function ncrWhere(array $where): array
@@ -1166,12 +1346,67 @@ class IsoController extends AppController
 
     private function ncrDepartmentOptions(): array
     {
-        $dept = $this->ncrScope();
+        return $this->scopedDepartmentOptions($this->ncrScope());
+    }
+
+    private function sopVisible(int $id): bool
+    {
+        $dept = $this->departmentScope();
         if ($dept === null) {
-            return $this->departmentOptions();
+            return $id > 0 && (bool)$this->fetchTable('IsoSops')->find()->where(['id' => $id])->count();
+        }
+        if ($id < 1 || $dept === '') {
+            return false;
         }
 
-        return $dept === '' ? [] : [$dept => $dept];
+        return (bool)$this->fetchTable('IsoSops')->find()
+            ->where(['id' => $id, 'department' => $dept])
+            ->count();
+    }
+
+    private function sopRevisions(int $id)
+    {
+        return $this->fetchTable('IsoSopRevisions')->find()
+            ->where(['sop_id' => $id])
+            ->orderBy(['id' => 'DESC'])
+            ->all();
+    }
+
+    private function sopReviews(int $id)
+    {
+        return $this->fetchTable('IsoSopReviews')->find()
+            ->where(['sop_id' => $id])
+            ->orderBy(['id' => 'DESC'])
+            ->all();
+    }
+
+    private function showSop($id): ?Response
+    {
+        $id = (int)$id;
+        if (!$this->sopVisible($id)) {
+            $this->Flash->error($id < 1 ? 'Choose an SOP from the list.' : 'That SOP belongs to another department.');
+
+            return $this->redirect(['action' => 'sops']);
+        }
+        $entity = $this->fetchTable('IsoSops')->get($id);
+        $employeeId = (int)$this->Session->read('iso_employee_id');
+        $ownReview = null;
+        if ($employeeId > 0) {
+            $ownReview = $this->fetchTable('IsoSopReviews')->find()
+                ->where(['sop_id' => $id, 'employee_id' => $employeeId])
+                ->first();
+        }
+        $this->set('pageTitle', 'SOP');
+        $this->set('title', 'SOP');
+        $this->set('entity', $entity);
+        $this->set('revisions', $this->sopRevisions($id));
+        $this->set('sopReviewLog', $this->sopReviews($id));
+        $this->set('ownReview', $ownReview);
+        $this->set('canReview', $employeeId > 0 && $ownReview === null);
+        $this->set('listAction', 'sops');
+        $this->render('sop_view');
+
+        return null;
     }
 
     private function menuAssigned(): ?array
@@ -1200,6 +1435,9 @@ class IsoController extends AppController
             'index' => 'overview',
             'documents' => 'documents',
             'documentForm' => 'documents',
+            'sops' => 'documents',
+            'sopForm' => 'documents',
+            'sopReview' => 'documents',
             'training' => 'training',
             'trainingForm' => 'training',
             'suppliers' => 'suppliers',
