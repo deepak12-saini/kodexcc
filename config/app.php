@@ -266,7 +266,7 @@ return [
      * Change dailyReportTo here when the director address changes.
      */
     'Iso' => [
-        'dailyReportTo' => 'deepak@kodexcc.com',
+        'dailyReportTo' => 'kal@kodexcc.com',
     ],
 
     /*

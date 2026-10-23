@@ -37,28 +37,48 @@ class IsoDailyReportCommand extends Command
         $today = date('Y-m-d');
         if (!$args->getOption('dry-run') && !$args->getOption('force') && is_file($stamp) && trim((string)file_get_contents($stamp)) === $today) {
             $io->out('Already sent today.');
+            $this->logRun('already sent today');
 
             return static::CODE_SUCCESS;
         }
 
+        $to = IsoDailyReport::recipient();
         $report = IsoDailyReport::build();
-        $io->out('To ' . IsoDailyReport::recipient());
+        $summary = 'Open ' . $report['open'] . ', closed yesterday ' . $report['closed'];
+        $io->out('To ' . $to);
         $io->out($report['subject']);
-        $io->out('Open ' . $report['open'] . ', closed yesterday ' . $report['closed']);
+        $io->out($summary);
         if ($args->getOption('dry-run')) {
+            $this->logRun('dry-run, not sent to ' . $to . ' | ' . $summary);
+
             return static::CODE_SUCCESS;
         }
 
         try {
-            SmtpMail::send(IsoDailyReport::recipient(), $report['subject'], $report['html']);
+            SmtpMail::send($to, $report['subject'], $report['html']);
         } catch (\Throwable $e) {
             $io->err('Could not send the daily report. ' . $e->getMessage());
+            $this->logRun('failed to ' . $to . ' | ' . $e->getMessage());
 
             return static::CODE_ERROR;
         }
         file_put_contents($stamp, $today);
-        $io->out('Sent to ' . IsoDailyReport::recipient());
+        $io->out('Sent to ' . $to);
+        $this->logRun('sent to ' . $to . ' | ' . $summary);
 
         return static::CODE_SUCCESS;
+    }
+
+    private function logRun(string $line): void
+    {
+        $dir = LOGS;
+        if (!is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+        file_put_contents(
+            $dir . 'iso_daily.log',
+            date('Y-m-d H:i:s') . ' ' . $line . PHP_EOL,
+            FILE_APPEND | LOCK_EX
+        );
     }
 }
