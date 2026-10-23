@@ -214,7 +214,7 @@ class IsoController extends AppController
         $this->set('canEdit', $this->isoRole() === 'super_admin');
 
         return $this->renderList('SOPs', 'iso-sops.csv', 'IsoSops', [
-            'SOP no', 'Title', 'Department', 'Revision', 'Status', 'Next review',
+            'SOP no', 'Title', 'Department', 'Revision', 'Status', 'Staff review', 'Next review',
         ], [
             'selects' => [
                 'status' => self::SOP_STATUSES,
@@ -228,6 +228,7 @@ class IsoController extends AppController
                 $row->department,
                 $row->revision,
                 self::SOP_STATUSES[$row->status] ?? $row->status,
+                $this->latestSopReviewLabel((int)$row->id),
                 $this->plainDate($row->next_review_on),
             ];
         }, 'sopForm', 'sops');
@@ -1378,6 +1379,21 @@ class IsoController extends AppController
             ->where(['sop_id' => $id])
             ->orderBy(['id' => 'DESC'])
             ->all();
+    }
+
+    private function latestSopReviewLabel(int $id): string
+    {
+        $review = $this->fetchTable('IsoSopReviews')->find()
+            ->where(['sop_id' => $id])
+            ->orderBy(['id' => 'DESC'])
+            ->first();
+        if (!$review) {
+            return '';
+        }
+        $result = self::SOP_REVIEW_RESULTS[$review->result] ?? (string)$review->result;
+        $name = trim((string)$review->employee_name);
+
+        return $name === '' ? $result : $result . ' — ' . $name;
     }
 
     private function showSop($id): ?Response
