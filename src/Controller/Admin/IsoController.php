@@ -241,7 +241,7 @@ class IsoController extends AppController
         $archived = null;
 
         return $this->renderForm('SOP', 'IsoSops', 'sops', $id, [
-            'sop_no' => ['label' => 'SOP number', 'required' => true, 'placeholder' => 'e.g. SOP-QA-001'],
+            'sop_no' => ['label' => 'SOP number', 'required' => true, 'placeholder' => 'e.g. SOP-KGCC-001'],
             'title' => ['label' => 'Title', 'required' => true, 'placeholder' => 'Name of this procedure'],
             'department' => ['label' => 'Department', 'type' => 'select', 'required' => true, 'options' => $this->departmentOptions(), 'placeholder' => 'Select the department that owns it'],
             'revision' => ['label' => 'Revision', 'default' => '1', 'placeholder' => 'e.g. 1 or 1.1'],
